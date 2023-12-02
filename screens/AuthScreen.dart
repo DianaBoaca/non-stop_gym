@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:non_stop_gym/screens/AdminHomeScreen.dart';
+import 'package:non_stop_gym/screens/ClientHomeScreen.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -29,7 +31,6 @@ class _AuthScreenState extends State<AuthScreen> {
     }
 
     _form.currentState!.save();
-
     try {
       setState(() {
         _isAuthenticating = true;
@@ -57,6 +58,15 @@ class _AuthScreenState extends State<AuthScreen> {
           'role': 'client',
         });
       }
+
+      final user = FirebaseAuth.instance.currentUser!;
+      final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final role = userData.data()!['role'];
+      if (role == 'client') {
+        Navigator.push(context, MaterialPageRoute(builder: (ctx) => const ClientHomeScreen()));
+      } else {
+        Navigator.push(context, MaterialPageRoute(builder: (ctx) => const AdminHomeScreen()));
+      }
     } on FirebaseAuthException catch (error) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,11 +76,11 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
       );
-
-      setState(() {
-        _isAuthenticating = false;
-      });
     }
+
+    setState(() {
+      _isAuthenticating = false;
+    });
   }
 
   void _reset() async {

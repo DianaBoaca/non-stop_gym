@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
 
-class ClientHomeScreen extends StatelessWidget {
-  const ClientHomeScreen({super.key});
+class AdminHomeScreen extends StatelessWidget {
+  const AdminHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +23,9 @@ class ClientHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-     body: const Center(
-       child: Text('Logged in!'),
-     ),
+      body: const Center(
+        child: Text('Admin!'),
+      ),
     );
   }
 }
