@@ -63,9 +63,9 @@ class _AuthScreenState extends State<AuthScreen> {
       final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       final role = userData.data()!['role'];
       if (role == 'client') {
-        Navigator.push(context, MaterialPageRoute(builder: (ctx) => const ClientHomeScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx) => const ClientHomeScreen()));
       } else {
-        Navigator.push(context, MaterialPageRoute(builder: (ctx) => const AdminHomeScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx) => const AdminHomeScreen()));
       }
     } on FirebaseAuthException catch (error) {
       ScaffoldMessenger.of(context).clearSnackBars();
@@ -101,7 +101,6 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
