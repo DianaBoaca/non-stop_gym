@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/screens/TrainersListScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
@@ -26,9 +27,8 @@ class AdminHomeScreen extends StatelessWidget {
         ],
       ),
       body: Column(
-        //mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: 170),
           Card(
             margin: const EdgeInsets.all(6),
             child: ListTile(
@@ -48,7 +48,12 @@ class AdminHomeScreen extends StatelessWidget {
                     color: Colors.white),
               ),
               tileColor: Theme.of(context).colorScheme.onPrimaryContainer,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (ctx) => const TrainersListScreen()),
+                );
+              },
             ),
           ),
           Card(

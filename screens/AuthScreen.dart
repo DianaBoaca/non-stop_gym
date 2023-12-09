@@ -31,6 +31,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
 
     _form.currentState!.save();
+
     try {
       setState(() {
         _isAuthenticating = true;
@@ -63,9 +64,15 @@ class _AuthScreenState extends State<AuthScreen> {
       final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       final role = userData.data()!['role'];
       if (role == 'client') {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx) => const ClientHomeScreen()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (ctx) => const ClientHomeScreen()),
+        );
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx) => const AdminHomeScreen()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (ctx) => const AdminHomeScreen()),
+        );
       }
     } on FirebaseAuthException catch (error) {
       ScaffoldMessenger.of(context).clearSnackBars();
