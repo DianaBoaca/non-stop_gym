@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/screens/AdminContactScreen.dart';
 import 'package:non_stop_gym/screens/TrainersListScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
 
@@ -75,7 +76,12 @@ class AdminHomeScreen extends StatelessWidget {
                     color: Colors.white),
               ),
               tileColor: Theme.of(context).colorScheme.primary,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (ctx) => const AdminContactScreen()),
+                );
+              },
             ),
           ),
           Card(

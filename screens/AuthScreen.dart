@@ -26,11 +26,9 @@ class _AuthScreenState extends State<AuthScreen> {
   var _isAuthenticating = false;
 
   void _submit() async {
-    if (!_form.currentState!.validate()) {
-      return;
+    if (_form.currentState!.validate()) {
+      _form.currentState!.save();
     }
-
-    _form.currentState!.save();
 
     try {
       setState(() {
