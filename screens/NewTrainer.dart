@@ -22,8 +22,6 @@ class _NewTrainerState extends State<NewTrainer> {
   var _enteredPassword = '';
 
   void _save() async {
-    print('am ajuns');
-
     if (!_form.currentState!.validate()) {
       return;
     }
@@ -31,13 +29,10 @@ class _NewTrainerState extends State<NewTrainer> {
     _form.currentState!.save();
 
     try {
-      print('email ul este ' + _enteredEmail);
       final userCredentials = await _firebase.createUserWithEmailAndPassword(
         email: _enteredEmail,
         password: _enteredPassword,
       );
-
-      print('dar si aici');
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -59,8 +54,7 @@ class _NewTrainerState extends State<NewTrainer> {
         ),
       );
     }
-
-    print('si aici');
+    
     Navigator.pop(context);
   }
 
