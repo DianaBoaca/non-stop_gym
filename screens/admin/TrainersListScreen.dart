@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/NewTrainer.dart';
-
-final _firebase = FirebaseAuth.instance;
+import 'package:non_stop_gym/screens/admin/NewTrainer.dart';
 
 class TrainersListScreen extends StatefulWidget {
   const TrainersListScreen({super.key});
@@ -62,16 +60,29 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
 
           return ListView.builder(
             itemCount: trainers.length,
-            itemBuilder: (ctx, index) => ListTile(
-              title: Text(trainers[index].data()['lastName'] + ' ' + trainers[index].data()['surname']),
-              subtitle: Row(
-                children: [
-                  Text(trainers[index].data()['email']),
-                  const SizedBox(width: 20),
-                  Text(trainers[index].data()['phone']),
-                ],
+            itemBuilder: (ctx, index) => Dismissible(
+              key: ValueKey(trainers[index]),
+              onDismissed: (direction) {
+                trainers[index].reference.delete();
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Antrenorul a fost șters.'),
+                  ),
+                );
+              },
+              child: ListTile(
+                leading: const Icon(Icons.sports_gymnastics),
+                title: Text(trainers[index].data()['lastName'] + ' ' + trainers[index].data()['surname']),
+                subtitle: Row(
+                  children: [
+                    Text(trainers[index].data()['email']),
+                    const SizedBox(width: 20),
+                    Text(trainers[index].data()['phone']),
+                  ],
+                ),
+                tileColor: Theme.of(context).colorScheme.primaryContainer,
               ),
-              tileColor: Theme.of(context).colorScheme.primaryContainer,
             ),
           );
         },

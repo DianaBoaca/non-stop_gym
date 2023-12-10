@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/AdminContactScreen.dart';
-import 'package:non_stop_gym/screens/TrainersListScreen.dart';
+import 'package:non_stop_gym/screens/admin/AdminContactScreen.dart';
+import 'package:non_stop_gym/screens/admin/TrainersListScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
+
+import 'ClassesListScreen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -103,7 +105,12 @@ class AdminHomeScreen extends StatelessWidget {
                     color: Colors.white),
               ),
               tileColor: Theme.of(context).colorScheme.onPrimaryContainer,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (ctx) => const ClassesListScreen()),
+                );
+              },
             ),
           ),
           Card(
@@ -125,7 +132,8 @@ class AdminHomeScreen extends StatelessWidget {
                     color: Colors.white),
               ),
               tileColor: Theme.of(context).colorScheme.primary,
-              onTap: () {},
+              onTap: () {
+              },
             ),
           ),
           Card(
