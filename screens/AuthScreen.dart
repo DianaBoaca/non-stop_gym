@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:non_stop_gym/screens/AdminHomeScreen.dart';
+import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
 import 'package:non_stop_gym/screens/ClientHomeScreen.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -59,7 +59,10 @@ class _AuthScreenState extends State<AuthScreen> {
       }
 
       final user = FirebaseAuth.instance.currentUser!;
-      final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
       final role = userData.data()!['role'];
       if (role == 'client') {
         Navigator.pushReplacement(
@@ -115,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 margin: const EdgeInsets.only(
                   top: 30,
                   bottom: 20,
-                  left: 20,
+                  left: 15,
                   right: 20,
                 ),
                 width: 200,
@@ -140,9 +143,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             textCapitalization: TextCapitalization.none,
                             enableSuggestions: false,
                             validator: (value) {
-                              if (value == null ||
-                                  value.trim().isEmpty ||
-                                  !value.contains('@')) {
+                              if (value == null || value.trim().isEmpty || !value.contains('@')) {
                                 return 'Introduceți o adresă de email validă.';
                               }
                               return null;
@@ -169,7 +170,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               _enteredPassword = value!;
                             },
                           ),
-                          if(!_isLogin)
+                          if (!_isLogin)
                             TextFormField(
                               decoration: const InputDecoration(
                                 labelText: 'Nume',
@@ -178,8 +179,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               textCapitalization: TextCapitalization.none,
                               enableSuggestions: false,
                               validator: (value) {
-                                if (value == null ||
-                                    value.isEmpty) {
+                                if (value == null || value.isEmpty) {
                                   return 'Introduceți numele.';
                                 }
                                 return null;
@@ -188,7 +188,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 _enteredLastName = value!;
                               },
                             ),
-                          if(!_isLogin)
+                          if (!_isLogin)
                             TextFormField(
                               decoration: const InputDecoration(
                                 labelText: 'Prenume',
@@ -197,8 +197,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               textCapitalization: TextCapitalization.none,
                               enableSuggestions: false,
                               validator: (value) {
-                                if (value == null ||
-                                    value.isEmpty) {
+                                if (value == null || value.isEmpty) {
                                   return 'Introduceți prenumele.';
                                 }
                                 return null;
@@ -207,7 +206,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 _enteredSurname = value!;
                               },
                             ),
-                          if(!_isLogin)
+                          if (!_isLogin)
                             TextFormField(
                               decoration: const InputDecoration(
                                 labelText: 'Număr de telefon',
