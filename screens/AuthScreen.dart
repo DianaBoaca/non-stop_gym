@@ -25,6 +25,17 @@ class _AuthScreenState extends State<AuthScreen> {
   var _enteredPassword = '';
   var _isAuthenticating = false;
 
+  void _showError(FirebaseAuthException error) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error.message ?? 'Eroare de autentificare.',
+        ),
+      ),
+    );
+  }
+
   void _submit() async {
     if (_form.currentState!.validate()) {
       _form.currentState!.save();
@@ -59,10 +70,7 @@ class _AuthScreenState extends State<AuthScreen> {
       }
 
       final user = FirebaseAuth.instance.currentUser!;
-      final userData = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+      final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       final role = userData.data()!['role'];
       if (role == 'client') {
         Navigator.pushReplacement(
@@ -76,14 +84,7 @@ class _AuthScreenState extends State<AuthScreen> {
         );
       }
     } on FirebaseAuthException catch (error) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message ?? 'Eroare de autentificare.',
-          ),
-        ),
-      );
+      _showError(error);
     }
 
     setState(() {
@@ -95,14 +96,7 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       await _firebase.sendPasswordResetEmail(email: _enteredEmail);
     } on FirebaseAuthException catch (error) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message ?? 'Eroare de autentificare.',
-          ),
-        ),
-      );
+      _showError(error);
     }
   }
 
@@ -115,12 +109,7 @@ class _AuthScreenState extends State<AuthScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                margin: const EdgeInsets.only(
-                  top: 30,
-                  bottom: 20,
-                  left: 15,
-                  right: 20,
-                ),
+                margin: const EdgeInsets.only(top: 30, bottom: 20, left: 15, right: 20),
                 width: 200,
                 child: Image.asset('assets/images/logo.png'),
               ),
@@ -238,7 +227,10 @@ class _AuthScreenState extends State<AuthScreen> {
                                     .colorScheme
                                     .primaryContainer,
                               ),
-                              child: Text(_isLogin ? 'Log in' : 'Sign up'),
+                              child: Text(_isLogin
+                                  ? 'Log in'
+                                  : 'Sign up'
+                              ),
                             ),
                           if (!_isAuthenticating)
                             TextButton(
@@ -249,7 +241,8 @@ class _AuthScreenState extends State<AuthScreen> {
                               },
                               child: Text(_isLogin
                                   ? 'Creare cont nou'
-                                  : 'Am deja cont'),
+                                  : 'Am deja cont'
+                              ),
                             ),
                           if (!_isAuthenticating && _isLogin)
                             TextButton(
