@@ -14,7 +14,11 @@ class ClientHomeScreen extends StatelessWidget {
           IconButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx) => const AuthScreen()));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (ctx) => const AuthScreen(),
+              ),
+              );
             },
             icon: Icon(
               Icons.exit_to_app,

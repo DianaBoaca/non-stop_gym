@@ -59,13 +59,12 @@ class _NewClassState extends State<NewClass> {
         ),
       );
     }
-print('aici3');
+
     Navigator.pop(context);
   }
 
   void _selectDate() async {
-    final lastDate = DateTime(
-        DateTime.now().year, DateTime.now().month + 1, DateTime.now().day);
+    final lastDate = DateTime(DateTime.now().year, DateTime.now().month + 1, DateTime.now().day);
     final date = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
@@ -179,13 +178,9 @@ print('aici3');
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection('users')
-                                    .where('role', isEqualTo: 'trainer')
-                                    .snapshots(),
+                                stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').snapshots(),
                                 builder: (ctx, trainerSnapshots) {
-                                  if (trainerSnapshots.connectionState ==
-                                      ConnectionState.waiting) {
+                                  if (trainerSnapshots.connectionState == ConnectionState.waiting) {
                                     return const CircularProgressIndicator();
                                   }
 
@@ -193,14 +188,11 @@ print('aici3');
                                     return const Text('Eroare');
                                   }
 
-                                  List<DropdownMenuItem<DocumentReference>>
-                                      trainers = trainerSnapshots.data!.docs.map(
-                                    (DocumentSnapshot<Map<String, dynamic>>
-                                        trainer) {
+                                  List<DropdownMenuItem<DocumentReference>> trainers = trainerSnapshots.data!.docs
+                                      .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
                                       return DropdownMenuItem(
                                         value: trainer.reference,
-                                        child: Text(
-                                          '${trainer['lastName']} ${trainer['surname']}',
+                                        child: Text('${trainer['lastName']} ${trainer['surname']}',
                                         ),
                                       );
                                     },
@@ -221,8 +213,7 @@ print('aici3');
                             const SizedBox(width: 30),
                             DropdownButton(
                               value: _selectedRoom,
-                              items: Room.values
-                                  .map(
+                              items: Room.values.map(
                                     (room) => DropdownMenuItem(
                                   value: room,
                                   child: Text(room.name),
@@ -250,9 +241,7 @@ print('aici3');
                             ElevatedButton(
                               onPressed: _save,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
+                                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                               ),
                               child: const Text('Adaugă'),
                             ),

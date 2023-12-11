@@ -153,9 +153,7 @@ class _NewTrainerState extends State<NewTrainer> {
                         textCapitalization: TextCapitalization.none,
                         enableSuggestions: false,
                         validator: (value) {
-                          if (value == null ||
-                              value.isEmpty ||
-                              value.trim().length != 10) {
+                          if (value == null || value.isEmpty || value.trim().length != 10) {
                             return 'Introduceți un număr valid.';
                           }
                           return null;
@@ -177,8 +175,7 @@ class _NewTrainerState extends State<NewTrainer> {
                           ElevatedButton(
                             onPressed: _save,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primaryContainer,
+                              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                             ),
                             child: const Text('Adaugă'),
                           ),

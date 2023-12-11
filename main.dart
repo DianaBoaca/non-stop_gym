@@ -22,8 +22,7 @@ void main() async {
 
 Future<String> getRole() async {
   final user = FirebaseAuth.instance.currentUser!;
-  final userData =
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+  final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
   final role = userData.data()!['role'];
   return role;
 }
