@@ -77,6 +77,10 @@ class _NewClassState extends State<NewClass> {
   }
 
   void _selectStart() async {
+    if (_selectedDate == null) {
+      return;
+    }
+
     final start = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -85,6 +89,10 @@ class _NewClassState extends State<NewClass> {
     setState(() {
       _selectedStart = start;
     });
+  }
+
+  double toDouble(TimeOfDay time) {
+    return time.hour + time.minute/60.0;
   }
 
   void _selectEnd() async {
@@ -97,8 +105,7 @@ class _NewClassState extends State<NewClass> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (end!.hour >= _selectedStart!.hour &&
-        end.minute >= _selectedStart!.minute) {
+    if (toDouble(_selectedStart!) < toDouble(end!)) {
       setState(() {
         _selectedEnd = end;
       });
@@ -106,11 +113,11 @@ class _NewClassState extends State<NewClass> {
   }
 
   DateTime convert(TimeOfDay time) {
-    return DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, time.hour, time.minute);
+    return DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, time.hour, time.minute);
   }
 
   String formatTime(TimeOfDay time) {
-    return formatterTime.format(DateTime(_selectedDate!.year, DateTime.now().month, DateTime.now().day, time.hour, time.minute));
+    return formatterTime.format(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, time.hour, time.minute));
   }
 
   @override
@@ -198,13 +205,15 @@ class _NewClassState extends State<NewClass> {
                                     },
                                   ).toList();
 
-                                  return DropdownButton<DocumentReference>(
+                                  return DropdownButton(
                                     items: trainers,
                                     onChanged: (value) {
                                       if (value == null) {
                                         return;
                                       }
-                                      _selectedTrainer = value;
+                                      setState(() {
+                                        _selectedTrainer = value;
+                                      });
                                     },
                                     value: _selectedTrainer,
                                     hint: const Text('Antrenor'),
