@@ -10,6 +10,8 @@ class TrainersListScreen extends StatefulWidget {
 }
 
 class _TrainersListScreenState extends State<TrainersListScreen> {
+  DocumentSnapshot<Map<String, dynamic>>? _deletedTrainer;
+
   void _openAddTrainerOverlay() {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -60,25 +62,45 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
             itemBuilder: (ctx, index) => Dismissible(
               key: ValueKey(trainers[index]),
               onDismissed: (direction) {
+                _deletedTrainer = trainers[index];
                 trainers[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Antrenorul a fost șters.'),
+                  SnackBar(
+                    content: const Text('Antrenorul a fost șters.'),
+                    action: SnackBarAction(
+                      label: 'Anulați',
+                      onPressed: () {
+                        trainers[index].reference.set(_deletedTrainer!.data()!);
+                        _deletedTrainer = null;
+                      },
+                    ),
                   ),
                 );
               },
-              child: ListTile(
-                leading: const Icon(Icons.sports_gymnastics),
-                title: Text(trainers[index].data()['lastName'] + ' ' + trainers[index].data()['surname']),
-                subtitle: Row(
-                  children: [
-                    Text(trainers[index].data()['email']),
-                    const SizedBox(width: 20),
-                    Text(trainers[index].data()['phone']),
-                  ],
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: ListTile(
+                  leading: const Icon(Icons.sports_gymnastics),
+                  title: Text(
+                    trainers[index].data()['lastName'] + ' ' + trainers[index].data()['surname'],
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  subtitle: Row(
+                    children: [
+                      Text(
+                        trainers[index].data()['email'],
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                      const SizedBox(width: 20),
+                      Text(
+                        trainers[index].data()['phone'],
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  ),
+                  tileColor: Theme.of(context).colorScheme.primaryContainer,
                 ),
-                tileColor: Theme.of(context).colorScheme.primaryContainer,
               ),
             ),
           );

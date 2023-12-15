@@ -10,6 +10,8 @@ class ClassesListScreen extends StatefulWidget {
 }
 
 class _ClassesListScreenState extends State<ClassesListScreen> {
+  DocumentSnapshot<Map<String, dynamic>>? _deletedClass;
+
   void _openAddClassOverlay() {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -39,7 +41,7 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('classes').where('end', isLessThan: DateTime.now()).snapshots(),
+        stream: FirebaseFirestore.instance.collection('classes').where('end', isGreaterThan: DateTime.now()).orderBy('end').snapshots(),
         builder: (ctx, classesSnapshots) {
           if (classesSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -66,55 +68,71 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
             itemBuilder: (ctx, index) => Dismissible(
               key: ValueKey(classes[index]),
               onDismissed: (direction) {
-                classes[index].reference.delete();
+                _deletedClass = classes[index];
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Clasa a fost ștearsă.'),
+                  SnackBar(
+                    content: const Text('Clasa a fost ștearsă.'),
+                    action: SnackBarAction(
+                      label: 'Anulați',
+                      onPressed: () {
+                        classes[index].reference.set(_deletedClass!.data()!);
+                        _deletedClass = null;
+                      },
+                    ),
                   ),
                 );
               },
               child: FutureBuilder(
                 future: _getTrainerName(classes[index].data()['trainer']),
                 builder: (ctx, trainerSnapshots) {
-                  if (trainerSnapshots.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  }
-
                   if (trainerSnapshots.hasError) {
                     return const Text('Eroare');
                   }
 
-                  return ListTile(
-                    leading: Icon(classes[index].data()['room'] == Room.aerobic
-                        ? Icons.monitor_heart_outlined
-                        : Icons.fitness_center
-                    ),
-                    title: Text(
-                      classes[index].data()['className'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                  return Padding(
+                    padding: const EdgeInsets.all(7),
+                    child: ListTile(
+                      leading: Icon(classes[index].data()['room'] == Room.aerobic
+                          ? Icons.monitor_heart_outlined
+                          : Icons.fitness_center
                       ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(formatter.format(classes[index].data()['date'].toDate())),
-                            const SizedBox(width: 20),
-                            Text('${formatterTime.format(classes[index].data()['start'].toDate())} - ${formatterTime.format(classes[index].data()['end'].toDate())}'),
-                          ],
+                      title: Text(
+                        classes[index].data()['className'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
                         ),
-                        Text('${trainerSnapshots.data}, ${classes[index].data()['room'] == Room.aerobic
-                            ? 'Aerobic'
-                            : 'Functional'}'
-                        ),
-                        Text('Persoane înscrise: ${classes[index].data()['reserved']}/${classes[index].data()['capacity']}'),
-                      ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                formatter.format(classes[index].data()['date'].toDate()),
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                              const SizedBox(width: 20),
+                              Text(
+                                '${formatterTime.format(classes[index].data()['start'].toDate())} - ${formatterTime.format(classes[index].data()['end'].toDate())}',
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                            ],
+                          ),
+                          Text('${trainerSnapshots.data}, ${classes[index].data()['room'] == 'Room.aerobic'
+                              ? 'Aerobic'
+                              : 'Functional'}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            'Persoane înscrise: ${classes[index].data()['reserved']}/${classes[index].data()['capacity']}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      tileColor: Theme.of(context).colorScheme.primaryContainer,
                     ),
-                    tileColor: Theme.of(context).colorScheme.primaryContainer,
                   );
                 },
               ),

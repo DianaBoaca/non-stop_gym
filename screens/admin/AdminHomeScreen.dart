@@ -34,37 +34,38 @@ class AdminHomeScreen extends StatelessWidget {
         children: [
           Card(
             margin: const EdgeInsets.all(6),
-            child: ListTile(
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(21),
+                borderRadius: BorderRadius.circular(20),
               ),
-              leading: const Icon(
-                Icons.fitness_center,
-                color: Colors.white,
-                size: 25,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.fitness_center,
+                  color: Colors.white,
+                  size: 25,
+                ),
+                title: const Text(
+                  'Antrenori',
+                  style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (ctx) => const TrainersListScreen()),
+                  );
+                },
               ),
-              title: const Text(
-                'Antrenori',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              tileColor: Theme.of(context).colorScheme.onPrimaryContainer,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (ctx) => const TrainersListScreen()),
-                );
-              },
             ),
-          ),
           Card(
             margin: const EdgeInsets.all(6),
+            color: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(21),
-              ),
               leading: const Icon(
                 Icons.contact_page,
                 color: Colors.white,
@@ -77,7 +78,6 @@ class AdminHomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: Colors.white),
               ),
-              tileColor: Theme.of(context).colorScheme.primary,
               onTap: () {
                 Navigator.push(
                   context,
@@ -88,10 +88,11 @@ class AdminHomeScreen extends StatelessWidget {
           ),
           Card(
             margin: const EdgeInsets.all(6),
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(21),
-              ),
               leading: const Icon(
                 Icons.calendar_today,
                 color: Colors.white,
@@ -104,7 +105,6 @@ class AdminHomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: Colors.white),
               ),
-              tileColor: Theme.of(context).colorScheme.onPrimaryContainer,
               onTap: () {
                 Navigator.push(
                   context,
@@ -115,10 +115,11 @@ class AdminHomeScreen extends StatelessWidget {
           ),
           Card(
             margin: const EdgeInsets.all(6),
+            color: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(21),
-              ),
               leading: const Icon(
                 Icons.rule,
                 color: Colors.white,
@@ -131,17 +132,17 @@ class AdminHomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: Colors.white),
               ),
-              tileColor: Theme.of(context).colorScheme.primary,
               onTap: () {
               },
             ),
           ),
           Card(
             margin: const EdgeInsets.all(6),
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(21),
-              ),
               leading: const Icon(
                 Icons.payment,
                 color: Colors.white,
@@ -154,7 +155,6 @@ class AdminHomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: Colors.white),
               ),
-              tileColor: Theme.of(context).colorScheme.onPrimaryContainer,
               onTap: () {},
             ),
           ),
