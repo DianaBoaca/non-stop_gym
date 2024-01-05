@@ -1,77 +1,62 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/admin/EditUser.dart';
-import 'package:non_stop_gym/screens/admin/NewTrainer.dart';
 
-class TrainersListScreen extends StatefulWidget {
-  const TrainersListScreen({super.key});
+class ClientsListScreen extends StatefulWidget {
+  const ClientsListScreen({super.key});
 
   @override
-  State<TrainersListScreen> createState() => _TrainersListScreenState();
+  State<ClientsListScreen> createState() => _ClientsListScreenState();
 }
 
-class _TrainersListScreenState extends State<TrainersListScreen> {
-  DocumentSnapshot<Map<String, dynamic>>? _deletedTrainer;
+class _ClientsListScreenState extends State<ClientsListScreen> {
+  DocumentSnapshot<Map<String, dynamic>>? _deletedClient;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Antrenori'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (ctx) {
-                  return const NewTrainer();
-                },
-              );
-            },
-            icon: const Icon(Icons.add),
-          ),
-        ],
+        title: const Text('Clienți'),
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').snapshots(),
-        builder: (ctx, trainerSnapshots) {
-          if (trainerSnapshots.connectionState == ConnectionState.waiting) {
+        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'client').snapshots(),
+        builder: (ctx, clientSnapshot) {
+          if (clientSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final trainers = trainerSnapshots.data!.docs;
+          final clients = clientSnapshot.data!.docs;
 
-          if (!trainerSnapshots.hasData || trainers.isEmpty) {
+          if (!clientSnapshot.hasData || clients.isEmpty) {
             return const Center(
-              child: Text('Nu există antrenori.'),
+              child: Text('Nu există clienți.'),
             );
           }
 
-          if (trainerSnapshots.hasError) {
+          if (clientSnapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
           }
 
           return ListView.builder(
-            itemCount: trainers.length,
+            itemCount: clients.length,
             itemBuilder: (ctx, index) => Dismissible(
-              key: ValueKey(trainers[index]),
+              key: ValueKey(clients[index]),
               onDismissed: (direction) {
-                _deletedTrainer = trainers[index];
-                trainers[index].reference.delete();
+                _deletedClient = clients[index];
+                clients[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Antrenorul a fost șters.'),
+                    content: const Text('Clientul a fost șters.'),
                     action: SnackBarAction(
                       label: 'Anulați',
                       onPressed: () {
-                        trainers[index].reference.set(_deletedTrainer!.data()!);
-                        _deletedTrainer = null;
+                        clients[index].reference.set(_deletedClient!.data()!);
+                        _deletedClient = null;
                       },
                     ),
                   ),
@@ -80,20 +65,20 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: ListTile(
-                  leading: const Icon(Icons.fitness_center),
+                  leading: const Icon(Icons.person),
                   title: Text(
-                    trainers[index].data()['lastName'] + ' ' + trainers[index].data()['surname'],
+                    clients[index].data()['lastName'] + ' ' + clients[index].data()['surname'],
                     style: const TextStyle(fontSize: 20),
                   ),
                   subtitle: Row(
                     children: [
                       Text(
-                        trainers[index].data()['email'],
+                        clients[index].data()['email'],
                         style: const TextStyle(fontSize: 15),
                       ),
                       const SizedBox(width: 20),
                       Text(
-                        trainers[index].data()['phone'],
+                        clients[index].data()['phone'],
                         style: const TextStyle(fontSize: 15),
                       ),
                     ],
@@ -104,7 +89,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                       isScrollControlled: true,
                       context: context,
                       builder: (ctx) {
-                        return EditUser(user: trainers[index].reference);
+                        return EditUser(user: clients[index].reference);
                       },
                     );
                   },

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/admin/AdminContactScreen.dart';
+import 'package:non_stop_gym/screens/admin/ClientsListScreen.dart';
 import 'package:non_stop_gym/screens/admin/TrainersListScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
 
@@ -67,6 +68,60 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             child: ListTile(
               leading: const Icon(
+                Icons.calendar_today,
+                color: Colors.white,
+                size: 25,
+              ),
+              title: const Text(
+                'Clase',
+                style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (ctx) => const ClassesListScreen()),
+                );
+              },
+            ),
+          ),
+          Card(
+            margin: const EdgeInsets.all(6),
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: ListTile(
+              leading: const Icon(
+                Icons.person,
+                color: Colors.white,
+                size: 25,
+              ),
+              title: const Text(
+                'Clienți',
+                style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (ctx) => const ClientsListScreen()),
+                );
+              },
+            ),
+          ),
+          Card(
+            margin: const EdgeInsets.all(6),
+            color: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: ListTile(
+              leading: const Icon(
                 Icons.contact_page,
                 color: Colors.white,
                 size: 25,
@@ -94,33 +149,6 @@ class AdminHomeScreen extends StatelessWidget {
             ),
             child: ListTile(
               leading: const Icon(
-                Icons.calendar_today,
-                color: Colors.white,
-                size: 25,
-              ),
-              title: const Text(
-                'Orar clase',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (ctx) => const ClassesListScreen()),
-                );
-              },
-            ),
-          ),
-          Card(
-            margin: const EdgeInsets.all(6),
-            color: Theme.of(context).colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(
                 Icons.rule,
                 color: Colors.white,
                 size: 25,
@@ -138,7 +166,7 @@ class AdminHomeScreen extends StatelessWidget {
           ),
           Card(
             margin: const EdgeInsets.all(6),
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: Theme.of(context).colorScheme.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),

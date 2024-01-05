@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../utils/ClassUtils.dart';
+import 'EditClass.dart';
 import 'NewClass.dart';
 
 class ClassesListScreen extends StatefulWidget {
@@ -11,16 +13,6 @@ class ClassesListScreen extends StatefulWidget {
 
 class _ClassesListScreenState extends State<ClassesListScreen> {
   DocumentSnapshot<Map<String, dynamic>>? _deletedClass;
-
-  void _openAddClassOverlay() {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (ctx) {
-        return const NewClass();
-      },
-    );
-  }
 
   Future<String> _getTrainerName(DocumentReference ref) async {
     DocumentSnapshot trainer = await ref.get();
@@ -35,13 +27,21 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
         title: const Text('Listă clase'),
         actions: [
           IconButton(
-            onPressed: _openAddClassOverlay,
+            onPressed: () {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: (ctx) {
+                  return const NewClass();
+                },
+              );
+            },
             icon: const Icon(Icons.add),
           ),
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('classes').where('end', isGreaterThan: DateTime.now()).orderBy('end').snapshots(),
+        stream: FirebaseFirestore.instance.collection('classes').where('end', isLessThan: DateTime.now()).orderBy('end').snapshots(),
         builder: (ctx, classesSnapshots) {
           if (classesSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -91,7 +91,7 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.all(7),
+                    padding: const EdgeInsets.all(6),
                     child: ListTile(
                       leading: Icon(classes[index].data()['room'] == Room.aerobic
                           ? Icons.monitor_heart_outlined
@@ -132,6 +132,15 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
                         ],
                       ),
                       tileColor: Theme.of(context).colorScheme.primaryContainer,
+                      onTap: () {
+                        showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (ctx) {
+                            return EditClass(classs: classes[index].reference);
+                          },
+                        );
+                      },
                     ),
                   );
                 },
