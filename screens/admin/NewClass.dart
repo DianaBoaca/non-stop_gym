@@ -1,12 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-final formatter = DateFormat.yMd();
-final formatterTime = DateFormat.jm();
-
-enum Room { aerobic, functional }
+import '../../utils/ClassUtils.dart';
 
 class NewClass extends StatefulWidget {
   const NewClass({super.key});
@@ -27,6 +22,17 @@ class _NewClassState extends State<NewClass> {
   Room? _selectedRoom;
   int _counter = 0;
 
+  void _showError(FirebaseAuthException error) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error.message ?? 'Eroare stocare date.',
+        ),
+      ),
+    );
+  }
+
   void _save() async {
     if (!_form.currentState!.validate()) {
       return;
@@ -42,22 +48,15 @@ class _NewClassState extends State<NewClass> {
       await FirebaseFirestore.instance.collection('classes').add({
         'className': _enteredName,
         'date': _selectedDate,
-        'start': convert(_selectedStart!),
-        'end': convert(_selectedEnd!),
+        'start': convert(_selectedDate!, _selectedStart!),
+        'end': convert(_selectedDate!, _selectedEnd!),
         'trainer': _selectedTrainer,
         'room': _selectedRoom.toString(),
         'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
         'reserved': _counter,
       });
     } on FirebaseAuthException catch (error) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message ?? 'Eroare de stocare.',
-          ),
-        ),
-      );
+      _showError(error);
     }
 
     Navigator.pop(context);
@@ -112,14 +111,6 @@ class _NewClassState extends State<NewClass> {
     }
   }
 
-  DateTime convert(TimeOfDay time) {
-    return DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, time.hour, time.minute);
-  }
-
-  String formatTime(TimeOfDay time) {
-    return formatterTime.format(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, time.hour, time.minute));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,7 +145,7 @@ class _NewClassState extends State<NewClass> {
                             _enteredName = value!;
                           },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: _selectDate,
                           child: Text(_selectedDate != null
@@ -164,7 +155,6 @@ class _NewClassState extends State<NewClass> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const SizedBox(width: 10),
                             ElevatedButton(
                               onPressed: _selectStart,
                               child: Text(_selectedStart != null
@@ -180,7 +170,7 @@ class _NewClassState extends State<NewClass> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -195,8 +185,8 @@ class _NewClassState extends State<NewClass> {
                                     return const Text('Eroare');
                                   }
 
-                                  List<DropdownMenuItem<DocumentReference>> trainers = trainerSnapshots.data!.docs
-                                      .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
+                                  List<DropdownMenuItem<DocumentReference>> trainers = trainerSnapshots.data!.docs.map(
+                                        (DocumentSnapshot<Map<String, dynamic>> trainer) {
                                       return DropdownMenuItem(
                                         value: trainer.reference,
                                         child: Text('${trainer['lastName']} ${trainer['surname']}',
@@ -219,7 +209,7 @@ class _NewClassState extends State<NewClass> {
                                     hint: const Text('Antrenor'),
                                   );
                                 }),
-                            const SizedBox(width: 30),
+                            const SizedBox(width: 10),
                             DropdownButton(
                               value: _selectedRoom,
                               items: Room.values.map(
@@ -237,7 +227,7 @@ class _NewClassState extends State<NewClass> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 15),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

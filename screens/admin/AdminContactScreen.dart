@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+final _firebase = FirebaseFirestore.instance.collection('contact').doc('XZc7U6u8uXpXVJsO1hIK');
+
 class AdminContactScreen extends StatefulWidget {
   const AdminContactScreen({super.key});
 
@@ -17,6 +19,17 @@ class _AdminContactScreenState extends State<AdminContactScreen> {
   final _websiteController = TextEditingController();
   var _isEditable = false;
   final _form = GlobalKey<FormState>();
+
+  void _showError(FirebaseException error) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error.message ?? 'Eroare de autentificare.',
+        ),
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -37,26 +50,19 @@ class _AdminContactScreenState extends State<AdminContactScreen> {
     }
 
     try {
-      await FirebaseFirestore.instance.collection('contact').doc('XZc7U6u8uXpXVJsO1hIK').set({
+      await _firebase.set({
         'location': _addressController.text,
         'phone': _phoneController.text,
         'email': _emailController.text,
         'website': _websiteController.text,
       });
     } on FirebaseException catch (error) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message ?? 'Eroare stocare date.',
-          ),
-        ),
-      );
+      _showError(error);
     }
   }
 
   void _loadData() async {
-    var contactDetails = await FirebaseFirestore.instance.collection('contact').doc('XZc7U6u8uXpXVJsO1hIK').get();
+    var contactDetails = await _firebase.get();
 
     if (contactDetails.exists) {
       _addressController.text = contactDetails.data()!['location'];
@@ -69,7 +75,6 @@ class _AdminContactScreenState extends State<AdminContactScreen> {
   @override
   void initState() {
     super.initState();
-
     _loadData();
   }
 
@@ -108,8 +113,7 @@ class _AdminContactScreenState extends State<AdminContactScreen> {
                             enabled: _isEditable,
                             keyboardType: TextInputType.streetAddress,
                             validator: (value) {
-                              if (value == null ||
-                                  value.trim().isEmpty) {
+                              if (value == null || value.trim().isEmpty) {
                                 return 'Introduceți o adresă.';
                               }
                               return null;

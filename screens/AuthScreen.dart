@@ -36,10 +36,21 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  void _route(Widget screen) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (ctx) => screen),
+    );
+  }
+
   void _submit() async {
+    FocusScope.of(context).unfocus();
+
     if (_form.currentState!.validate()) {
       _form.currentState!.save();
     }
+
+    BuildContext currentContext = context;
 
     try {
       setState(() {
@@ -73,15 +84,9 @@ class _AuthScreenState extends State<AuthScreen> {
       final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       final role = userData.data()!['role'];
       if (role == 'client') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (ctx) => const ClientHomeScreen()),
-        );
+        _route(const ClientHomeScreen());
       } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (ctx) => const AdminHomeScreen()),
-        );
+        _route(const AdminHomeScreen());
       }
     } on FirebaseAuthException catch (error) {
       _showError(error);
@@ -109,8 +114,8 @@ class _AuthScreenState extends State<AuthScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                margin: const EdgeInsets.only(top: 30, bottom: 20, left: 15, right: 20),
-                width: 200,
+                margin: const EdgeInsets.all(20),
+                width: 250,
                 child: Image.asset('assets/images/logo.png'),
               ),
               Card(
