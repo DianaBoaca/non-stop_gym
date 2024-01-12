@@ -2,19 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class NewRule extends StatefulWidget {
-  const NewRule({super.key});
+class EditRule extends StatefulWidget {
+  const EditRule({super.key, required this.rule});
+
+  final DocumentReference rule;
 
   @override
-  State<NewRule> createState() {
-    return _NewRuleState();
+  State<EditRule> createState() {
+    return _EditRuleState();
   }
 }
 
-class _NewRuleState extends State<NewRule> {
+class _EditRuleState extends State<EditRule> {
   final _form = GlobalKey<FormState>();
-  String _enteredTitle = '';
-  String _enteredText = '';
+  final _titleController = TextEditingController();
+  final _textController = TextEditingController();
 
   void _showError(FirebaseAuthException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -27,27 +29,45 @@ class _NewRuleState extends State<NewRule> {
     );
   }
 
-  void _changeScreen() {
-    Navigator.pop(context);
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _textController.dispose();
+    super.dispose();
   }
 
   void _onSave() async {
-    if (!_form.currentState!.validate()) {
-      return;
+    if (_form.currentState!.validate()) {
+      _form.currentState!.save();
     }
 
-    _form.currentState!.save();
-
     try {
-      await FirebaseFirestore.instance.collection('rules').add({
-        'title': _enteredTitle,
-        'text': _enteredText,
+      await widget.rule.set({
+        'title': _titleController.text,
+        'text': _textController.text,
       });
     } on FirebaseAuthException catch (error) {
       _showError(error);
     }
+  }
 
-    _changeScreen();
+  void _loadData() async {
+    var ruleData = await widget.rule.get();
+
+    if (ruleData.exists) {
+      Map<String, dynamic> userDataMap = ruleData.data() as Map<String, dynamic>;
+
+      setState(() {
+        _titleController.text = userDataMap['title'];
+        _textController.text = userDataMap['text'];
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
   }
 
   @override
@@ -70,6 +90,7 @@ class _NewRuleState extends State<NewRule> {
                         decoration: const InputDecoration(
                           labelText: 'Titlu',
                         ),
+                        controller: _titleController,
                         autocorrect: false,
                         textCapitalization: TextCapitalization.none,
                         enableSuggestions: false,
@@ -79,26 +100,21 @@ class _NewRuleState extends State<NewRule> {
                           }
                           return null;
                         },
-                        onSaved: (value) {
-                          _enteredTitle = value!;
-                        },
                       ),
                       TextFormField(
                         decoration: const InputDecoration(
                           labelText: 'Text',
                         ),
+                        controller: _textController,
                         autocorrect: false,
                         textCapitalization: TextCapitalization.none,
-                        enableSuggestions: false,
                         maxLines: null,
+                        enableSuggestions: false,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Introduceți textul.';
                           }
                           return null;
-                        },
-                        onSaved: (value) {
-                          _enteredText = value!;
                         },
                       ),
                       const SizedBox(height: 20),
@@ -112,13 +128,11 @@ class _NewRuleState extends State<NewRule> {
                             child: const Text('Anulează'),
                           ),
                           ElevatedButton(
-                            onPressed: _onSave,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                            ),
-                            child: const Text('Adaugă'),
+                            onPressed: () {
+                              _onSave();
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Salvează'),
                           ),
                         ],
                       ),
@@ -129,6 +143,7 @@ class _NewRuleState extends State<NewRule> {
             ),
           ],
         ),
+        //),
       ),
     );
   }
