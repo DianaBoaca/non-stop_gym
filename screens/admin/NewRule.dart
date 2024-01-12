@@ -129,7 +129,6 @@ class _NewRuleState extends State<NewRule> {
             ),
           ],
         ),
-        //),
       ),
     );
   }
