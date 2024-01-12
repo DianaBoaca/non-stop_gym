@@ -1,23 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'EditUser.dart';
-import 'NewTrainer.dart';
+import 'NewRule.dart';
 
-class TrainersListScreen extends StatefulWidget {
-  const TrainersListScreen({super.key});
+class AdminRuleScreen extends StatefulWidget {
+  const AdminRuleScreen({super.key});
 
   @override
-  State<TrainersListScreen> createState() => _TrainersListScreenState();
+  State<AdminRuleScreen> createState() => _AdminRuleScreenState();
 }
 
-class _TrainersListScreenState extends State<TrainersListScreen> {
-  DocumentSnapshot<Map<String, dynamic>>? _deletedTrainer;
+class _AdminRuleScreenState extends State<AdminRuleScreen> {
+  DocumentSnapshot<Map<String, dynamic>>? _deletedRule;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Antrenori'),
+        title: const Text('Reguli și sfaturi'),
         actions: [
           IconButton(
             onPressed: () {
@@ -25,7 +25,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                 isScrollControlled: true,
                 context: context,
                 builder: (ctx) {
-                  return const NewTrainer();
+                  return const NewRule();
                 },
               );
             },
@@ -34,35 +34,35 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').snapshots(),
-        builder: (ctx, trainerSnapshots) {
-          if (trainerSnapshots.connectionState == ConnectionState.waiting) {
+        stream: FirebaseFirestore.instance.collection('rules').snapshots(),
+        builder: (ctx, ruleSnapshots) {
+          if (ruleSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final trainers = trainerSnapshots.data!.docs;
+          final rules = ruleSnapshots.data!.docs;
 
-          if (!trainerSnapshots.hasData || trainers.isEmpty) {
+          if (!ruleSnapshots.hasData || rules.isEmpty) {
             return const Center(
-              child: Text('Nu există antrenori.'),
+              child: Text('Nu există reguli.'),
             );
           }
 
-          if (trainerSnapshots.hasError) {
+          if (ruleSnapshots.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
           }
 
           return ListView.builder(
-            itemCount: trainers.length,
+            itemCount: rules.length,
             itemBuilder: (ctx, index) => Dismissible(
-              key: ValueKey(trainers[index]),
+              key: ValueKey(rules[index]),
               onDismissed: (direction) {
-                _deletedTrainer = trainers[index];
-                trainers[index].reference.delete();
+                _deletedRule = rules[index];
+                rules[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -70,8 +70,8 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                     action: SnackBarAction(
                       label: 'Anulați',
                       onPressed: () {
-                        trainers[index].reference.set(_deletedTrainer!.data()!);
-                        _deletedTrainer = null;
+                        rules[index].reference.set(_deletedRule!.data()!);
+                        _deletedRule = null;
                       },
                     ),
                   ),
@@ -80,23 +80,14 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: ListTile(
-                  leading: const Icon(Icons.fitness_center),
+                  leading: const Icon(Icons.rule),
                   title: Text(
-                    trainers[index].data()['lastName'] + ' ' + trainers[index].data()['surname'],
+                    rules[index].data()['title'],
                     style: const TextStyle(fontSize: 20),
                   ),
-                  subtitle: Row(
-                    children: [
-                      Text(
-                        trainers[index].data()['email'],
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                      const SizedBox(width: 20),
-                      Text(
-                        trainers[index].data()['phone'],
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ],
+                  subtitle: Text(
+                    rules[index].data()['text'],
+                    style: const TextStyle(fontSize: 15),
                   ),
                   tileColor: Theme.of(context).colorScheme.primaryContainer,
                   onTap: () {
@@ -104,7 +95,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                       isScrollControlled: true,
                       context: context,
                       builder: (ctx) {
-                        return EditUser(user: trainers[index].reference);
+                        return EditUser(user: rules[index].reference);
                       },
                     );
                   },

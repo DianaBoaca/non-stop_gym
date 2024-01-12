@@ -19,7 +19,7 @@ class _EditUserState extends State<EditUser> {
   final _surnameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  var role = '';
+  String role = '';
 
   void _showError(FirebaseAuthException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
