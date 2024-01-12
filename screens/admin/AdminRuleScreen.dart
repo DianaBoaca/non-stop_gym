@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'EditUser.dart';
+import 'package:non_stop_gym/screens/admin/EditRule.dart';
 import 'NewRule.dart';
 
 class AdminRuleScreen extends StatefulWidget {
@@ -95,7 +95,7 @@ class _AdminRuleScreenState extends State<AdminRuleScreen> {
                       isScrollControlled: true,
                       context: context,
                       builder: (ctx) {
-                        return EditUser(user: rules[index].reference);
+                        return EditRule(rule: rules[index].reference);
                       },
                     );
                   },
