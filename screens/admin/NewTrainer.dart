@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-final _firebase = FirebaseAuth.instance;
-
 class NewTrainer extends StatefulWidget {
   const NewTrainer({super.key});
 
@@ -15,13 +13,28 @@ class NewTrainer extends StatefulWidget {
 
 class _NewTrainerState extends State<NewTrainer> {
   final _form = GlobalKey<FormState>();
-  var _enteredLastName = '';
-  var _enteredSurname = '';
-  var _enteredPhone = '';
-  var _enteredEmail = '';
-  var _enteredPassword = '';
+  String _enteredLastName = '';
+  String _enteredSurname = '';
+  String _enteredPhone = '';
+  String _enteredEmail = '';
+  String _enteredPassword = '';
 
-  void _save() async {
+  void _showError(FirebaseAuthException error) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error.message ?? 'Eroare stocare date.',
+        ),
+      ),
+    );
+  }
+
+  void _changeScreen() {
+    Navigator.pop(context);
+  }
+
+  void _onSave() async {
     if (!_form.currentState!.validate()) {
       return;
     }
@@ -29,7 +42,7 @@ class _NewTrainerState extends State<NewTrainer> {
     _form.currentState!.save();
 
     try {
-      final userCredentials = await _firebase.createUserWithEmailAndPassword(
+      final userCredentials = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _enteredEmail,
         password: _enteredPassword,
       );
@@ -45,17 +58,10 @@ class _NewTrainerState extends State<NewTrainer> {
         'role': 'trainer',
       });
     } on FirebaseAuthException catch (error) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message ?? 'Eroare de stocare.',
-          ),
-        ),
-      );
+      _showError(error);
     }
 
-    Navigator.pop(context);
+    _changeScreen();
   }
 
   @override
@@ -173,7 +179,7 @@ class _NewTrainerState extends State<NewTrainer> {
                             child: const Text('Anulează'),
                           ),
                           ElevatedButton(
-                            onPressed: _save,
+                            onPressed: _onSave,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                             ),

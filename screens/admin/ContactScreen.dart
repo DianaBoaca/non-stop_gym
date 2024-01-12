@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 
 final _firebase = FirebaseFirestore.instance.collection('contact').doc('XZc7U6u8uXpXVJsO1hIK');
 
-class AdminContactScreen extends StatefulWidget {
-  const AdminContactScreen({super.key});
+class ContactScreen extends StatefulWidget {
+  const ContactScreen({super.key});
 
   @override
-  State<AdminContactScreen> createState() {
-    return _AdminContactScreenState();
+  State<ContactScreen> createState() {
+    return _ContactScreenState();
   }
 }
 
-class _AdminContactScreenState extends State<AdminContactScreen> {
+class _ContactScreenState extends State<ContactScreen> {
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _websiteController = TextEditingController();
-  var _isEditable = false;
+  bool _isEditable = false;
   final _form = GlobalKey<FormState>();
 
   void _showError(FirebaseException error) {

@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/admin/AdminContactScreen.dart';
-import 'package:non_stop_gym/screens/admin/ClientsListScreen.dart';
-import 'package:non_stop_gym/screens/admin/TrainersListScreen.dart';
+import 'ContactScreen.dart';
+import 'AdminRuleScreen.dart';
+import 'ClientsListScreen.dart';
+import 'TrainersListScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
-
 import 'ClassesListScreen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
@@ -136,7 +136,7 @@ class AdminHomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (ctx) => const AdminContactScreen()),
+                  MaterialPageRoute(builder: (ctx) => const ContactScreen()),
                 );
               },
             ),
@@ -161,6 +161,10 @@ class AdminHomeScreen extends StatelessWidget {
                     color: Colors.white),
               ),
               onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (ctx) => const AdminRuleScreen()),
+                );
               },
             ),
           ),

@@ -14,7 +14,7 @@ class NewClass extends StatefulWidget {
 
 class _NewClassState extends State<NewClass> {
   final _form = GlobalKey<FormState>();
-  var _enteredName = '';
+  String _enteredName = '';
   DateTime? _selectedDate;
   TimeOfDay? _selectedStart;
   TimeOfDay? _selectedEnd;
@@ -33,7 +33,11 @@ class _NewClassState extends State<NewClass> {
     );
   }
 
-  void _save() async {
+  void _changeScreen() {
+    Navigator.pop(context);
+  }
+
+  void _onSave() async {
     if (!_form.currentState!.validate()) {
       return;
     }
@@ -59,7 +63,7 @@ class _NewClassState extends State<NewClass> {
       _showError(error);
     }
 
-    Navigator.pop(context);
+    _changeScreen();
   }
 
   void _selectDate() async {
@@ -115,7 +119,6 @@ class _NewClassState extends State<NewClass> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -156,14 +159,14 @@ class _NewClassState extends State<NewClass> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
-                              onPressed: _selectStart,
+                              onPressed: _selectedDate != null ? _selectStart : null,
                               child: Text(_selectedStart != null
                                   ? formatTime(_selectedStart!)
                                   : 'Start'),
                             ),
                             const SizedBox(width: 10),
                             ElevatedButton(
-                              onPressed: _selectEnd,
+                              onPressed: _selectedStart != null ? _selectEnd : null,
                               child: Text(_selectedEnd != null
                                   ? formatTime(_selectedEnd!)
                                   : 'Final'),
@@ -238,7 +241,7 @@ class _NewClassState extends State<NewClass> {
                               child: const Text('Anulează'),
                             ),
                             ElevatedButton(
-                              onPressed: _save,
+                              onPressed: _onSave,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                               ),
@@ -254,7 +257,6 @@ class _NewClassState extends State<NewClass> {
             ],
           ),
         ),
-      ),
     );
   }
 }

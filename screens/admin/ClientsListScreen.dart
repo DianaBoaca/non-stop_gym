@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/admin/EditUser.dart';
+import 'EditUser.dart';
 
 class ClientsListScreen extends StatefulWidget {
   const ClientsListScreen({super.key});

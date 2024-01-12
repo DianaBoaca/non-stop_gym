@@ -17,13 +17,13 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final _form = GlobalKey<FormState>();
-  var _isLogin = true;
-  var _enteredLastName = '';
-  var _enteredSurname = '';
-  var _enteredPhone = '';
-  var _enteredEmail = '';
-  var _enteredPassword = '';
-  var _isAuthenticating = false;
+  bool _isLogin = true;
+  String _enteredLastName = '';
+  String _enteredSurname = '';
+  String _enteredPhone = '';
+  String _enteredEmail = '';
+  String _enteredPassword = '';
+  bool _isAuthenticating = false;
 
   void _showError(FirebaseAuthException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -49,8 +49,6 @@ class _AuthScreenState extends State<AuthScreen> {
     if (_form.currentState!.validate()) {
       _form.currentState!.save();
     }
-
-    BuildContext currentContext = context;
 
     try {
       setState(() {
