@@ -168,28 +168,6 @@ class AdminHomeScreen extends StatelessWidget {
               },
             ),
           ),
-          Card(
-            margin: const EdgeInsets.all(6),
-            color: Theme.of(context).colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(
-                Icons.payment,
-                color: Colors.white,
-                size: 25,
-              ),
-              title: const Text(
-                'Tarife',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              onTap: () {},
-            ),
-          ),
         ],
       ),
     );
