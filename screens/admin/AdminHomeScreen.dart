@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/utils/CustomContainer.dart';
 import 'ContactScreen.dart';
 import 'AdminRuleScreen.dart';
 import 'ClientsListScreen.dart';
@@ -33,165 +34,38 @@ class AdminHomeScreen extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Card(
-            margin: const EdgeInsets.all(6),
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: ListTile(
-                leading: const Icon(
-                  Icons.fitness_center,
-                  color: Colors.white,
-                  size: 25,
-                ),
-                title: const Text(
-                  'Antrenori',
-                  style: TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (ctx) => const TrainersListScreen()),
-                  );
-                },
-              ),
-            ),
-          Card(
-            margin: const EdgeInsets.all(6),
-            color: Theme.of(context).colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(
-                Icons.calendar_today,
-                color: Colors.white,
-                size: 25,
-              ),
-              title: const Text(
-                'Clase',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (ctx) => const ClassesListScreen()),
-                );
-              },
-            ),
+          CustomContainer(
+            icon: Icons.fitness_center,
+            title: 'Antrenori',
+            color: Theme.of(context).colorScheme.onPrimaryContainer ,
+            route: const TrainersListScreen(),
           ),
-          Card(
-            margin: const EdgeInsets.all(6),
+          CustomContainer(
+            icon: Icons.calendar_today,
+            title: 'Clase',
+            color: Theme.of(context).colorScheme.primary,
+            route: const ClassesListScreen(),
+          ),
+          CustomContainer(
+            icon: Icons.person,
+            title: 'Clienți',
             color: Theme.of(context).colorScheme.onPrimaryContainer,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(
-                Icons.person,
-                color: Colors.white,
-                size: 25,
-              ),
-              title: const Text(
-                'Clienți',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (ctx) => const ClientsListScreen()),
-                );
-              },
-            ),
+            route: const ClientsListScreen(),
           ),
-          Card(
-            margin: const EdgeInsets.all(6),
+          CustomContainer(
+            icon: Icons.contact_page,
+            title: 'Date de contact',
             color: Theme.of(context).colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(
-                Icons.contact_page,
-                color: Colors.white,
-                size: 25,
-              ),
-              title: const Text(
-                'Contact',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (ctx) => const ContactScreen()),
-                );
-              },
-            ),
+            route: const ContactScreen(),
           ),
-          Card(
-            margin: const EdgeInsets.all(6),
+          CustomContainer(
+            icon: Icons.rule,
+            title: 'Reguli și sfaturi',
             color: Theme.of(context).colorScheme.onPrimaryContainer,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(
-                Icons.rule,
-                color: Colors.white,
-                size: 25,
-              ),
-              title: const Text(
-                'Reguli și sfaturi',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (ctx) => const AdminRuleScreen()),
-                );
-              },
-            ),
-          ),
-          Card(
-            margin: const EdgeInsets.all(6),
-            color: Theme.of(context).colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(
-                Icons.payment,
-                color: Colors.white,
-                size: 25,
-              ),
-              title: const Text(
-                'Tarife',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
-              ),
-              onTap: () {},
-            ),
+            route: const AdminRuleScreen(),
           ),
         ],
       ),
-    );
+     );
   }
 }
