@@ -57,11 +57,11 @@ class _NewTrainerState extends State<NewTrainer> {
         'phone': _enteredPhone,
         'role': 'trainer',
       });
+
+      _changeScreen();
     } on FirebaseAuthException catch (error) {
       _showError(error);
     }
-
-    _changeScreen();
   }
 
   @override

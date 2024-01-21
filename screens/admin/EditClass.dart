@@ -22,7 +22,7 @@ class _EditClassState extends State<EditClass> {
   TimeOfDay? _selectedEnd;
   DocumentReference? _selectedTrainer;
   Room? _selectedRoom;
-  var _counter = 0;
+  int _counter = 0;
 
   void _showError(FirebaseAuthException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -31,6 +31,15 @@ class _EditClassState extends State<EditClass> {
         content: Text(
           error.message ?? 'Eroare stocare date.',
         ),
+      ),
+    );
+  }
+
+  void _showBookingError(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
       ),
     );
   }
@@ -63,17 +72,18 @@ class _EditClassState extends State<EditClass> {
   }
 
   void _selectDate() async {
-    final lastDate = DateTime(
-        DateTime.now().year, DateTime.now().month + 1, DateTime.now().day);
+    final lastDate = DateTime(DateTime.now().year + 1, DateTime.now().month, DateTime.now().day);
     final date = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
       lastDate: lastDate,
     );
 
-    setState(() {
-      _selectedDate = date;
-    });
+    if (date != null) {
+      setState(() {
+        _selectedDate = date;
+      });
+    }
   }
 
   void _selectStart() async {
@@ -86,9 +96,16 @@ class _EditClassState extends State<EditClass> {
       initialTime: TimeOfDay.now(),
     );
 
-    setState(() {
-      _selectedStart = start;
-    });
+    if (await verifyRoomAvailability(_selectedDate!, _selectedRoom.toString(), _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Sala este ocupată în acel interval orar.');
+    } else if (await verifyTrainerAvailability(_selectedTrainer!, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Antrenorul este ocupat în acel interval orar.');
+    }
+    else if (start != null) {
+      setState(() {
+        _selectedStart = start;
+      });
+    }
   }
 
   void _selectEnd() async {
@@ -101,9 +118,35 @@ class _EditClassState extends State<EditClass> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (toDouble(_selectedStart!) < toDouble(end!)) {
+    if (toDouble(_selectedStart!) > toDouble(end!)) {
+      _showBookingError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
+    } else if(await verifyRoomAvailability(_selectedDate!, _selectedRoom.toString(), _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Sala este ocupată în acel interval orar.');
+    } else if (await verifyTrainerAvailability(_selectedTrainer!, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Antrenorul este ocupat în acel interval orar.');
+    } else {
       setState(() {
         _selectedEnd = end;
+    });
+    }
+  }
+
+  void _selectTrainer(DocumentReference value) async {
+    if(await verifyTrainerAvailability(value, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Antrenorul este ocupat în acel interval orar.');
+    } else {
+      setState(() {
+        _selectedTrainer = value;
+      });
+    }
+  }
+
+  void _selectRoom(Room value) async {
+    if(await verifyRoomAvailability(_selectedDate!, value.toString(), _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Sala este ocupată în acel interval orar.');
+    } else {
+      setState(() {
+        _selectedRoom = value;
       });
     }
   }
@@ -112,8 +155,7 @@ class _EditClassState extends State<EditClass> {
     var classData = await widget.classs.get();
 
     if (classData.exists) {
-      Map<String, dynamic> classDataMap =
-          classData.data() as Map<String, dynamic>;
+      Map<String, dynamic> classDataMap = classData.data() as Map<String, dynamic>;
 
       setState(() {
         _nameController.text = classDataMap['className'];
@@ -121,7 +163,7 @@ class _EditClassState extends State<EditClass> {
         _selectedStart = TimeOfDay.fromDateTime(classDataMap['start'].toDate());
         _selectedEnd = TimeOfDay.fromDateTime(classDataMap['end'].toDate());
         _selectedTrainer = classDataMap['trainer'];
-        _selectedRoom = classDataMap['room'] == 'Aerobic' ? Room.aerobic : Room.functional;
+        _selectedRoom = classDataMap['room'] == 'Room.aerobic' ? Room.aerobic : Room.functional;
       });
     }
   }
@@ -193,10 +235,7 @@ class _EditClassState extends State<EditClass> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection('users')
-                                  .where('role', isEqualTo: 'trainer')
-                                  .snapshots(),
+                              stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').snapshots(),
                               builder: (ctx, trainerSnapshots) {
                                 if (trainerSnapshots.connectionState ==
                                     ConnectionState.waiting) {
@@ -221,12 +260,9 @@ class _EditClassState extends State<EditClass> {
                                 return DropdownButton(
                                   items: trainers,
                                   onChanged: (value) {
-                                    if (value == null) {
-                                      return;
+                                    if (value != null) {
+                                      _selectTrainer(value);
                                     }
-                                    setState(() {
-                                      _selectedTrainer = value;
-                                    });
                                   },
                                   value: _selectedTrainer,
                                   hint: const Text('Antrenor'),
@@ -242,9 +278,9 @@ class _EditClassState extends State<EditClass> {
                                   ),
                                 ).toList(),
                             onChanged: (value) {
-                              setState(() {
-                                _selectedRoom = value!;
-                              });
+                              if(value != null) {
+                                _selectRoom(value);
+                              }
                             },
                             hint: const Text('Sala'),
                           ),
