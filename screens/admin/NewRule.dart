@@ -43,11 +43,11 @@ class _NewRuleState extends State<NewRule> {
         'title': _enteredTitle,
         'text': _enteredText,
       });
+
+      _changeScreen();
     } on FirebaseAuthException catch (error) {
       _showError(error);
     }
-
-    _changeScreen();
   }
 
   @override

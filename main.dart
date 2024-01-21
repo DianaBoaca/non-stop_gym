@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
 import 'package:non_stop_gym/screens/ClientHomeScreen.dart';
-import 'package:non_stop_gym/screens/SplashScreen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -45,16 +44,12 @@ class App extends StatelessWidget {
           ),
         ),
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 66, 43, 129)),
+            seedColor: const Color.fromARGB(255, 66, 43, 129)).copyWith(background: Colors.white),
       ),
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (ctx, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SplashScreen();
-          }
-
-          if (snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.waiting && snapshot.hasData) {
             if (getRole().toString() == 'client') {
               return const ClientHomeScreen();
             } else if (getRole().toString() == 'admin') {

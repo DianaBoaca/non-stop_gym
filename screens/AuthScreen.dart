@@ -113,7 +113,7 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               Container(
                 margin: const EdgeInsets.all(20),
-                width: 250,
+                width: 325,
                 child: Image.asset('assets/images/logo.png'),
               ),
               Card(

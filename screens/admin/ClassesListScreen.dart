@@ -4,15 +4,8 @@ import '../../utils/ClassUtils.dart';
 import 'EditClass.dart';
 import 'NewClass.dart';
 
-class ClassesListScreen extends StatefulWidget {
+class ClassesListScreen extends StatelessWidget {
   const ClassesListScreen({super.key});
-
-  @override
-  State<ClassesListScreen> createState() => _ClassesListScreenState();
-}
-
-class _ClassesListScreenState extends State<ClassesListScreen> {
-  DocumentSnapshot<Map<String, dynamic>>? _deletedClass;
 
   Future<String> _getTrainerName(DocumentReference ref) async {
     DocumentSnapshot trainer = await ref.get();
@@ -22,6 +15,8 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    DocumentSnapshot<Map<String, dynamic>>? deletedClass;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Listă clase'),
@@ -41,7 +36,7 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('classes').where('end', isLessThan: DateTime.now()).orderBy('end').snapshots(),
+        stream: FirebaseFirestore.instance.collection('classes').where('end', isGreaterThanOrEqualTo: DateTime.now()).orderBy('end').snapshots(),
         builder: (ctx, classesSnapshots) {
           if (classesSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -68,7 +63,8 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
             itemBuilder: (ctx, index) => Dismissible(
               key: ValueKey(classes[index]),
               onDismissed: (direction) {
-                _deletedClass = classes[index];
+                deletedClass = classes[index];
+                classes[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -76,8 +72,8 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
                     action: SnackBarAction(
                       label: 'Anulați',
                       onPressed: () {
-                        classes[index].reference.set(_deletedClass!.data()!);
-                        _deletedClass = null;
+                        classes[index].reference.set(deletedClass!.data()!);
+                        deletedClass = null;
                       },
                     ),
                   ),
@@ -89,13 +85,13 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
                   if (trainerSnapshots.hasError) {
                     return const Text('Eroare');
                   }
-
                   return Padding(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(8),
                     child: ListTile(
-                      leading: Icon(classes[index].data()['room'] == Room.aerobic
-                          ? Icons.monitor_heart_outlined
-                          : Icons.fitness_center
+                      leading: Icon(
+                          classes[index].data()['room'] == 'Room.aerobic'
+                              ? Icons.monitor_heart
+                              : Icons.fitness_center
                       ),
                       title: Text(
                         classes[index].data()['className'],
@@ -120,9 +116,8 @@ class _ClassesListScreenState extends State<ClassesListScreen> {
                               ),
                             ],
                           ),
-                          Text('${trainerSnapshots.data}, ${classes[index].data()['room'] == 'Room.aerobic'
-                              ? 'Aerobic'
-                              : 'Functional'}',
+                          Text(
+                            '${trainerSnapshots.data}, ${classes[index].data()['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
                             style: const TextStyle(fontSize: 16),
                           ),
                           Text(

@@ -33,20 +33,33 @@ class _NewClassState extends State<NewClass> {
     );
   }
 
+  void _showBookingError(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
   void _changeScreen() {
     Navigator.pop(context);
   }
 
   void _onSave() async {
-    if (!_form.currentState!.validate()) {
+    if (_form.currentState!.validate() && _selectedDate != null && _selectedStart != null && _selectedEnd != null && _selectedTrainer != null && _selectedRoom != null) {
+      _form.currentState!.save();
+    }
+
+    if (await verifyTrainerAvailability(_selectedTrainer!, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Antrenorul este ocupat în acel interval orar.');
       return;
     }
 
-    if(_selectedDate == null || _selectedStart == null || _selectedEnd == null || _selectedTrainer == null || _selectedRoom == null) {
+    if (await verifyRoomAvailability(_selectedDate!, _selectedRoom!.toString(), _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Sala este ocupată în acel interval orar.');
       return;
     }
-
-    _form.currentState!.save();
 
     try {
       await FirebaseFirestore.instance.collection('classes').add({
@@ -59,15 +72,15 @@ class _NewClassState extends State<NewClass> {
         'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
         'reserved': _counter,
       });
+
+      _changeScreen();
     } on FirebaseAuthException catch (error) {
       _showError(error);
     }
-
-    _changeScreen();
   }
 
   void _selectDate() async {
-    final lastDate = DateTime(DateTime.now().year, DateTime.now().month + 1, DateTime.now().day);
+    final lastDate = DateTime(DateTime.now().year + 1, DateTime.now().month, DateTime.now().day);
     final date = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
@@ -112,6 +125,8 @@ class _NewClassState extends State<NewClass> {
       setState(() {
         _selectedEnd = end;
       });
+    } else {
+      _showBookingError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
     }
   }
 
