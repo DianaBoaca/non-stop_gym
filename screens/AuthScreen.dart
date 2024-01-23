@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
-import 'package:non_stop_gym/screens/ClientHomeScreen.dart';
+import 'package:non_stop_gym/screens/client/client_tabs.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -82,7 +82,7 @@ class _AuthScreenState extends State<AuthScreen> {
       final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       final role = userData.data()!['role'];
       if (role == 'client') {
-        _route(const ClientHomeScreen());
+        _route(const ClientTabsScreen());
       } else {
         _route(const AdminHomeScreen());
       }

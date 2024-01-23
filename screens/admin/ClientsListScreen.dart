@@ -19,7 +19,7 @@ class _ClientsListScreenState extends State<ClientsListScreen> {
         title: const Text('Clienți'),
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'client').snapshots(),
+        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'client').orderBy('lastName').snapshots(),
         builder: (ctx, clientSnapshot) {
           if (clientSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(

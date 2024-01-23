@@ -34,7 +34,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').snapshots(),
+        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').orderBy('lastName').snapshots(),
         builder: (ctx, trainerSnapshots) {
           if (trainerSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -91,7 +91,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                         trainers[index].data()['email'],
                         style: const TextStyle(fontSize: 15),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 10),
                       Text(
                         trainers[index].data()['phone'],
                         style: const TextStyle(fontSize: 15),

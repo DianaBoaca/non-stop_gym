@@ -34,7 +34,7 @@ class _AdminRuleScreenState extends State<AdminRuleScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('rules').snapshots(),
+        stream: FirebaseFirestore.instance.collection('rules').orderBy('title').snapshots(),
         builder: (ctx, ruleSnapshots) {
           if (ruleSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(

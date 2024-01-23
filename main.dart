@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
-import 'package:non_stop_gym/screens/ClientHomeScreen.dart';
+import 'package:non_stop_gym/screens/client/client_home.dart';
+import 'package:non_stop_gym/screens/client/client_tabs.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -51,7 +52,7 @@ class App extends StatelessWidget {
         builder: (ctx, snapshot) {
           if (snapshot.connectionState != ConnectionState.waiting && snapshot.hasData) {
             if (getRole().toString() == 'client') {
-              return const ClientHomeScreen();
+              return const ClientTabsScreen();
             } else if (getRole().toString() == 'admin') {
               return const AdminHomeScreen();
             }

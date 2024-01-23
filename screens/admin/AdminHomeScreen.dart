@@ -25,9 +25,7 @@ class AdminHomeScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (ctx) => const AuthScreen()),
               );
             },
-            icon: const Icon(
-              Icons.exit_to_app,
-            ),
+            icon: const Icon(Icons.exit_to_app),
           ),
         ],
       ),
