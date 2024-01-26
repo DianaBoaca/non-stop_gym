@@ -10,7 +10,7 @@ class ClassesListScreen extends StatelessWidget {
   Future<String> _getTrainerName(DocumentReference ref) async {
     DocumentSnapshot trainer = await ref.get();
     Map<String, dynamic> trainerData = trainer.data() as Map<String, dynamic>;
-    return '${trainerData['lastName']} ${trainerData['surname']}';
+    return '${trainerData['lastName']} ${trainerData['firstName']}';
   }
 
   @override

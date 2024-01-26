@@ -207,7 +207,7 @@ class _NewClassState extends State<NewClass> {
                                         (DocumentSnapshot<Map<String, dynamic>> trainer) {
                                       return DropdownMenuItem(
                                         value: trainer.reference,
-                                        child: Text('${trainer['lastName']} ${trainer['surname']}',
+                                        child: Text('${trainer['lastName']} ${trainer['firstName']}',
                                         ),
                                       );
                                     },

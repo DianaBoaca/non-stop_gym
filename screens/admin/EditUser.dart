@@ -16,10 +16,11 @@ class EditUser extends StatefulWidget {
 class _EditUserState extends State<EditUser> {
   final _form = GlobalKey<FormState>();
   final _lastNameController = TextEditingController();
-  final _surnameController = TextEditingController();
+  final _firstNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  String role = '';
+  String _role = '';
+  String _id = '';
 
   void _showError(FirebaseAuthException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -35,7 +36,7 @@ class _EditUserState extends State<EditUser> {
   @override
   void dispose() {
     _lastNameController.dispose();
-    _surnameController.dispose();
+    _firstNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     super.dispose();
@@ -49,10 +50,11 @@ class _EditUserState extends State<EditUser> {
     try {
       await widget.user.set({
         'lastName': _lastNameController.text,
-        'surname': _surnameController.text,
+        'firstName': _firstNameController.text,
         'email': _emailController.text,
         'phone': _phoneController.text,
-        'role': role,
+        'role': _role,
+        'id': _id,
       });
     } on FirebaseAuthException catch (error) {
       _showError(error);
@@ -67,10 +69,11 @@ class _EditUserState extends State<EditUser> {
 
       setState(() {
         _lastNameController.text = userDataMap['lastName'];
-        _surnameController.text = userDataMap['surname'];
+        _firstNameController.text = userDataMap['firstName'];
         _emailController.text = userDataMap['email'];
         _phoneController.text = userDataMap['phone'];
-        role = userDataMap['role'];
+        _role = userDataMap['role'];
+        _id = userDataMap['id'];
       });
     }
   }
@@ -116,7 +119,7 @@ class _EditUserState extends State<EditUser> {
                         decoration: const InputDecoration(
                           labelText: 'Prenume',
                         ),
-                        controller: _surnameController,
+                        controller: _firstNameController,
                         autocorrect: false,
                         textCapitalization: TextCapitalization.none,
                         enableSuggestions: false,

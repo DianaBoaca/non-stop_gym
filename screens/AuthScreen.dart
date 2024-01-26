@@ -19,7 +19,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _form = GlobalKey<FormState>();
   bool _isLogin = true;
   String _enteredLastName = '';
-  String _enteredSurname = '';
+  String _enteredFirstName = '';
   String _enteredPhone = '';
   String _enteredEmail = '';
   String _enteredPassword = '';
@@ -71,7 +71,7 @@ class _AuthScreenState extends State<AuthScreen> {
             .doc(userCredentials.user!.uid)
             .set({
           'lastName': _enteredLastName,
-          'surname': _enteredSurname,
+          'firstName': _enteredFirstName,
           'email': _enteredEmail,
           'phone': _enteredPhone,
           'role': 'client',
@@ -195,7 +195,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 return null;
                               },
                               onSaved: (value) {
-                                _enteredSurname = value!;
+                                _enteredFirstName = value!;
                               },
                             ),
                           if (!_isLogin)

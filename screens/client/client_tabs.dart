@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/screens/admin/EditUser.dart';
 import 'client_home.dart';
 import '../AuthScreen.dart';
 
@@ -24,17 +26,27 @@ class _ClientTabsScreenState extends State<ClientTabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    User user = FirebaseAuth.instance.currentUser!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(tabTitles[_selectedTab]),
           actions: [
-              IconButton(
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (ctx) => EditUser(user: FirebaseFirestore.instance.collection('users').doc(user.uid))),
+                );
+              },
+              icon: const Icon(Icons.person),
+            ),
+            IconButton(
                 onPressed: () {
                   FirebaseAuth.instance.signOut();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (ctx) => const AuthScreen(),
-                    ),
+                    MaterialPageRoute(builder: (ctx) => const AuthScreen()),
                   );
                 },
                 icon: const Icon(Icons.exit_to_app),

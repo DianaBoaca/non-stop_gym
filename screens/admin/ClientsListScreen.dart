@@ -67,7 +67,7 @@ class _ClientsListScreenState extends State<ClientsListScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.person),
                   title: Text(
-                    clients[index].data()['lastName'] + ' ' + clients[index].data()['surname'],
+                    clients[index].data()['lastName'] + ' ' + clients[index].data()['firstName'],
                     style: const TextStyle(fontSize: 20),
                   ),
                   subtitle: Row(
