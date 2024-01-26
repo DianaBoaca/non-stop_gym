@@ -14,7 +14,7 @@ class NewTrainer extends StatefulWidget {
 class _NewTrainerState extends State<NewTrainer> {
   final _form = GlobalKey<FormState>();
   String _enteredLastName = '';
-  String _enteredSurname = '';
+  String _enteredFirstName = '';
   String _enteredPhone = '';
   String _enteredEmail = '';
   String _enteredPassword = '';
@@ -52,7 +52,7 @@ class _NewTrainerState extends State<NewTrainer> {
           .doc(userCredentials.user!.uid)
           .set({
         'lastName': _enteredLastName,
-        'surname': _enteredSurname,
+        'firstName': _enteredFirstName,
         'email': _enteredEmail,
         'phone': _enteredPhone,
         'role': 'trainer',
@@ -147,7 +147,7 @@ class _NewTrainerState extends State<NewTrainer> {
                           return null;
                         },
                         onSaved: (value) {
-                          _enteredSurname = value!;
+                          _enteredFirstName = value!;
                         },
                       ),
                       TextFormField(

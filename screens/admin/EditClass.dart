@@ -251,7 +251,7 @@ class _EditClassState extends State<EditClass> {
                                     return DropdownMenuItem(
                                       value: trainer.reference,
                                       child: Text(
-                                        '${trainer['lastName']} ${trainer['surname']}',
+                                        '${trainer['lastName']} ${trainer['firstName']}',
                                       ),
                                     );
                                   },

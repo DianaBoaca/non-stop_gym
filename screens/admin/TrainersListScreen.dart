@@ -82,7 +82,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.fitness_center),
                   title: Text(
-                    trainers[index].data()['lastName'] + ' ' + trainers[index].data()['surname'],
+                    trainers[index].data()['lastName'] + ' ' + trainers[index].data()['firstName'],
                     style: const TextStyle(fontSize: 20),
                   ),
                   subtitle: Row(
