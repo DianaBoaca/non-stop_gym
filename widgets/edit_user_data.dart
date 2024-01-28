@@ -19,8 +19,6 @@ class _EditUserState extends State<EditUser> {
   final _firstNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  String _role = '';
-  String _id = '';
 
   void _showError(FirebaseAuthException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -48,13 +46,11 @@ class _EditUserState extends State<EditUser> {
     }
 
     try {
-      await widget.user.set({
+      await widget.user.update({
         'lastName': _lastNameController.text,
         'firstName': _firstNameController.text,
         'email': _emailController.text,
         'phone': _phoneController.text,
-        'role': _role,
-        'id': _id,
       });
     } on FirebaseAuthException catch (error) {
       _showError(error);
@@ -62,7 +58,7 @@ class _EditUserState extends State<EditUser> {
   }
 
   void _loadData() async {
-    var userData = await widget.user.get();
+    DocumentSnapshot<Object?> userData = await widget.user.get();
 
     if (userData.exists) {
       Map<String, dynamic> userDataMap = userData.data() as Map<String, dynamic>;
@@ -72,8 +68,6 @@ class _EditUserState extends State<EditUser> {
         _firstNameController.text = userDataMap['firstName'];
         _emailController.text = userDataMap['email'];
         _phoneController.text = userDataMap['phone'];
-        _role = userDataMap['role'];
-        _id = userDataMap['id'];
       });
     }
   }

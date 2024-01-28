@@ -66,15 +66,13 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _enteredPassword,
         );
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredentials.user!.uid)
-            .set({
+        await FirebaseFirestore.instance.collection('users').doc(userCredentials.user!.uid).set({
           'lastName': _enteredLastName,
           'firstName': _enteredFirstName,
           'email': _enteredEmail,
           'phone': _enteredPhone,
           'role': 'client',
+          'checkedIn': false,
         });
       }
 
@@ -226,9 +224,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             ElevatedButton(
                               onPressed: _submit,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
+                                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                               ),
                               child: Text(_isLogin
                                   ? 'Log in'

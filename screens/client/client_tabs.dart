@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/admin/EditUser.dart';
+import 'package:non_stop_gym/widgets/edit_user_data.dart';
 import 'client_home.dart';
 import '../AuthScreen.dart';
 
