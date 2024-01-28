@@ -47,10 +47,7 @@ class _NewTrainerState extends State<NewTrainer> {
         password: _enteredPassword,
       );
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredentials.user!.uid)
-          .set({
+      await FirebaseFirestore.instance.collection('users').doc(userCredentials.user!.uid).set({
         'lastName': _enteredLastName,
         'firstName': _enteredFirstName,
         'email': _enteredEmail,

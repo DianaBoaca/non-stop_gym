@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/utils/CustomContainer.dart';
+import 'package:non_stop_gym/widgets/custom_container.dart';
 import 'ContactScreen.dart';
 import 'AdminRuleScreen.dart';
 import 'ClientsListScreen.dart';
