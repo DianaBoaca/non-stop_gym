@@ -3,16 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
 import 'package:non_stop_gym/screens/client/client_tabs.dart';
+import 'dart:math';
 
 final _firebase = FirebaseAuth.instance;
+
+String generateRandomString() {
+  Random random = Random();
+  String randomString = '';
+
+  for (int i = 0; i < 10; i++) {
+    randomString += random.nextInt(10).toString();
+  }
+
+  return randomString;
+}
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
   @override
-  State<AuthScreen> createState() {
-    return _AuthScreenState();
-  }
+  State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
@@ -73,6 +83,7 @@ class _AuthScreenState extends State<AuthScreen> {
           'phone': _enteredPhone,
           'role': 'client',
           'checkedIn': false,
+          'id': generateRandomString(),
         });
       }
 

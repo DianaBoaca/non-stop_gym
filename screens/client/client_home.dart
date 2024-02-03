@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/widgets/busy_indicator.dart';
 import 'package:non_stop_gym/widgets/client_card.dart';
 
 class ClientHomeScreen extends StatefulWidget {
@@ -11,9 +12,11 @@ class ClientHomeScreen extends StatefulWidget {
 class _ClientHomeScreenState extends State<ClientHomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
           children: [
-            ClientCard(),
+            const ClientCard(),
+            const SizedBox(height: 20),
+            BusyIndicator(),
           ],
     );
   }

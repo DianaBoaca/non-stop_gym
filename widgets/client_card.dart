@@ -124,29 +124,31 @@ class _ClientCardState extends State<ClientCard> {
               child: Padding(
                 padding: const EdgeInsets.all(18),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: QrImageView(
-                        data: user.uid,
-                        backgroundColor: Colors.white,
-                        size: 150,
-                      ),
+                    QrImageView(
+                      data: user.uid,
+                      backgroundColor: Colors.white,
+                      size: 160,
                     ),
-                    const SizedBox(width: 40),
-                    Expanded(
+                    Flexible(
                       child: Column(
                         children: [
                           Text(
                             snapshot.data!['lastName'] + ' ' + snapshot.data!['firstName'],
                             style: const TextStyle(
+                              fontWeight: FontWeight.w600,
                               color: Colors.lightBlueAccent,
-                              fontSize: 23,
+                              fontSize: 21,
                             ),
+                            maxLines:2,
+                            textAlign: TextAlign.center,
                           ),
+                          const SizedBox(height: 10),
                           Text(
                             snapshot.data!['id'],
                             style: const TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               color: Colors.lightBlueAccent,
                             ),
                           ),
