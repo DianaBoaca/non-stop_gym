@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class EditUser extends StatefulWidget {
@@ -20,13 +19,11 @@ class _EditUserState extends State<EditUser> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
 
-  void _showError(FirebaseAuthException error) {
+  void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          error.message ?? 'Eroare stocare date.',
-        ),
+        content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
   }
@@ -52,7 +49,7 @@ class _EditUserState extends State<EditUser> {
         'email': _emailController.text,
         'phone': _phoneController.text,
       });
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseException catch (error) {
       _showError(error);
     }
   }

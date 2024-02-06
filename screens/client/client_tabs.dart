@@ -6,7 +6,7 @@ import 'client_home.dart';
 import '../AuthScreen.dart';
 
 List<String> tabTitles = ['Rezervările mele', 'Calendar clase', 'Non-stop Gym', 'Regulament', 'Măsurători'];
-List<Widget> activeTabs = const [Placeholder(), Placeholder(), ClientHomeScreen(), Placeholder(), Placeholder()];
+List<Widget> activeTabs = [Placeholder(), Placeholder(), ClientHomeScreen(), Placeholder(), Placeholder()];
 
 class ClientTabsScreen extends StatefulWidget {
   const ClientTabsScreen({super.key});
@@ -30,6 +30,7 @@ class _ClientTabsScreenState extends State<ClientTabsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(tabTitles[_selectedTab]),
           actions: [
             IconButton(
@@ -53,6 +54,7 @@ class _ClientTabsScreenState extends State<ClientTabsScreen> {
               ),
             ],
       ),
+      backgroundColor: Colors.lightBlueAccent,
       body: activeTabs[_selectedTab],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

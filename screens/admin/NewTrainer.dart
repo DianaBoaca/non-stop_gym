@@ -19,13 +19,11 @@ class _NewTrainerState extends State<NewTrainer> {
   String _enteredEmail = '';
   String _enteredPassword = '';
 
-  void _showError(FirebaseAuthException error) {
+  void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          error.message ?? 'Eroare stocare date.',
-        ),
+        content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
   }
@@ -56,7 +54,7 @@ class _NewTrainerState extends State<NewTrainer> {
       });
 
       _changeScreen();
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseException catch (error) {
       _showError(error);
     }
   }

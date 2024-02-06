@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../utils/ClassUtils.dart';
 
@@ -24,13 +23,11 @@ class _EditClassState extends State<EditClass> {
   Room? _selectedRoom;
   int _counter = 0;
 
-  void _showError(FirebaseAuthException error) {
+  void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          error.message ?? 'Eroare stocare date.',
-        ),
+        content: Text(error.message ?? 'Eroare stocare date'),
       ),
     );
   }
@@ -66,7 +63,7 @@ class _EditClassState extends State<EditClass> {
         'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
         'reserved': _counter,
       });
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseException catch (error) {
       _showError(error);
     }
   }
