@@ -19,13 +19,6 @@ void main() async {
   runApp(const App());
 }
 
-Future<String> getRole() async {
-  final user = FirebaseAuth.instance.currentUser!;
-  final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-  final role = userData.data()!['role'];
-  return role;
-}
-
 class App extends StatelessWidget {
   const App({super.key});
 
@@ -44,20 +37,47 @@ class App extends StatelessWidget {
           ),
         ),
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 66, 43, 129)).copyWith(background: Colors.white),
+            seedColor: const Color.fromARGB(255, 66, 43, 129)
+        ).copyWith(background: Colors.white),
       ),
-      home: StreamBuilder(
+      home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (ctx, snapshot) {
-          if (snapshot.connectionState != ConnectionState.waiting && snapshot.hasData) {
-            if (getRole().toString() == 'client') {
-              return const ClientTabsScreen();
-            } else if (getRole().toString() == 'admin') {
-              return const AdminHomeScreen();
-            }
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
           }
-
-          return const AuthScreen();
+          if (snapshot.hasData) {
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(snapshot.data!.uid)
+                  .get(),
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Scaffold(
+                    body: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                if (userSnapshot.hasData) {
+                  final role = userSnapshot.data!.get('role');
+                  if (role == 'client') {
+                    return const ClientTabsScreen();
+                  } else if (role == 'admin') {
+                    return const AdminHomeScreen();
+                  }
+                }
+                return const AuthScreen();
+              },
+            );
+          } else {
+            return const AuthScreen();
+          }
         },
       ),
     );

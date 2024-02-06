@@ -5,8 +5,6 @@ import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
 import 'package:non_stop_gym/screens/client/client_tabs.dart';
 import 'dart:math';
 
-final _firebase = FirebaseAuth.instance;
-
 String generateRandomString() {
   Random random = Random();
   String randomString = '';
@@ -64,17 +62,20 @@ class _AuthScreenState extends State<AuthScreen> {
       });
 
       if (_isLogin) {
-        final userCredentials = await _firebase.signInWithEmailAndPassword(
+        final userCredentials = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
         );
       } else {
-        final userCredentials = await _firebase.createUserWithEmailAndPassword(
+        final userCredentials = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
         );
 
-        await FirebaseFirestore.instance.collection('users').doc(userCredentials.user!.uid).set({
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredentials.user!.uid)
+            .set({
           'lastName': _enteredLastName,
           'firstName': _enteredFirstName,
           'email': _enteredEmail,
@@ -85,8 +86,10 @@ class _AuthScreenState extends State<AuthScreen> {
         });
       }
 
-      final user = FirebaseAuth.instance.currentUser!;
-      final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
       final role = userData.data()!['role'];
       if (role == 'client') {
         _route(const ClientTabsScreen());
@@ -104,7 +107,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void _reset() async {
     try {
-      await _firebase.sendPasswordResetEmail(email: _enteredEmail);
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: _enteredEmail);
     } on FirebaseAuthException catch (error) {
       _showError(error);
     }
