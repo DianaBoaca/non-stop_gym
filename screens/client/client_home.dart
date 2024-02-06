@@ -5,8 +5,6 @@ import '../../widgets/busy_indicator.dart';
 import '../../widgets/client_card.dart';
 import '../../widgets/contact_details.dart';
 
-final FirebaseFirestore _firebase = FirebaseFirestore.instance;
-
 class ClientHomeScreen extends StatelessWidget {
   const ClientHomeScreen({super.key});
 
@@ -19,7 +17,10 @@ class ClientHomeScreen extends StatelessWidget {
       child: Column(
           children: [
             StreamBuilder(
-                stream: _firebase.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting ||
                       !snapshot.hasData ||
@@ -31,7 +32,10 @@ class ClientHomeScreen extends StatelessWidget {
                 }),
             const SizedBox(height: 30),
             StreamBuilder(
-              stream: _firebase.collection('statistics').doc('4WVH8oQxUkXv0bWq3pXn').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('statistics')
+                  .doc('4WVH8oQxUkXv0bWq3pXn')
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting ||
                     !snapshot.hasData ||
@@ -57,8 +61,12 @@ class ClientHomeScreen extends StatelessWidget {
                 );
               },
             ),
+            const SizedBox(height: 15),
             StreamBuilder(
-              stream: _firebase.collection('contact').doc('XZc7U6u8uXpXVJsO1hIK').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('contact')
+                  .doc('XZc7U6u8uXpXVJsO1hIK')
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting ||
                     !snapshot.hasData ||

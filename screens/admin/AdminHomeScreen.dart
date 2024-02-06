@@ -58,7 +58,7 @@ class AdminHomeScreen extends StatelessWidget {
           ),
           CustomContainer(
             icon: Icons.rule,
-            title: 'Reguli și sfaturi',
+            title: 'Regulament',
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             route: const AdminRuleScreen(),
           ),

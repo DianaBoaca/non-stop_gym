@@ -119,6 +119,7 @@ class _ClientCardState extends State<ClientCard> {
       side: CardSide.FRONT,
       speed: 1000,
       front: Card(
+        elevation: 5,
         margin: const EdgeInsets.all(12),
         color: Theme.of(context).colorScheme.primary,
         child: Padding(

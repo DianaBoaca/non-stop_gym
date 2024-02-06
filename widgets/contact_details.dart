@@ -49,7 +49,10 @@ class ContactDetailsState extends State<ContactDetails> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(25),
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 20,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -81,8 +84,8 @@ class ContactDetailsState extends State<ContactDetails> {
           ),
           Image.network(
             widget.contactDetails['tarife'],
-            height: 550,
-            width: 500,
+            height: 500,
+            width: 480,
           ),
         ],
       ),

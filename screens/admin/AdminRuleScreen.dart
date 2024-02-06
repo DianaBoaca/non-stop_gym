@@ -3,38 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/admin/EditRule.dart';
 import 'NewRule.dart';
 
-class AdminRuleScreen extends StatefulWidget {
+class AdminRuleScreen extends StatelessWidget {
   const AdminRuleScreen({super.key});
 
   @override
-  State<AdminRuleScreen> createState() => _AdminRuleScreenState();
-}
-
-class _AdminRuleScreenState extends State<AdminRuleScreen> {
-  DocumentSnapshot<Map<String, dynamic>>? _deletedRule;
-
-  @override
   Widget build(BuildContext context) {
+    DocumentSnapshot<Map<String, dynamic>>? deletedRule;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reguli și sfaturi'),
         actions: [
-          IconButton(
-            onPressed: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (ctx) {
-                  return const NewRule();
-                },
-              );
-            },
-            icon: const Icon(Icons.add),
-          ),
+         IconButton(
+           onPressed: () {
+             showModalBottomSheet(
+               isScrollControlled: true,
+               context: context,
+               builder: (ctx) {
+                 return const NewRule();
+                 },
+             );
+             },
+           icon: const Icon(Icons.add),
+         ),
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('rules').orderBy('title').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('rules')
+            .orderBy('title')
+            .snapshots(),
         builder: (ctx, ruleSnapshots) {
           if (ruleSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -61,7 +59,7 @@ class _AdminRuleScreenState extends State<AdminRuleScreen> {
             itemBuilder: (ctx, index) => Dismissible(
               key: ValueKey(rules[index]),
               onDismissed: (direction) {
-                _deletedRule = rules[index];
+                deletedRule = rules[index];
                 rules[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -70,8 +68,8 @@ class _AdminRuleScreenState extends State<AdminRuleScreen> {
                     action: SnackBarAction(
                       label: 'Anulați',
                       onPressed: () {
-                        rules[index].reference.set(_deletedRule!.data()!);
-                        _deletedRule = null;
+                        rules[index].reference.set(deletedRule!.data()!);
+                        deletedRule = null;
                       },
                     ),
                   ),
@@ -87,7 +85,7 @@ class _AdminRuleScreenState extends State<AdminRuleScreen> {
                   ),
                   subtitle: Text(
                     rules[index].data()['text'],
-                    style: const TextStyle(fontSize: 15),
+                    style: const TextStyle(fontSize: 16),
                   ),
                   tileColor: Theme.of(context).colorScheme.primaryContainer,
                   onTap: () {
