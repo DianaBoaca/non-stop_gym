@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NewRule extends StatefulWidget {
@@ -16,13 +15,11 @@ class _NewRuleState extends State<NewRule> {
   String _enteredTitle = '';
   String _enteredText = '';
 
-  void _showError(FirebaseAuthException error) {
+  void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          error.message ?? 'Eroare stocare date.',
-        ),
+        content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
   }
@@ -45,7 +42,7 @@ class _NewRuleState extends State<NewRule> {
       });
 
       _changeScreen();
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseException catch (error) {
       _showError(error);
     }
   }

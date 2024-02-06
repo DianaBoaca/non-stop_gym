@@ -9,7 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 DocumentReference<Map<String, dynamic>> firebase = FirebaseFirestore.instance.collection('statistics').doc('4WVH8oQxUkXv0bWq3pXn');
 
 class ClientCard extends StatefulWidget {
-  const ClientCard({super.key});
+  const ClientCard({super.key, required this.user});
+
+  final DocumentSnapshot<Map<String, dynamic>>  user;
 
   @override
   State<ClientCard> createState() => _ClientCardState();
@@ -24,7 +26,7 @@ class _ClientCardState extends State<ClientCard> {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.',),
+        content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
   }
@@ -32,7 +34,8 @@ class _ClientCardState extends State<ClientCard> {
   void _showMessage() {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content:  Text('Check-${_checkedIn ? 'in' : 'out'} înregistrat.'),
+      SnackBar(
+        content: Text('Check-${_checkedIn ? 'in' : 'out'} înregistrat.'),
       ),
     );
   }
@@ -62,10 +65,10 @@ class _ClientCardState extends State<ClientCard> {
         'checkedInClients': _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
       });
 
-      await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({
-        'checkedIn': _checkedIn,
-      });
-
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'checkedIn': _checkedIn});
     } on FirebaseException catch (error) {
       _showError(error);
       return;
@@ -84,7 +87,10 @@ class _ClientCardState extends State<ClientCard> {
   }
 
   void _loadData() async {
-    DocumentSnapshot<Object?> userData = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+    DocumentSnapshot<Object?> userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
 
     if (userData.exists) {
       Map<String, dynamic> userDataMap = userData.data() as Map<String, dynamic>;
@@ -108,77 +114,66 @@ class _ClientCardState extends State<ClientCard> {
 
   @override
   Widget build(BuildContext context) {
-   User user = FirebaseAuth.instance.currentUser!;
-
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.waiting && snapshot.hasData) {
-          return FlipCard(
-            fill: Fill.fillBack,
-            side: CardSide.FRONT,
-            speed: 1000,
-            front: Card(
-              margin: const EdgeInsets.all(12),
-              color: Theme.of(context).colorScheme.primary,
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return FlipCard(
+      fill: Fill.fillBack,
+      side: CardSide.FRONT,
+      speed: 1000,
+      front: Card(
+        margin: const EdgeInsets.all(12),
+        color: Theme.of(context).colorScheme.primary,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              QrImageView(
+                data: widget.user.id,
+                backgroundColor: Colors.white,
+                size: 160,
+              ),
+              Flexible(
+                child: Column(
                   children: [
-                    QrImageView(
-                      data: user.uid,
-                      backgroundColor: Colors.white,
-                      size: 160,
+                    Text(
+                      widget.user['lastName'] + ' ' + widget.user['firstName'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.lightBlueAccent,
+                        fontSize: 21,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    Flexible(
-                      child: Column(
-                        children: [
-                          Text(
-                            snapshot.data!['lastName'] + ' ' + snapshot.data!['firstName'],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.lightBlueAccent,
-                              fontSize: 21,
-                            ),
-                            maxLines:2,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            snapshot.data!['id'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.lightBlueAccent,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 10),
+                    Text(
+                      widget.user['id'],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.lightBlueAccent,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-            back: Card(
-              margin: const EdgeInsets.all(12),
-              color: Theme.of(context).colorScheme.primary,
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Center(
-                  child: OutlinedButton(
-                    onPressed: _checkIn,
-                    child: const Text(
-                      'Scanează',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
+            ],
+          ),
+        ),
+      ),
+      back: Card(
+        margin: const EdgeInsets.all(12),
+        color: Theme.of(context).colorScheme.primary,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Center(
+            child: OutlinedButton(
+              onPressed: _checkIn,
+              child: const Text(
+                'Scanează',
+                style: TextStyle(color: Colors.white),
               ),
             ),
-          );
-        }
-        return const CircularProgressIndicator();
-      },
+          ),
+        ),
+      ),
     );
   }
 }

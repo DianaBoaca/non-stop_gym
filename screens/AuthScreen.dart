@@ -39,9 +39,7 @@ class _AuthScreenState extends State<AuthScreen> {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          error.message ?? 'Eroare de autentificare.',
-        ),
+        content: Text(error.message ?? 'Eroare de autentificare.'),
       ),
     );
   }

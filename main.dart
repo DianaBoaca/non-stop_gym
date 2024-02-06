@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
 import 'package:non_stop_gym/screens/AuthScreen.dart';
-import 'package:non_stop_gym/screens/client/client_home.dart';
 import 'package:non_stop_gym/screens/client/client_tabs.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';

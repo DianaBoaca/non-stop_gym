@@ -29,7 +29,7 @@ class _ContactScreenState extends State<ContactScreen> {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(error.message ?? 'Eroare de autentificare.',),
+        content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
   }
@@ -44,34 +44,36 @@ class _ContactScreenState extends State<ContactScreen> {
   }
 
   void _onSave() async {
+    String url = '';
+
     setState(() {
       _isEditable = !_isEditable;
     });
-
-    if (_selectedImageFile == null) {
-      return;
-    }
 
     if (_form.currentState!.validate()) {
       _form.currentState!.save();
     }
 
-    final storageRef = FirebaseStorage.instance.ref().child('tarife').child('tarife.jpg');
-    await storageRef.putFile(_selectedImageFile!);
-    final url = await storageRef.getDownloadURL();
-
-    try {
-      await _firebase.set({
-        'location': _addressController.text,
-        'phone': _phoneController.text,
-        'email': _emailController.text,
-        'website': _websiteController.text,
-        'tarife': url,
-      });
-    } on FirebaseException catch (error) {
-      _showError(error);
+    if (_selectedImageFile != null) {
+      Reference storageRef = FirebaseStorage.instance.ref()
+          .child('tarife')
+          .child('tarife2024.jpg');
+      await storageRef.putFile(_selectedImageFile!);
+      url = await storageRef.getDownloadURL();
+      try {
+        await _firebase.update({
+          'location': _addressController.text,
+          'phone': _phoneController.text,
+          'email': _emailController.text,
+          'website': _websiteController.text,
+          'tarife': url,
+        });
+      } on FirebaseException catch (error) {
+        _showError(error);
+      }
     }
   }
+
 
   void _loadData() async {
     var contactDetails = await _firebase.get();
@@ -116,13 +118,13 @@ class _ContactScreenState extends State<ContactScreen> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Card(
-              margin: const EdgeInsets.all(20),
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                margin: const EdgeInsets.all(20),
+                color: Theme.of(context).colorScheme.primaryContainer,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Form(
@@ -130,16 +132,23 @@ class _ContactScreenState extends State<ContactScreen> {
                     child: Column(
                       children: [
                         TextFormField(
-                          decoration: const InputDecoration(labelText: 'Adresă'),
+                          decoration: InputDecoration(
+                            labelText: 'Adresă',
+                            //labelStyle: _isEditable ? null : const TextStyle(color: Colors.black),
+                            // disabledBorder: _isEditable
+                            //     ? null
+                            //     : const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                          ),
                           controller: _addressController,
                           enabled: _isEditable,
                           keyboardType: TextInputType.streetAddress,
+                          //style: _isEditable ? null : const TextStyle(color: Colors.black),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Introduceți o adresă.';
                             }
                             return null;
-                          },
+                            },
                         ),
                         TextFormField(
                           decoration: const InputDecoration(labelText: 'Număr de telefon'),
@@ -151,7 +160,7 @@ class _ContactScreenState extends State<ContactScreen> {
                               return 'Introduceți un număr valid.';
                             }
                             return null;
-                          },
+                            },
                         ),
                         TextFormField(
                           decoration: const InputDecoration(labelText: 'Email'),
@@ -163,7 +172,7 @@ class _ContactScreenState extends State<ContactScreen> {
                               return 'Introduceți o adresă de email validă.';
                             }
                             return null;
-                          },
+                            },
                         ),
                         TextFormField(
                           decoration: const InputDecoration(labelText: 'Website'),
@@ -174,33 +183,33 @@ class _ContactScreenState extends State<ContactScreen> {
                               return 'Introduceți un website.';
                             }
                             return null;
-                          },
+                            },
                         ),
                         const SizedBox(height: 20),
-                        InkWell(
+                        GestureDetector(
                           onTap: _isEditable ? _selectImage : null,
                           child: Container(
-                            width: 150,
-                            height: 200,
+                            width: 140,
+                            height: 160,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                             child: _imageUrl == null && _selectedImageFile == null
                                 ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.add_photo_alternate,
-                                        size: 40,
-                                        color: Theme.of(context).colorScheme.primary,
-                                      ),
-                                      const Text('Tarife'),
-                                    ],
-                                  )
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_photo_alternate,
+                                  size: 40,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const Text('Tarife'),
+                              ],
+                            )
                                 : _selectedImageFile != null
-                                    ? Image.file(_selectedImageFile!)
-                                    : Image.network(_imageUrl!),
+                                ? Image.file(_selectedImageFile!)
+                                : Image.network(_imageUrl!),
                           ),
                         ),
                       ],
@@ -208,8 +217,8 @@ class _ContactScreenState extends State<ContactScreen> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../utils/ClassUtils.dart';
 
@@ -22,13 +21,11 @@ class _NewClassState extends State<NewClass> {
   Room? _selectedRoom;
   int _counter = 0;
 
-  void _showError(FirebaseAuthException error) {
+  void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          error.message ?? 'Eroare stocare date.',
-        ),
+        content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
   }
@@ -74,7 +71,7 @@ class _NewClassState extends State<NewClass> {
       });
 
       _changeScreen();
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseException catch (error) {
       _showError(error);
     }
   }
