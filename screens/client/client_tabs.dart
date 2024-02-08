@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/screens/client/classes_calendar.dart';
 import 'package:non_stop_gym/widgets/edit_user_data.dart';
 import 'client_home.dart';
 import '../AuthScreen.dart';
 import 'client_rules.dart';
 
 List<String> tabTitles = ['Rezervările mele', 'Calendar clase', 'Non-stop Gym', 'Regulament', 'Măsurători'];
-List<Widget> activeTabs = [const Placeholder(), const Placeholder(), const ClientHomeScreen(), const ClientRuleScreen(), const Placeholder()];
+List<Widget> activeTabs = [const Placeholder(), const ClassesCalendarScreen(), const ClientHomeScreen(), const ClientRuleScreen(), const Placeholder()];
 
 class ClientTabsScreen extends StatefulWidget {
   const ClientTabsScreen({super.key});

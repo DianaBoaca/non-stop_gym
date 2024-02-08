@@ -37,7 +37,7 @@ class ContactDetailsState extends State<ContactDetails> {
     if (response.statusCode == 200) {
       final data = Map<String, dynamic>.from(json.decode(response.body));
 
-      if (data['results'] != null && data['results'].isNotEmpty) {
+      if (data['results'] != null && data['results'].isNotEmpty && mounted) {
         setState(() {
           lat = data['results'][0]['geometry']['location']['lat'];
           long = data['results'][0]['geometry']['location']['lng'];
@@ -50,16 +50,12 @@ class ContactDetailsState extends State<ContactDetails> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        vertical: 10,
+        vertical: 5,
         horizontal: 20,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CustomRow(
-            icon: Icons.book,
-            text: widget.contactDetails['location'],
-          ),
           CustomRow(
             icon: Icons.alternate_email,
             text: widget.contactDetails['email'],
@@ -71,6 +67,14 @@ class ContactDetailsState extends State<ContactDetails> {
           CustomRow(
             icon: Icons.web,
             text: widget.contactDetails['website'],
+          ),
+          const CustomRow(
+            icon: Icons.watch_later_outlined,
+            text: 'Deschis 24/7',
+          ),
+          CustomRow(
+            icon: Icons.book,
+            text: widget.contactDetails['location'],
           ),
           const SizedBox(height: 30),
           GestureDetector(
