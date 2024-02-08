@@ -36,7 +36,11 @@ class ClassesListScreen extends StatelessWidget {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('classes').where('end', isGreaterThanOrEqualTo: DateTime.now()).orderBy('end').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('classes')
+            .where('end', isGreaterThanOrEqualTo: DateTime.now())
+            .orderBy('end')
+            .snapshots(),
         builder: (ctx, classesSnapshots) {
           if (classesSnapshots.connectionState == ConnectionState.waiting) {
             return const Center(
