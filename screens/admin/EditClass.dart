@@ -3,19 +3,17 @@ import 'package:flutter/material.dart';
 import '../../utils/ClassUtils.dart';
 
 class EditClass extends StatefulWidget {
-  const EditClass({super.key, required this.classs});
+  const EditClass({super.key, required this.fitnessClass});
 
-  final DocumentReference classs;
+  final DocumentReference fitnessClass;
 
   @override
-  State<EditClass> createState() {
-    return _EditClassState();
-  }
+  State<EditClass> createState() => _EditClassState();
 }
 
 class _EditClassState extends State<EditClass> {
-  final _form = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final GlobalKey<FormState> _form = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedStart;
   TimeOfDay? _selectedEnd;
@@ -53,7 +51,7 @@ class _EditClassState extends State<EditClass> {
     }
 
     try {
-      await widget.classs.set({
+      await widget.fitnessClass.set({
         'className': _nameController.text,
         'date': _selectedDate,
         'start': convert(_selectedDate!, _selectedStart!),
@@ -69,7 +67,11 @@ class _EditClassState extends State<EditClass> {
   }
 
   void _selectDate() async {
-    final lastDate = DateTime(DateTime.now().year + 1, DateTime.now().month, DateTime.now().day);
+    final lastDate = DateTime(
+      DateTime.now().year + 1,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
     final date = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
@@ -149,7 +151,7 @@ class _EditClassState extends State<EditClass> {
   }
 
   void _loadData() async {
-    var classData = await widget.classs.get();
+    var classData = await widget.fitnessClass.get();
 
     if (classData.exists) {
       Map<String, dynamic> classDataMap = classData.data() as Map<String, dynamic>;
@@ -173,143 +175,144 @@ class _EditClassState extends State<EditClass> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Card(
-              margin: const EdgeInsets.all(20),
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _form,
-                  child: Column(
+    return Center(
+      child: SingleChildScrollView(
+        child: Card(
+          margin: const EdgeInsets.all(20),
+          color: Theme.of(context).colorScheme.primaryContainer,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _form,
+              child: Column(
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Nume',
+                    ),
+                    controller: _nameController,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    enableSuggestions: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Introduceți numele.';
+                      }
+
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  ElevatedButton(
+                    onPressed: _selectDate,
+                    child: Text(
+                      _selectedDate != null
+                          ? formatter.format(_selectedDate!)
+                          : 'Data',
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Nume',
-                        ),
-                        controller: _nameController,
-                        autocorrect: false,
-                        textCapitalization: TextCapitalization.none,
-                        enableSuggestions: false,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Introduceți numele.';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 15),
                       ElevatedButton(
-                        onPressed: _selectDate,
-                        child: Text(_selectedDate != null
-                            ? formatter.format(_selectedDate!)
-                            : 'Data'),
+                        onPressed: _selectStart,
+                        child: Text(
+                          _selectedStart != null
+                              ? formatTime(_selectedStart!)
+                              : 'Start',
+                        ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            onPressed: _selectStart,
-                            child: Text(_selectedStart != null
-                                ? formatTime(_selectedStart!)
-                                : 'Start'),
-                          ),
-                          const SizedBox(width: 10),
-                          ElevatedButton(
-                            onPressed: _selectEnd,
-                            child: Text(_selectedEnd != null
-                                ? formatTime(_selectedEnd!)
-                                : 'Final'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          StreamBuilder(
-                              stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').snapshots(),
-                              builder: (ctx, trainerSnapshots) {
-                                if (trainerSnapshots.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
-                                }
-
-                                if (trainerSnapshots.hasError) {
-                                  return const Text('Eroare');
-                                }
-
-                                List<DropdownMenuItem<DocumentReference>> trainers = trainerSnapshots.data!.docs.map(
-                                  (DocumentSnapshot<Map<String, dynamic>> trainer) {
-                                    return DropdownMenuItem(
-                                      value: trainer.reference,
-                                      child: Text(
-                                        '${trainer['lastName']} ${trainer['firstName']}',
-                                      ),
-                                    );
-                                  },
-                                ).toList();
-
-                                return DropdownButton(
-                                  items: trainers,
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      _selectTrainer(value);
-                                    }
-                                  },
-                                  value: _selectedTrainer,
-                                  hint: const Text('Antrenor'),
-                                );
-                              }),
-                          const SizedBox(width: 10),
-                          DropdownButton(
-                            value: _selectedRoom,
-                            items: Room.values.map(
-                                  (room) => DropdownMenuItem(
-                                    value: room,
-                                    child: Text(room.name),
-                                  ),
-                                ).toList(),
-                            onChanged: (value) {
-                              if(value != null) {
-                                _selectRoom(value);
-                              }
-                            },
-                            hint: const Text('Sala'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Anulează'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              _onSave();
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Salvează'),
-                          ),
-                        ],
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: _selectEnd,
+                        child: Text(
+                          _selectedEnd != null
+                              ? formatTime(_selectedEnd!)
+                              : 'Final',
+                        ),
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection('users')
+                              .where('role', isEqualTo: 'trainer')
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            }
+
+                            if (snapshot.hasError) {
+                              return const Text('Eroare');
+                            }
+
+                            List<DropdownMenuItem<DocumentReference>> trainers = snapshot.data!.docs
+                                .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
+                              return DropdownMenuItem(
+                                value: trainer.reference,
+                                child: Text('${trainer['lastName']} ${trainer['firstName']}',),
+                              );
+                            },
+                            ).toList();
+
+                            return DropdownButton(
+                              items: trainers,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  _selectTrainer(value);
+                                }
+                              },
+                              value: _selectedTrainer,
+                              hint: const Text('Antrenor'),
+                            );
+                          }),
+                      const SizedBox(width: 10),
+                      DropdownButton(
+                        value: _selectedRoom,
+                        items: Room.values.map(
+                              (room) => DropdownMenuItem(
+                            value: room,
+                            child: Text(room.name),
+                          ),
+                        ).toList(),
+                        onChanged: (value) {
+                          if(value != null) {
+                            _selectRoom(value);
+                          }
+                        },
+                        hint: const Text('Sala'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Anulează'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          _onSave();
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Salvează'),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
-        //),
       ),
     );
   }

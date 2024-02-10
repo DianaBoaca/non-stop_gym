@@ -7,6 +7,36 @@ final formatterTime = DateFormat.jm();
 
 enum Room { aerobic, functional }
 
+class FitnessClass {
+  FitnessClass(
+      this.className,
+      this.start,
+      this.end,
+      this.date,
+      this.color,
+      this.capacity,
+      this.reserved,
+      this.room,
+      this.trainer,
+      );
+
+  String className;
+  DateTime start;
+  DateTime end;
+  DateTime date;
+  Color color;
+  int capacity;
+  int reserved;
+  String room;
+  DocumentReference trainer;
+}
+
+Future<String> getTrainerName(DocumentReference ref) async {
+  DocumentSnapshot trainer = await ref.get();
+  Map<String, dynamic> trainerData = trainer.data() as Map<String, dynamic>;
+  return '${trainerData['lastName']} ${trainerData['firstName']}';
+}
+
 DateTime convert(DateTime date, TimeOfDay time) {
   return DateTime(
     date.year,
@@ -47,7 +77,7 @@ Future<bool> verifyTrainerAvailability(DocumentReference trainer, DateTime date,
   return verifyHours(existingClasses, date, start, end);
 }
 
-Future<bool> verifyHours(Query<Map<String, dynamic>> existingClasses, DateTime date,TimeOfDay start, TimeOfDay end) async {
+Future<bool> verifyHours(Query<Map<String, dynamic>> existingClasses, DateTime date, TimeOfDay start, TimeOfDay end) async {
   final existingClassBeforeStart = await existingClasses.where('start', isLessThanOrEqualTo: convert(date, start)).get();
 
   final existingClassBeforeEnd = await existingClasses.where('end', isGreaterThan: convert(date, start)).get();
@@ -56,8 +86,13 @@ Future<bool> verifyHours(Query<Map<String, dynamic>> existingClasses, DateTime d
 
   final existingClassAfterEnd = await existingClasses.where('end', isGreaterThanOrEqualTo: convert(date, end)).get();
 
-  if ((existingClassBeforeStart.docs.isNotEmpty && existingClassBeforeEnd.docs.isNotEmpty)
-      || (existingClassAfterStart.docs.isNotEmpty && existingClassAfterEnd.docs.isNotEmpty)) {
+  final existingClass = await existingClasses.where('start', isGreaterThanOrEqualTo: convert(date, start)).get();
+
+  final existingClass2 = await existingClasses.where('start', isLessThan: convert(date, end)).get();
+
+  if ((existingClassBeforeStart.docs.isNotEmpty && existingClassBeforeEnd.docs.isNotEmpty) ||
+      (existingClassAfterStart.docs.isNotEmpty && existingClassAfterEnd.docs.isNotEmpty) ||
+      (existingClass.docs.isNotEmpty && existingClass2.docs.isNotEmpty)) {
     return false;
   }
 

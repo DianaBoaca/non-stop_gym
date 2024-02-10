@@ -14,18 +14,17 @@ class AdminRuleScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Reguli și sfaturi'),
         actions: [
-         IconButton(
-           onPressed: () {
-             showModalBottomSheet(
-               isScrollControlled: true,
-               context: context,
-               builder: (ctx) {
-                 return const NewRule();
-                 },
-             );
-             },
-           icon: const Icon(Icons.add),
-         ),
+          IconButton(
+            onPressed: () {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (context) => const NewRule(),
+              );
+            },
+            icon: const Icon(Icons.add),
+          ),
         ],
       ),
       body: StreamBuilder(
@@ -33,22 +32,22 @@ class AdminRuleScreen extends StatelessWidget {
             .collection('rules')
             .orderBy('title')
             .snapshots(),
-        builder: (ctx, ruleSnapshots) {
-          if (ruleSnapshots.connectionState == ConnectionState.waiting) {
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final rules = ruleSnapshots.data!.docs;
+          final rules = snapshot.data!.docs;
 
-          if (!ruleSnapshots.hasData || rules.isEmpty) {
+          if (!snapshot.hasData || rules.isEmpty) {
             return const Center(
               child: Text('Nu există reguli.'),
             );
           }
 
-          if (ruleSnapshots.hasError) {
+          if (snapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
@@ -56,7 +55,7 @@ class AdminRuleScreen extends StatelessWidget {
 
           return ListView.builder(
             itemCount: rules.length,
-            itemBuilder: (ctx, index) => Dismissible(
+            itemBuilder: (context, index) => Dismissible(
               key: ValueKey(rules[index]),
               onDismissed: (direction) {
                 deletedRule = rules[index];
@@ -91,10 +90,9 @@ class AdminRuleScreen extends StatelessWidget {
                   onTap: () {
                     showModalBottomSheet(
                       isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
                       context: context,
-                      builder: (ctx) {
-                        return EditRule(rule: rules[index].reference);
-                      },
+                      builder: (context) => EditRule(rule: rules[index].reference),
                     );
                   },
                 ),

@@ -1,21 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class NewTrainer extends StatefulWidget {
-  const NewTrainer({super.key});
+class EditUser extends StatefulWidget {
+  const EditUser({super.key, required this.user});
+
+  final DocumentReference user;
 
   @override
-  State<NewTrainer> createState() => _NewTrainerState();
+  State<EditUser> createState() => _EditUserState();
 }
 
-class _NewTrainerState extends State<NewTrainer> {
+class _EditUserState extends State<EditUser> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
-  String _enteredLastName = '';
-  String _enteredFirstName = '';
-  String _enteredPhone = '';
-  String _enteredEmail = '';
-  String _enteredPassword = '';
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -26,38 +26,52 @@ class _NewTrainerState extends State<NewTrainer> {
     );
   }
 
-  void _changeScreen() {
-    Navigator.pop(context);
+  @override
+  void dispose() {
+    _lastNameController.dispose();
+    _firstNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    super.dispose();
   }
 
   void _onSave() async {
-    if (!_form.currentState!.validate()) {
-      return;
+    if (_form.currentState!.validate()) {
+      _form.currentState!.save();
     }
 
-    _form.currentState!.save();
-
     try {
-      final userCredentials = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _enteredEmail,
-        password: _enteredPassword,
-      );
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredentials.user!.uid)
-          .set({
-        'lastName': _enteredLastName,
-        'firstName': _enteredFirstName,
-        'email': _enteredEmail,
-        'phone': _enteredPhone,
-        'role': 'trainer',
+      await widget.user.update({
+        'lastName': _lastNameController.text,
+        'firstName': _firstNameController.text,
+        'email': _emailController.text,
+        'phone': _phoneController.text,
       });
-
-      _changeScreen();
     } on FirebaseException catch (error) {
       _showError(error);
     }
+  }
+
+  void _loadData() async {
+    DocumentSnapshot<Object?> userData = await widget.user.get();
+
+    if (userData.exists) {
+      Map<String, dynamic> userDataMap =
+          userData.data() as Map<String, dynamic>;
+
+      setState(() {
+        _lastNameController.text = userDataMap['lastName'];
+        _firstNameController.text = userDataMap['firstName'];
+        _emailController.text = userDataMap['email'];
+        _phoneController.text = userDataMap['phone'];
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
   }
 
   @override
@@ -66,6 +80,7 @@ class _NewTrainerState extends State<NewTrainer> {
       child: SingleChildScrollView(
         child: Card(
           margin: const EdgeInsets.all(20),
+          color: Theme.of(context).colorScheme.primaryContainer,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
@@ -74,8 +89,41 @@ class _NewTrainerState extends State<NewTrainer> {
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
+                      labelText: 'Nume',
+                    ),
+                    controller: _lastNameController,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    enableSuggestions: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Introduceți numele.';
+                      }
+
+                      return null;
+                      },
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Prenume',
+                    ),
+                    controller: _firstNameController,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    enableSuggestions: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Introduceți prenumele.';
+                      }
+
+                      return null;
+                      },
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
                       labelText: 'Adresă de email',
                     ),
+                    controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
                     textCapitalization: TextCapitalization.none,
@@ -89,69 +137,12 @@ class _NewTrainerState extends State<NewTrainer> {
 
                       return null;
                       },
-                    onSaved: (value) {
-                      _enteredEmail = value!;
-                      },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Parolă',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.trim().length < 6) {
-                        return 'Parola trebuie să aibă cel puțin 6 caractere!';
-                      }
-
-                      return null;
-                      },
-                    onSaved: (value) {
-                      _enteredPassword = value!;
-                      },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Nume',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Introduceți numele.';
-                      }
-
-                      return null;
-                      },
-                    onSaved: (value) {
-                      _enteredLastName = value!;
-                         },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Prenume',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Introduceți prenumele.';
-                      }
-
-                      return null;
-                      },
-                    onSaved: (value) {
-                      _enteredFirstName = value!;
-                      },
                   ),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Număr de telefon',
                     ),
+                    controller: _phoneController,
                     keyboardType: TextInputType.number,
                     autocorrect: false,
                     textCapitalization: TextCapitalization.none,
@@ -165,9 +156,6 @@ class _NewTrainerState extends State<NewTrainer> {
 
                       return null;
                       },
-                    onSaved: (value) {
-                      _enteredPhone = value!;
-                      },
                   ),
                   const SizedBox(height: 20),
                   Row(
@@ -180,11 +168,11 @@ class _NewTrainerState extends State<NewTrainer> {
                         child: const Text('Anulează'),
                       ),
                       ElevatedButton(
-                        onPressed: _onSave,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                        ),
-                        child: const Text('Adaugă'),
+                        onPressed: () {
+                          _onSave();
+                          Navigator.pop(context);
+                          },
+                        child: const Text('Salvează'),
                       ),
                     ],
                   ),
