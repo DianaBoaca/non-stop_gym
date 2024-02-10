@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/edit_user_data.dart';
+import '../../widgets/edit_user.dart';
 import 'NewTrainer.dart';
 
 class TrainersListScreen extends StatefulWidget {
@@ -23,10 +23,9 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
             onPressed: () {
               showModalBottomSheet(
                 isScrollControlled: true,
+                backgroundColor: Colors.transparent,
                 context: context,
-                builder: (ctx) {
-                  return const NewTrainer();
-                },
+                builder: (context) => const NewTrainer(),
               );
             },
             icon: const Icon(Icons.add),
@@ -34,23 +33,27 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'trainer').orderBy('lastName').snapshots(),
-        builder: (ctx, trainerSnapshots) {
-          if (trainerSnapshots.connectionState == ConnectionState.waiting) {
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .where('role', isEqualTo: 'trainer')
+            .orderBy('lastName')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final trainers = trainerSnapshots.data!.docs;
+          final trainers = snapshot.data!.docs;
 
-          if (!trainerSnapshots.hasData || trainers.isEmpty) {
+          if (!snapshot.hasData || trainers.isEmpty) {
             return const Center(
               child: Text('Nu există antrenori.'),
             );
           }
 
-          if (trainerSnapshots.hasError) {
+          if (snapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
@@ -58,7 +61,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
 
           return ListView.builder(
             itemCount: trainers.length,
-            itemBuilder: (ctx, index) => Dismissible(
+            itemBuilder: (context, index) => Dismissible(
               key: ValueKey(trainers[index]),
               onDismissed: (direction) {
                 _deletedTrainer = trainers[index];
@@ -78,7 +81,7 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(5),
                 child: ListTile(
                   leading: const Icon(Icons.fitness_center),
                   title: Text(
@@ -102,10 +105,9 @@ class _TrainersListScreenState extends State<TrainersListScreen> {
                   onTap: () {
                     showModalBottomSheet(
                       isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
                       context: context,
-                      builder: (ctx) {
-                        return EditUser(user: trainers[index].reference);
-                      },
+                      builder: (context) => EditUser(user: trainers[index].reference),
                     );
                   },
                 ),

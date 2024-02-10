@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/widgets/class_card.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import '../../utils/ClassUtils.dart';
 
 Map<String, Color> colors = {
   'Cycling': Colors.purpleAccent,
@@ -8,7 +10,7 @@ Map<String, Color> colors = {
   'Pilates': Colors.green,
   'TRX': Colors.orange,
   'Kickbox': Colors.lightGreen,
-  'Yoga': Colors.lime,
+  'Yoga': Colors.yellow,
   'Circuit Training': Colors.grey,
 };
 
@@ -18,25 +20,23 @@ class ClassesCalendarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('classes')
-          .snapshots(),
-      builder: (context, snapshots) {
-        if (snapshots.connectionState == ConnectionState.waiting) {
+      stream: FirebaseFirestore.instance.collection('classes').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
 
-        final classes = snapshots.data!.docs;
+        final classes = snapshot.data!.docs;
 
-        if (!snapshots.hasData || classes.isEmpty) {
+        if (!snapshot.hasData || classes.isEmpty) {
           return const Center(
             child: Text('Nu există clase.'),
           );
         }
 
-        if (snapshots.hasError) {
+        if (snapshot.hasError) {
           return const Center(
             child: Text('Eroare!'),
           );
@@ -50,7 +50,12 @@ class ClassesCalendarScreen extends StatelessWidget {
               doc['className'],
               doc['start'].toDate(),
               doc['end'].toDate(),
-              colors[doc['className']] ?? Colors.white,
+              doc['date'].toDate(),
+              colors[doc['className']]!,
+              doc['capacity'],
+              doc['reserved'],
+              doc['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional',
+              doc['trainer'],
             ),
           );
         }
@@ -77,6 +82,18 @@ class ClassesCalendarScreen extends StatelessWidget {
               fontSize: 25,
             ),
           ),
+          onTap: (CalendarTapDetails details) {
+            if (details.targetElement == CalendarElement.appointment) {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => ClassCard(
+                  fitnessClass: details.appointments![0],
+                ),
+              );
+            }
+          },
         );
       },
     );
@@ -90,12 +107,12 @@ class ClassDataSource extends CalendarDataSource {
 
   @override
   DateTime getStartTime(int index) {
-    return appointments![index].from;
+    return appointments![index].start;
   }
 
   @override
   DateTime getEndTime(int index) {
-    return appointments![index].to;
+    return appointments![index].end;
   }
 
   @override
@@ -105,15 +122,6 @@ class ClassDataSource extends CalendarDataSource {
 
   @override
   Color getColor(int index) {
-    return appointments![index].background;
+    return appointments![index].color;
   }
-}
-
-class FitnessClass {
-  FitnessClass(this.className, this.from, this.to, this.background);
-
-  String className;
-  DateTime from;
-  DateTime to;
-  Color background;
 }

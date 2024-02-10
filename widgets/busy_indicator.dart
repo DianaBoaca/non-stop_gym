@@ -45,7 +45,7 @@ class BusyIndicator extends StatelessWidget {
                     child: Container(
                       width: 5,
                       height: 30,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                   ),
                 ],

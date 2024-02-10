@@ -7,15 +7,13 @@ class EditRule extends StatefulWidget {
   final DocumentReference rule;
 
   @override
-  State<EditRule> createState() {
-    return _EditRuleState();
-  }
+  State<EditRule> createState() => _EditRuleState();
 }
 
 class _EditRuleState extends State<EditRule> {
-  final _form = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _textController = TextEditingController();
+  final GlobalKey<FormState> _form = GlobalKey<FormState>();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -69,78 +67,74 @@ class _EditRuleState extends State<EditRule> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Card(
-              margin: const EdgeInsets.all(20),
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _form,
-                  child: Column(
+    return Center(
+      child: SingleChildScrollView(
+        child: Card(
+          margin: const EdgeInsets.all(20),
+          color: Theme.of(context).colorScheme.primaryContainer,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _form,
+              child: Column(
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Titlu',
+                    ),
+                    controller: _titleController,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    enableSuggestions: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Introduceți titlul.';
+                      }
+
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Text',
+                    ),
+                    controller: _textController,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    maxLines: null,
+                    enableSuggestions: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Introduceți textul.';
+                      }
+
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Titlu',
-                        ),
-                        controller: _titleController,
-                        autocorrect: false,
-                        textCapitalization: TextCapitalization.none,
-                        enableSuggestions: false,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Introduceți titlul.';
-                          }
-                          return null;
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
                         },
+                        child: const Text('Anulează'),
                       ),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Text',
-                        ),
-                        controller: _textController,
-                        autocorrect: false,
-                        textCapitalization: TextCapitalization.none,
-                        maxLines: null,
-                        enableSuggestions: false,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Introduceți textul.';
-                          }
-                          return null;
+                      ElevatedButton(
+                        onPressed: () {
+                          _onSave();
+                          Navigator.pop(context);
                         },
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Anulează'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              _onSave();
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Salvează'),
-                          ),
-                        ],
+                        child: const Text('Salvează'),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
-        //),
       ),
     );
   }

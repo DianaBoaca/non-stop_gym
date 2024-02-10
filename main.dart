@@ -25,7 +25,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FlutterChat',
+      title: 'Non-stop Gym',
       theme: ThemeData(
         appBarTheme: const AppBarTheme(
           color: Color.fromARGB(255, 66, 43, 129),

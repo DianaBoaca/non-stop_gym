@@ -11,22 +11,22 @@ class ClientRuleScreen extends StatelessWidget {
           .collection('rules')
           .orderBy('title')
           .snapshots(),
-      builder: (ctx, ruleSnapshots) {
-        if (ruleSnapshots.connectionState == ConnectionState.waiting) {
+      builder: (ctx, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
 
-        final rules = ruleSnapshots.data!.docs;
+        final rules = snapshot.data!.docs;
 
-        if (!ruleSnapshots.hasData || rules.isEmpty) {
+        if (!snapshot.hasData || rules.isEmpty) {
           return const Center(
             child: Text('Nu există reguli.'),
           );
         }
 
-        if (ruleSnapshots.hasError) {
+        if (snapshot.hasError) {
           return const Center(
             child: Text('Eroare!'),
           );

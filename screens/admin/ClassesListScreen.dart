@@ -7,12 +7,6 @@ import 'NewClass.dart';
 class ClassesListScreen extends StatelessWidget {
   const ClassesListScreen({super.key});
 
-  Future<String> _getTrainerName(DocumentReference ref) async {
-    DocumentSnapshot trainer = await ref.get();
-    Map<String, dynamic> trainerData = trainer.data() as Map<String, dynamic>;
-    return '${trainerData['lastName']} ${trainerData['firstName']}';
-  }
-
   @override
   Widget build(BuildContext context) {
     DocumentSnapshot<Map<String, dynamic>>? deletedClass;
@@ -25,10 +19,9 @@ class ClassesListScreen extends StatelessWidget {
             onPressed: () {
               showModalBottomSheet(
                 isScrollControlled: true,
+                backgroundColor: Colors.transparent,
                 context: context,
-                builder: (ctx) {
-                  return const NewClass();
-                },
+                builder: (context) => const NewClass(),
               );
             },
             icon: const Icon(Icons.add),
@@ -41,22 +34,22 @@ class ClassesListScreen extends StatelessWidget {
             .where('end', isGreaterThanOrEqualTo: DateTime.now())
             .orderBy('end')
             .snapshots(),
-        builder: (ctx, classesSnapshots) {
-          if (classesSnapshots.connectionState == ConnectionState.waiting) {
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final classes = classesSnapshots.data!.docs;
+          final classes = snapshot.data!.docs;
 
-          if (!classesSnapshots.hasData || classes.isEmpty) {
+          if (!snapshot.hasData || classes.isEmpty) {
             return const Center(
               child: Text('Nu există clase.'),
             );
           }
 
-          if (classesSnapshots.hasError) {
+          if (snapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
@@ -64,7 +57,7 @@ class ClassesListScreen extends StatelessWidget {
 
           return ListView.builder(
             itemCount: classes.length,
-            itemBuilder: (ctx, index) => Dismissible(
+            itemBuilder: (context, index) => Dismissible(
               key: ValueKey(classes[index]),
               onDismissed: (direction) {
                 deletedClass = classes[index];
@@ -84,11 +77,12 @@ class ClassesListScreen extends StatelessWidget {
                 );
               },
               child: FutureBuilder(
-                future: _getTrainerName(classes[index].data()['trainer']),
-                builder: (ctx, trainerSnapshots) {
-                  if (trainerSnapshots.hasError) {
+                future: getTrainerName(classes[index].data()['trainer']),
+                builder: (context, trainerSnapshot) {
+                  if (trainerSnapshot.hasError) {
                     return const Text('Eroare');
                   }
+
                   return Padding(
                     padding: const EdgeInsets.all(8),
                     child: ListTile(
@@ -121,7 +115,7 @@ class ClassesListScreen extends StatelessWidget {
                             ],
                           ),
                           Text(
-                            '${trainerSnapshots.data}, ${classes[index].data()['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
+                            '${trainerSnapshot.data}, ${classes[index].data()['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
                             style: const TextStyle(fontSize: 16),
                           ),
                           Text(
@@ -134,10 +128,11 @@ class ClassesListScreen extends StatelessWidget {
                       onTap: () {
                         showModalBottomSheet(
                           isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
                           context: context,
-                          builder: (ctx) {
-                            return EditClass(classs: classes[index].reference);
-                          },
+                          builder: (context) => EditClass(
+                              fitnessClass: classes[index].reference,
+                          ),
                         );
                       },
                     ),

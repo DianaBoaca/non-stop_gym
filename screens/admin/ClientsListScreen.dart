@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/edit_user_data.dart';
+import '../../widgets/edit_user.dart';
 
 class ClientsListScreen extends StatefulWidget {
   const ClientsListScreen({super.key});
@@ -24,22 +24,22 @@ class _ClientsListScreenState extends State<ClientsListScreen> {
             .where('role', isEqualTo: 'client')
             .orderBy('lastName')
             .snapshots(),
-        builder: (ctx, clientSnapshot) {
-          if (clientSnapshot.connectionState == ConnectionState.waiting) {
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final clients = clientSnapshot.data!.docs;
+          final clients = snapshot.data!.docs;
 
-          if (!clientSnapshot.hasData || clients.isEmpty) {
+          if (!snapshot.hasData || clients.isEmpty) {
             return const Center(
               child: Text('Nu există clienți.'),
             );
           }
 
-          if (clientSnapshot.hasError) {
+          if (snapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
@@ -47,7 +47,7 @@ class _ClientsListScreenState extends State<ClientsListScreen> {
 
           return ListView.builder(
             itemCount: clients.length,
-            itemBuilder: (ctx, index) => Dismissible(
+            itemBuilder: (context, index) => Dismissible(
               key: ValueKey(clients[index]),
               onDismissed: (direction) {
                 _deletedClient = clients[index];
@@ -91,10 +91,9 @@ class _ClientsListScreenState extends State<ClientsListScreen> {
                   onTap: () {
                     showModalBottomSheet(
                       isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
                       context: context,
-                      builder: (ctx) {
-                        return EditUser(user: clients[index].reference);
-                      },
+                      builder: (context) => EditUser(user: clients[index].reference),
                     );
                   },
                 ),
