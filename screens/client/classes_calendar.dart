@@ -47,6 +47,7 @@ class ClassesCalendarScreen extends StatelessWidget {
         for (final doc in classes) {
           appointments.add(
             FitnessClass(
+              doc.id,
               doc['className'],
               doc['start'].toDate(),
               doc['end'].toDate(),
@@ -85,6 +86,7 @@ class ClassesCalendarScreen extends StatelessWidget {
           onTap: (CalendarTapDetails details) {
             if (details.targetElement == CalendarElement.appointment) {
               showModalBottomSheet(
+                isDismissible: true,
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,

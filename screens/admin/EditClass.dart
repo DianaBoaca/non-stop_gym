@@ -5,7 +5,7 @@ import '../../utils/ClassUtils.dart';
 class EditClass extends StatefulWidget {
   const EditClass({super.key, required this.fitnessClass});
 
-  final DocumentReference fitnessClass;
+  final DocumentReference<Map<String, dynamic>> fitnessClass;
 
   @override
   State<EditClass> createState() => _EditClassState();
@@ -19,7 +19,7 @@ class _EditClassState extends State<EditClass> {
   TimeOfDay? _selectedEnd;
   DocumentReference? _selectedTrainer;
   Room? _selectedRoom;
-  int _counter = 0;
+  int? _counter;
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -54,8 +54,8 @@ class _EditClassState extends State<EditClass> {
       await widget.fitnessClass.set({
         'className': _nameController.text,
         'date': _selectedDate,
-        'start': convert(_selectedDate!, _selectedStart!),
-        'end': convert(_selectedDate!, _selectedEnd!),
+        'start': convertToDateTime(_selectedDate!, _selectedStart!),
+        'end': convertToDateTime(_selectedDate!, _selectedEnd!),
         'trainer': _selectedTrainer,
         'room': _selectedRoom.toString(),
         'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
@@ -151,10 +151,10 @@ class _EditClassState extends State<EditClass> {
   }
 
   void _loadData() async {
-    var classData = await widget.fitnessClass.get();
+    DocumentSnapshot<Map<String, dynamic>> classData = await widget.fitnessClass.get();
 
     if (classData.exists) {
-      Map<String, dynamic> classDataMap = classData.data() as Map<String, dynamic>;
+      Map<String, dynamic> classDataMap = classData.data()!;
 
       setState(() {
         _nameController.text = classDataMap['className'];
@@ -163,6 +163,7 @@ class _EditClassState extends State<EditClass> {
         _selectedEnd = TimeOfDay.fromDateTime(classDataMap['end'].toDate());
         _selectedTrainer = classDataMap['trainer'];
         _selectedRoom = classDataMap['room'] == 'Room.aerobic' ? Room.aerobic : Room.functional;
+        _counter = classDataMap['reserved'];
       });
     }
   }

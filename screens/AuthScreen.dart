@@ -45,7 +45,7 @@ class _AuthScreenState extends State<AuthScreen> {
   void _route(Widget screen) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (ctx) => screen),
+      MaterialPageRoute(builder: (context) => screen),
     );
   }
 

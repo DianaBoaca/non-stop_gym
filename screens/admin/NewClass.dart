@@ -17,7 +17,6 @@ class _NewClassState extends State<NewClass> {
   TimeOfDay? _selectedEnd;
   DocumentReference? _selectedTrainer;
   Room? _selectedRoom;
-  int _counter = 0;
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -65,12 +64,12 @@ class _NewClassState extends State<NewClass> {
       await FirebaseFirestore.instance.collection('classes').add({
         'className': _enteredName,
         'date': _selectedDate,
-        'start': convert(_selectedDate!, _selectedStart!),
-        'end': convert(_selectedDate!, _selectedEnd!),
+        'start': convertToDateTime(_selectedDate!, _selectedStart!),
+        'end': convertToDateTime(_selectedDate!, _selectedEnd!),
         'trainer': _selectedTrainer,
         'room': _selectedRoom.toString(),
         'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
-        'reserved': _counter,
+        'reserved': 0,
       });
 
       _changeScreen();

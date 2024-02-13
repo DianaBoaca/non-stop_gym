@@ -5,80 +5,64 @@ import '../../widgets/busy_indicator.dart';
 import '../../widgets/client_card.dart';
 import '../../widgets/contact_details.dart';
 
-class ClientHomeScreen extends StatelessWidget {
+class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
 
   @override
+  State<ClientHomeScreen> createState() => _ClientHomeScreenState();
+}
+
+class _ClientHomeScreenState extends State<ClientHomeScreen> {
+  late DocumentSnapshot<Map<String, dynamic>> _clientSnapshot;
+  late DocumentSnapshot<Map<String, dynamic>> _contactSnapshot;
+  late DocumentSnapshot<Map<String, dynamic>> _indicatorSnapshot;
+  bool _isLoading = true;
+
+  Future<void> _loadData() async {
+    DocumentSnapshot<Map<String, dynamic>> client = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    DocumentSnapshot<Map<String, dynamic>> indicator = await FirebaseFirestore
+        .instance
+        .collection('statistics')
+        .doc('4WVH8oQxUkXv0bWq3pXn')
+        .get();
+    DocumentSnapshot<Map<String, dynamic>> contact = await FirebaseFirestore
+        .instance
+        .collection('contact')
+        .doc('XZc7U6u8uXpXVJsO1hIK')
+        .get();
+
+    setState(() {
+      _clientSnapshot = client;
+      _indicatorSnapshot = indicator;
+      _contactSnapshot = contact;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    int checkedInClients;
-    int index;
-
-    return SingleChildScrollView(
-      child: Column(
-          children: [
-            StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting ||
-                      !snapshot.hasData ||
-                      snapshot.hasError) {
-                    return const SizedBox();
-                  }
-
-                  return ClientCard(user: snapshot.data!);
-                }),
-            const SizedBox(height: 30),
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('statistics')
-                  .doc('4WVH8oQxUkXv0bWq3pXn')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    !snapshot.hasData ||
-                    snapshot.data == null) {
-                  checkedInClients = 0;
-                  return const SizedBox();
-                } else {
-                  checkedInClients = snapshot.data!['checkedInClients'];
-                }
-
-                double percentage = checkedInClients / 50;
-                if (percentage <= 0.33) {
-                  index = 0;
-                } else if (percentage <= 0.66) {
-                  index = 1;
-                } else {
-                  index = 2;
-                }
-
-                return BusyIndicator(
-                    index: index,
-                    percentage: percentage
-                );
-              },
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+            child: Column(
+              children: [
+                ClientCard(user: _clientSnapshot),
+                const SizedBox(height: 30),
+                BusyIndicator(statistics: _indicatorSnapshot),
+                const SizedBox(height: 15),
+                ContactDetails(contactDetails: _contactSnapshot),
+              ],
             ),
-            const SizedBox(height: 15),
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('contact')
-                  .doc('XZc7U6u8uXpXVJsO1hIK')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    !snapshot.hasData ||
-                    snapshot.hasError) {
-                  return const SizedBox();
-                }
-
-                return ContactDetails(contactDetails: snapshot.data!);
-              },
-            ),
-          ],
-      ),
-    );
+          );
   }
 }

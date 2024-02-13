@@ -1,18 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 final List<int> emojis = [0x1F60A, 0x1F605, 0x1F633];
 final List<String> texts = ['Lejer', 'Destul de aglomerat', 'Foarte aglomerat'];
 final List<MaterialColor> colors = [Colors.green, Colors.yellow, Colors.red];
 
-class BusyIndicator extends StatelessWidget {
+class BusyIndicator extends StatefulWidget {
   const BusyIndicator({
     super.key,
-    required this.index,
-    required this.percentage,
+    required this.statistics,
   });
 
-  final int index;
-  final double percentage;
+  final DocumentSnapshot<Map<String, dynamic>> statistics;
+
+  @override
+  State<BusyIndicator> createState() => _BusyIndicatorState();
+}
+
+class _BusyIndicatorState extends State<BusyIndicator> {
+  double percentage = 0;
+  int index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      percentage = widget.statistics['checkedInClients'] / 50;
+      if (percentage <= 0.33) {
+        index = 0;
+      } else if (percentage <= 0.66) {
+        index = 1;
+      } else {
+        index = 2;
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
