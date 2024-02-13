@@ -31,8 +31,11 @@ class ContactDetailsState extends State<ContactDetails> {
 
   Future<void> _getCoordinates() async {
     String address = widget.contactDetails['location'];
-    Response response = await get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$apiKey'));
+    Response response = await get(
+      Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$apiKey',
+      ),
+    );
 
     if (response.statusCode == 200) {
       final data = Map<String, dynamic>.from(json.decode(response.body));

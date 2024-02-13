@@ -74,17 +74,17 @@ class _ContactScreenState extends State<ContactScreen> {
     }
   }
 
-
   void _loadData() async {
-    var contactDetails = await _firebase.get();
+    DocumentSnapshot<Map<String, dynamic>> contactDetails = await _firebase.get();
+    Map<String, dynamic> contactDetailsMap = contactDetails.data()!;
 
     if (contactDetails.exists) {
       setState(() {
-        _addressController.text = contactDetails.data()!['location'];
-        _phoneController.text = contactDetails.data()!['phone'];
-        _emailController.text = contactDetails.data()!['email'];
-        _websiteController.text = contactDetails.data()!['website'];
-        _imageUrl = contactDetails.data()!['tarife'];
+        _addressController.text = contactDetailsMap['location'];
+        _phoneController.text = contactDetailsMap['phone'];
+        _emailController.text = contactDetailsMap['email'];
+        _websiteController.text = contactDetailsMap['website'];
+        _imageUrl = contactDetailsMap['tarife'];
       });
     }
   }
@@ -132,13 +132,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     child: Column(
                       children: [
                         TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Adresă',
-                            //labelStyle: _isEditable ? null : const TextStyle(color: Colors.black),
-                            // disabledBorder: _isEditable
-                            //     ? null
-                            //     : const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                          ),
+                          decoration: const InputDecoration(labelText: 'Adresă'),
                           controller: _addressController,
                           enabled: _isEditable,
                           keyboardType: TextInputType.streetAddress,

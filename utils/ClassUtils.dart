@@ -9,6 +9,7 @@ enum Room { aerobic, functional }
 
 class FitnessClass {
   FitnessClass(
+      this.id,
       this.className,
       this.start,
       this.end,
@@ -20,6 +21,7 @@ class FitnessClass {
       this.trainer,
       );
 
+  String id;
   String className;
   DateTime start;
   DateTime end;
@@ -37,7 +39,7 @@ Future<String> getTrainerName(DocumentReference ref) async {
   return '${trainerData['lastName']} ${trainerData['firstName']}';
 }
 
-DateTime convert(DateTime date, TimeOfDay time) {
+DateTime convertToDateTime(DateTime date, TimeOfDay time) {
   return DateTime(
     date.year,
     date.month,
@@ -45,6 +47,11 @@ DateTime convert(DateTime date, TimeOfDay time) {
     time.hour,
     time.minute,
   );
+}
+
+TimeOfDay convertToTimeOfDay(Timestamp timestamp) {
+  DateTime dateTime = timestamp.toDate();
+  return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
 }
 
 String formatTime(TimeOfDay time) {
@@ -77,18 +84,19 @@ Future<bool> verifyTrainerAvailability(DocumentReference trainer, DateTime date,
   return verifyHours(existingClasses, date, start, end);
 }
 
+
 Future<bool> verifyHours(Query<Map<String, dynamic>> existingClasses, DateTime date, TimeOfDay start, TimeOfDay end) async {
-  final existingClassBeforeStart = await existingClasses.where('start', isLessThanOrEqualTo: convert(date, start)).get();
+  final existingClassBeforeStart = await existingClasses.where('start', isLessThanOrEqualTo: convertToDateTime(date, start)).get();
 
-  final existingClassBeforeEnd = await existingClasses.where('end', isGreaterThan: convert(date, start)).get();
+  final existingClassBeforeEnd = await existingClasses.where('end', isGreaterThan: convertToDateTime(date, start)).get();
 
-  final existingClassAfterStart = await existingClasses.where('start', isLessThan: convert(date, end)).get();
+  final existingClassAfterStart = await existingClasses.where('start', isLessThan: convertToDateTime(date, end)).get();
 
-  final existingClassAfterEnd = await existingClasses.where('end', isGreaterThanOrEqualTo: convert(date, end)).get();
+  final existingClassAfterEnd = await existingClasses.where('end', isGreaterThanOrEqualTo: convertToDateTime(date, end)).get();
 
-  final existingClass = await existingClasses.where('start', isGreaterThanOrEqualTo: convert(date, start)).get();
+  final existingClass = await existingClasses.where('start', isGreaterThanOrEqualTo: convertToDateTime(date, start)).get();
 
-  final existingClass2 = await existingClasses.where('start', isLessThan: convert(date, end)).get();
+  final existingClass2 = await existingClasses.where('start', isLessThan: convertToDateTime(date, end)).get();
 
   if ((existingClassBeforeStart.docs.isNotEmpty && existingClassBeforeEnd.docs.isNotEmpty) ||
       (existingClassAfterStart.docs.isNotEmpty && existingClassAfterEnd.docs.isNotEmpty) ||
