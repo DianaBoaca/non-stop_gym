@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/busy_indicator.dart';
-import '../../widgets/client_card.dart';
-import '../../widgets/contact_details.dart';
+import '../../widgets/client/busy_indicator.dart';
+import '../../widgets/client/client_card.dart';
+import '../../widgets/client/contact_details.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});

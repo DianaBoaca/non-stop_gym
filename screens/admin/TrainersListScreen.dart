@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/edit_user.dart';
+import '../../widgets/admin/edit_user.dart';
 import 'NewTrainer.dart';
 
 class TrainersListScreen extends StatefulWidget {

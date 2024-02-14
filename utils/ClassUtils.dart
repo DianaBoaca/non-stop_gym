@@ -7,6 +7,16 @@ final formatterTime = DateFormat.jm();
 
 enum Room { aerobic, functional }
 
+Map<String, Color> colors = {
+  'Cycling': Colors.purpleAccent,
+  'Zumba': Colors.pink,
+  'Pilates': Colors.green,
+  'TRX': Colors.orange,
+  'Kickbox': Colors.lightGreen,
+  'Yoga': Colors.yellow,
+  'Circuit Training': Colors.grey,
+};
+
 class FitnessClass {
   FitnessClass(
       this.id,
