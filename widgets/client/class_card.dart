@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/widgets/white_text.dart';
-import '../utils/ClassUtils.dart';
+import 'package:non_stop_gym/widgets/client/white_text.dart';
+import '../../utils/ClassUtils.dart';
 
 class ClassCard extends StatefulWidget {
   const ClassCard({super.key, required this.fitnessClass});
@@ -40,7 +40,7 @@ class _ClassCardState extends State<ClassCard> {
       } else if (classMap['reserved'] < classMap['capacity']) {
         await FirebaseFirestore.instance.collection('reservations').add({
           'class': classRef,
-          'client': userRef,
+          'client': FirebaseAuth.instance.currentUser!.uid,
           'date': classMap['date'],
           'start': classMap['start'],
           'end': classMap['end'],
@@ -54,7 +54,7 @@ class _ClassCardState extends State<ClassCard> {
       } else {
         await FirebaseFirestore.instance.collection('waitingList').add({
           'class': classRef,
-          'client': userRef,
+          'client': FirebaseAuth.instance.currentUser!.uid,
           'time': DateTime.now(),
         });
 
@@ -77,9 +77,6 @@ class _ClassCardState extends State<ClassCard> {
   }
 
   void _loadData() async {
-    DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
     DocumentReference<Map<String, dynamic>> classRef = FirebaseFirestore
         .instance
         .collection('classes')
@@ -88,13 +85,13 @@ class _ClassCardState extends State<ClassCard> {
         await FirebaseFirestore.instance
             .collection('reservations')
             .where('class', isEqualTo: classRef)
-            .where('client', isEqualTo: userRef)
+            .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .get();
     QuerySnapshot<Map<String, dynamic>> waitingReservations =
         await FirebaseFirestore.instance
             .collection('waitingList')
             .where('class', isEqualTo: classRef)
-            .where('client', isEqualTo: userRef)
+            .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .get();
     String name = await getTrainerName(widget.fitnessClass.trainer);
 
@@ -164,7 +161,7 @@ class _ClassCardState extends State<ClassCard> {
                           const SizedBox(height: 10),
                           WhiteText(text: 'Antrenor: $_trainer'),
                           const SizedBox(height: 10),
-                          WhiteText(text: 'Sala: ${snapshot.data!['room']}'),
+                          WhiteText(text: 'Sala: ${snapshot.data!['room'] =='Room.aerobic' ? 'Aerobic' : 'Functional'}'),
                           const SizedBox(height: 10),
                           WhiteText(
                               text:
