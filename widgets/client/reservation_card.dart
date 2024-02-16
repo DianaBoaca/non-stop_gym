@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:googleapis_auth/auth_io.dart';
+import 'package:http/http.dart';
 import 'white_text.dart';
 import '../../utils/ClassUtils.dart';
 
@@ -23,28 +27,81 @@ class _ReservationCardState extends State<ReservationCard> {
     );
   }
 
-  void _cancelClass() {
-    DocumentSnapshot<Map<String, dynamic>>? canceledReservation;
+  Future<bool> sendNotification(String token, String title, String text) async {
+    String jsonCredentials = await rootBundle.loadString('517570860ed0e887014067b5f426e130a86d7436');
+    ServiceAccountCredentials credentials = ServiceAccountCredentials.fromJson(jsonCredentials);
+    AutoRefreshingAuthClient client = await clientViaServiceAccount(
+      credentials,
+      ['https://www.googleapis.com/auth/cloud-platform'],
+    );
+    Map<String, Map<String, Object>> notification = {
+      'message': {
+        'token': token,
+        'notification': {
+          'title': title,
+          'body': text,
+        }
+      }
+    };
+    Response response = await client.post(
+      Uri.parse(
+        'https://fcm.googleapis.com/v1/projects/224380999505/messages:send'),
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: jsonEncode(notification),
+    );
 
+    client.close();
+
+    if(response.statusCode == 200) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<void> _cancelClass() async {
     try {
-      canceledReservation = widget.reservationSnapshot;
       widget.reservationSnapshot.reference.delete();
+      widget.classSnapshot.reference.update({'reserved': FieldValue.increment(-1)});
+
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Rezervarea a fost anulată.'),
-          action: SnackBarAction(
-            label: 'Anulați',
-            onPressed: () {
-              widget.reservationSnapshot.reference.set(canceledReservation!.data()!);
-              canceledReservation = null;
-              widget.classSnapshot.reference.update({'reserved': FieldValue.increment(1)});
-            },
-          ),
+        const SnackBar(
+          content: Text('Rezervarea a fost anulată.'),
         ),
       );
 
-      widget.classSnapshot.reference.update({'reserved': FieldValue.increment(-1)});
+      QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
+          await FirebaseFirestore.instance
+          .collection('waitingList')
+          .where('class', isEqualTo: widget.classSnapshot.reference)
+          .orderBy('time')
+          .get();
+
+      if (waitingListSnapshot.docs.isNotEmpty) {
+        DocumentSnapshot<Map<String, dynamic>> first = waitingListSnapshot.docs.first;
+
+        await FirebaseFirestore.instance.collection('reservations').add({
+          'class': widget.classSnapshot.reference,
+          'client': first['client'],
+          'date': widget.classSnapshot['date'],
+          'start': widget.classSnapshot['start'],
+          'end': widget.classSnapshot['end'],
+        });
+
+        widget.classSnapshot.reference.update({'reserved': FieldValue.increment(1)});
+
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot = await FirebaseFirestore.instance.collection('users').doc(first['client']).get();
+        sendNotification(
+          userSnapshot['token'],
+          'Rezervare confirmată',
+          'A fost eliberat un loc la clasa de ${widget.classSnapshot['className']}. Rezervarea este confirmată!',
+        );
+
+        await first.reference.delete();
+      }
     } on FirebaseException catch (error) {
       _showError(error);
     }
@@ -78,10 +135,52 @@ class _ReservationCardState extends State<ReservationCard> {
               ],
             ),
             ElevatedButton(
-              onPressed: () {
-                _cancelClass();
-              },
               child: const Text('Anulează'),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) {
+                    return Center(
+                      child: SingleChildScrollView(
+                        child: Card(
+                          margin: const EdgeInsets.all(20),
+                          color: colors[widget.classSnapshot['className']],
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                WhiteText(text: 'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?'),
+                                const SizedBox(height: 20),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        _cancelClass();
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Da'),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Nu'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),

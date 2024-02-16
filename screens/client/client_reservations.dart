@@ -51,10 +51,10 @@ class ReservationsListScreen extends StatelessWidget {
                     reservationSnapshot: reservations[index],
                     classSnapshot: classSnapshot.data!,
                   );
-                },
+                  },
               );
-              },
-          );
+            }
+            );
         }
         );
   }
