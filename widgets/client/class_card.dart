@@ -20,22 +20,19 @@ class _ClassCardState extends State<ClassCard> {
   String _trainer = '';
 
   void _reserveClass() async {
-    DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
     DocumentReference<Map<String, dynamic>> classRef = FirebaseFirestore
         .instance
         .collection('classes')
         .doc(widget.fitnessClass.id);
     DocumentSnapshot<Map<String, dynamic>> classSnapshot = await classRef.get();
     Map<String, dynamic> classMap = classSnapshot.data()!;
-    Query<Map<String, dynamic>> existingClasses = FirebaseFirestore.instance
+    Query<Map<String, dynamic>> existingReservations = FirebaseFirestore.instance
         .collection('reservations')
-        .where('client', isEqualTo: userRef)
+        .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
         .where('date', isEqualTo: classMap['date']);
 
     try {
-      if(await verifyHours(existingClasses, classMap['date'].toDate(), convertToTimeOfDay(classMap['start']), convertToTimeOfDay(classMap['end'])) == false) {
+      if(await verifyHours(existingReservations, classMap['date'].toDate(), convertToTimeOfDay(classMap['start']), convertToTimeOfDay(classMap['end'])) == false) {
         _showMessage();
       } else if (classMap['reserved'] < classMap['capacity']) {
         await FirebaseFirestore.instance.collection('reservations').add({

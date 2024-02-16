@@ -40,7 +40,7 @@ class ContactDetailsState extends State<ContactDetails> {
     if (response.statusCode == 200) {
       final data = Map<String, dynamic>.from(json.decode(response.body));
 
-      if (data['results'] != null && data['results'].isNotEmpty && mounted) {
+      if (data['results'] != null && data['results'].isNotEmpty) {
         setState(() {
           lat = data['results'][0]['geometry']['location']['lat'];
           long = data['results'][0]['geometry']['location']['lng'];

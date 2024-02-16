@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/client/busy_indicator.dart';
 import '../../widgets/client/client_card.dart';
@@ -43,10 +44,20 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     });
   }
 
+  void _setNotifications() async {
+    await FirebaseMessaging.instance.requestPermission();
+    String? token = await FirebaseMessaging.instance.getToken();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({'token': token});
+  }
+
   @override
   void initState() {
     super.initState();
     _loadData();
+    _setNotifications();
   }
 
   @override

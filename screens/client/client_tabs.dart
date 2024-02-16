@@ -38,9 +38,12 @@ class _ClientTabsScreenState extends State<ClientTabsScreen> {
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (ctx) => EditUser(user: FirebaseFirestore.instance.collection('users').doc(user.uid))),
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => EditUser(
+                      user: FirebaseFirestore.instance.collection('users').doc(user.uid)),
                 );
               },
               icon: const Icon(Icons.person),
