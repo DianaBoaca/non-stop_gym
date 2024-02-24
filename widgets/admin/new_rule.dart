@@ -107,7 +107,8 @@ class _NewRuleState extends State<NewRule> {
                       ElevatedButton(
                         onPressed: _onSave,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
                         ),
                         child: const Text('Adaugă'),
                       ),

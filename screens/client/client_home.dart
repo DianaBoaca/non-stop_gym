@@ -4,7 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/client/busy_indicator.dart';
 import '../../widgets/client/client_card.dart';
-import '../../widgets/client/contact_details.dart';
+import '../../widgets/client/client_contact_details.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -36,12 +36,14 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         .doc('XZc7U6u8uXpXVJsO1hIK')
         .get();
 
-    setState(() {
-      _clientSnapshot = client;
-      _indicatorSnapshot = indicator;
-      _contactSnapshot = contact;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _clientSnapshot = client;
+        _indicatorSnapshot = indicator;
+        _contactSnapshot = contact;
+        _isLoading = false;
+      });
+    }
   }
 
   void _setNotifications() async {
@@ -64,16 +66,13 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   Widget build(BuildContext context) {
     return _isLoading
         ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            child: Column(
-              children: [
-                ClientCard(user: _clientSnapshot),
-                const SizedBox(height: 30),
-                BusyIndicator(statistics: _indicatorSnapshot),
-                const SizedBox(height: 15),
-                ContactDetails(contactDetails: _contactSnapshot),
-              ],
-            ),
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ClientCard(user: _clientSnapshot),
+              BusyIndicator(statistics: _indicatorSnapshot),
+              ContactDetails(contactDetails: _contactSnapshot),
+            ],
           );
   }
 }

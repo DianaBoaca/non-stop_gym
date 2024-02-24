@@ -1,31 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/ClassUtils.dart';
+import '../../utils/class_utils.dart';
 
-class EditClass extends StatefulWidget {
-  const EditClass({super.key, required this.fitnessClass});
-
-  final DocumentReference<Map<String, dynamic>> fitnessClass;
+class NewClass extends StatefulWidget {
+  const NewClass({super.key});
 
   @override
-  State<EditClass> createState() => _EditClassState();
+  State<NewClass> createState() => _NewClassState();
 }
 
-class _EditClassState extends State<EditClass> {
+class _NewClassState extends State<NewClass> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
+  String _enteredName = '';
   DateTime? _selectedDate;
   TimeOfDay? _selectedStart;
   TimeOfDay? _selectedEnd;
   DocumentReference? _selectedTrainer;
   Room? _selectedRoom;
-  int? _counter;
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date'),
+        content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
   }
@@ -39,28 +36,43 @@ class _EditClassState extends State<EditClass> {
     );
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void _changeScreen() {
+    Navigator.pop(context);
   }
 
   void _onSave() async {
-    if (_form.currentState!.validate()) {
+    if (_form.currentState!.validate() &&
+        _selectedDate != null &&
+        _selectedStart != null &&
+        _selectedEnd != null &&
+        _selectedTrainer != null &&
+        _selectedRoom != null) {
       _form.currentState!.save();
     }
 
+    if (await verifyTrainerAvailability('', _selectedTrainer!, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Antrenorul este ocupat în acel interval orar.');
+      return;
+    }
+
+    if (await verifyRoomAvailability('', _selectedDate!, _selectedRoom!.toString(), _selectedStart!, _selectedEnd!) == false) {
+      _showBookingError('Sala este ocupată în acel interval orar.');
+      return;
+    }
+
     try {
-      await widget.fitnessClass.set({
-        'className': _nameController.text,
+      await FirebaseFirestore.instance.collection('classes').add({
+        'className': _enteredName,
         'date': _selectedDate,
         'start': convertToDateTime(_selectedDate!, _selectedStart!),
         'end': convertToDateTime(_selectedDate!, _selectedEnd!),
         'trainer': _selectedTrainer,
         'room': _selectedRoom.toString(),
         'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
-        'reserved': _counter,
+        'reserved': 0,
       });
+
+      _changeScreen();
     } on FirebaseException catch (error) {
       _showError(error);
     }
@@ -78,11 +90,9 @@ class _EditClassState extends State<EditClass> {
       lastDate: lastDate,
     );
 
-    if (date != null) {
-      setState(() {
-        _selectedDate = date;
-      });
-    }
+    setState(() {
+      _selectedDate = date;
+    });
   }
 
   void _selectStart() async {
@@ -95,16 +105,13 @@ class _EditClassState extends State<EditClass> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (await verifyRoomAvailability(_selectedDate!, _selectedRoom.toString(), _selectedStart!, _selectedEnd!) == false) {
-      _showBookingError('Sala este ocupată în acel interval orar.');
-    } else if (await verifyTrainerAvailability(_selectedTrainer!, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
-      _showBookingError('Antrenorul este ocupat în acel interval orar.');
-    }
-    else if (start != null) {
-      setState(() {
-        _selectedStart = start;
-      });
-    }
+    setState(() {
+      _selectedStart = start;
+    });
+  }
+
+  double toDouble(TimeOfDay time) {
+    return time.hour + time.minute / 60.0;
   }
 
   void _selectEnd() async {
@@ -117,93 +124,47 @@ class _EditClassState extends State<EditClass> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (toDouble(_selectedStart!) > toDouble(end!)) {
-      _showBookingError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
-    } else if(await verifyRoomAvailability(_selectedDate!, _selectedRoom.toString(), _selectedStart!, _selectedEnd!) == false) {
-      _showBookingError('Sala este ocupată în acel interval orar.');
-    } else if (await verifyTrainerAvailability(_selectedTrainer!, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
-      _showBookingError('Antrenorul este ocupat în acel interval orar.');
-    } else {
+    if (toDouble(_selectedStart!) < toDouble(end!)) {
       setState(() {
         _selectedEnd = end;
-    });
-    }
-  }
-
-  void _selectTrainer(DocumentReference value) async {
-    if(await verifyTrainerAvailability(value, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
-      _showBookingError('Antrenorul este ocupat în acel interval orar.');
+      });
     } else {
-      setState(() {
-        _selectedTrainer = value;
-      });
+      _showBookingError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
     }
-  }
-
-  void _selectRoom(Room value) async {
-    if(await verifyRoomAvailability(_selectedDate!, value.toString(), _selectedStart!, _selectedEnd!) == false) {
-      _showBookingError('Sala este ocupată în acel interval orar.');
-    } else {
-      setState(() {
-        _selectedRoom = value;
-      });
-    }
-  }
-
-  void _loadData() async {
-    DocumentSnapshot<Map<String, dynamic>> classData = await widget.fitnessClass.get();
-
-    if (classData.exists) {
-      Map<String, dynamic> classDataMap = classData.data()!;
-
-      setState(() {
-        _nameController.text = classDataMap['className'];
-        _selectedDate = classDataMap['date'].toDate();
-        _selectedStart = TimeOfDay.fromDateTime(classDataMap['start'].toDate());
-        _selectedEnd = TimeOfDay.fromDateTime(classDataMap['end'].toDate());
-        _selectedTrainer = classDataMap['trainer'];
-        _selectedRoom = classDataMap['room'] == 'Room.aerobic' ? Room.aerobic : Room.functional;
-        _counter = classDataMap['reserved'];
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return  Center(
       child: SingleChildScrollView(
         child: Card(
-          margin: const EdgeInsets.all(20),
-          color: Theme.of(context).colorScheme.primaryContainer,
+          margin: const EdgeInsets.all(15),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(30),
             child: Form(
               key: _form,
               child: Column(
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'Nume',
+                      labelText: 'Nume clasă',
                     ),
-                    controller: _nameController,
+                    keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
                     textCapitalization: TextCapitalization.none,
                     enableSuggestions: false,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Introduceți numele.';
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Introduceți un nume de clasă.';
                       }
 
                       return null;
                     },
+                    onSaved: (value) {
+                      _enteredName = value!;
+                    },
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: _selectDate,
                     child: Text(
@@ -216,7 +177,9 @@ class _EditClassState extends State<EditClass> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        onPressed: _selectStart,
+                        onPressed: _selectedDate != null
+                            ? _selectStart
+                            : null,
                         child: Text(
                           _selectedStart != null
                               ? formatTime(_selectedStart!)
@@ -225,7 +188,9 @@ class _EditClassState extends State<EditClass> {
                       ),
                       const SizedBox(width: 10),
                       ElevatedButton(
-                        onPressed: _selectEnd,
+                        onPressed: _selectedStart != null
+                            ? _selectEnd
+                            : null,
                         child: Text(
                           _selectedEnd != null
                               ? formatTime(_selectedEnd!)
@@ -244,7 +209,8 @@ class _EditClassState extends State<EditClass> {
                               .where('role', isEqualTo: 'trainer')
                               .snapshots(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             }
 
@@ -252,11 +218,13 @@ class _EditClassState extends State<EditClass> {
                               return const Text('Eroare');
                             }
 
-                            List<DropdownMenuItem<DocumentReference>> trainers = snapshot.data!.docs
+                            List<DropdownMenuItem<DocumentReference>>trainers = snapshot.data!.docs
                                 .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
                               return DropdownMenuItem(
                                 value: trainer.reference,
-                                child: Text('${trainer['lastName']} ${trainer['firstName']}',),
+                                child: Text(
+                                  '${trainer['lastName']} ${trainer['firstName']}',
+                                ),
                               );
                             },
                             ).toList();
@@ -264,9 +232,12 @@ class _EditClassState extends State<EditClass> {
                             return DropdownButton(
                               items: trainers,
                               onChanged: (value) {
-                                if (value != null) {
-                                  _selectTrainer(value);
+                                if (value == null) {
+                                  return;
                                 }
+                                setState(() {
+                                  _selectedTrainer = value;
+                                });
                               },
                               value: _selectedTrainer,
                               hint: const Text('Antrenor'),
@@ -275,16 +246,15 @@ class _EditClassState extends State<EditClass> {
                       const SizedBox(width: 10),
                       DropdownButton(
                         value: _selectedRoom,
-                        items: Room.values.map(
-                              (room) => DropdownMenuItem(
-                            value: room,
-                            child: Text(room.name),
-                          ),
+                        items: Room.values.map((room) => DropdownMenuItem(
+                          value: room,
+                          child: Text(room.name),
+                        ),
                         ).toList(),
                         onChanged: (value) {
-                          if(value != null) {
-                            _selectRoom(value);
-                          }
+                          setState(() {
+                            _selectedRoom = value!;
+                          });
                         },
                         hint: const Text('Sala'),
                       ),
@@ -301,11 +271,11 @@ class _EditClassState extends State<EditClass> {
                         child: const Text('Anulează'),
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          _onSave();
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Salvează'),
+                        onPressed: _onSave,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                        ),
+                        child: const Text('Adaugă'),
                       ),
                     ],
                   ),

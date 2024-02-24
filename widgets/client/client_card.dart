@@ -95,9 +95,11 @@ class _ClientCardState extends State<ClientCard> {
     if (userData.exists) {
       Map<String, dynamic> userDataMap = userData.data() as Map<String, dynamic>;
 
-      setState(() {
+      if (mounted) {
+        setState(() {
         _checkedIn = userDataMap['checkedIn'];
       });
+      }
     }
   }
 

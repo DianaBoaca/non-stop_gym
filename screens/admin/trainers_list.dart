@@ -1,27 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/admin/edit_user.dart';
+import '../../widgets/edit_user.dart';
+import '../../widgets/admin/new_trainer.dart';
 
-class ClientsListScreen extends StatefulWidget {
-  const ClientsListScreen({super.key});
-
-  @override
-  State<ClientsListScreen> createState() => _ClientsListScreenState();
-}
-
-class _ClientsListScreenState extends State<ClientsListScreen> {
-  DocumentSnapshot<Map<String, dynamic>>? _deletedClient;
+class TrainersListScreen extends StatelessWidget {
+  const TrainersListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    DocumentSnapshot<Map<String, dynamic>>? deletedTrainer;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Clienți'),
+        title: const Text('Antrenori'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (context) => const NewTrainer(),
+              );
+            },
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('users')
-            .where('role', isEqualTo: 'client')
+            .where('role', isEqualTo: 'trainer')
             .orderBy('lastName')
             .snapshots(),
         builder: (context, snapshot) {
@@ -31,58 +40,60 @@ class _ClientsListScreenState extends State<ClientsListScreen> {
             );
           }
 
-          final clients = snapshot.data!.docs;
-
-          if (!snapshot.hasData || clients.isEmpty) {
-            return const Center(
-              child: Text('Nu există clienți.'),
-            );
-          }
-
           if (snapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
           }
 
+          if (snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text('Nu există antrenori.'),
+            );
+          }
+
+          final trainers = snapshot.data!.docs;
+
           return ListView.builder(
-            itemCount: clients.length,
+            itemCount: trainers.length,
             itemBuilder: (context, index) => Dismissible(
-              key: ValueKey(clients[index]),
+              key: ValueKey(trainers[index]),
               onDismissed: (direction) {
-                _deletedClient = clients[index];
-                clients[index].reference.delete();
+                deletedTrainer = trainers[index];
+                trainers[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Clientul a fost șters.'),
+                    content: const Text('Antrenorul a fost șters.'),
                     action: SnackBarAction(
                       label: 'Anulați',
                       onPressed: () {
-                        clients[index].reference.set(_deletedClient!.data()!);
-                        _deletedClient = null;
+                        trainers[index].reference.set(deletedTrainer!.data()!);
+                        deletedTrainer = null;
                       },
                     ),
                   ),
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(5),
                 child: ListTile(
-                  leading: const Icon(Icons.person),
+                  leading: const Icon(Icons.fitness_center),
                   title: Text(
-                    clients[index].data()['lastName'] + ' ' + clients[index].data()['firstName'],
+                    trainers[index].data()['lastName'] +
+                        ' ' +
+                        trainers[index].data()['firstName'],
                     style: const TextStyle(fontSize: 20),
                   ),
                   subtitle: Row(
                     children: [
                       Text(
-                        clients[index].data()['email'],
+                        trainers[index].data()['email'],
                         style: const TextStyle(fontSize: 15),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 10),
                       Text(
-                        clients[index].data()['phone'],
+                        trainers[index].data()['phone'],
                         style: const TextStyle(fontSize: 15),
                       ),
                     ],
@@ -93,7 +104,8 @@ class _ClientsListScreenState extends State<ClientsListScreen> {
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
                       context: context,
-                      builder: (context) => EditUser(user: clients[index].reference),
+                      builder: (context) =>
+                          EditUser(user: trainers[index].reference),
                     );
                   },
                 ),

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/client/white_text.dart';
-import '../../utils/ClassUtils.dart';
+import '../../utils/class_utils.dart';
 
 class ClassCard extends StatefulWidget {
   const ClassCard({super.key, required this.fitnessClass});
@@ -26,13 +26,21 @@ class _ClassCardState extends State<ClassCard> {
         .doc(widget.fitnessClass.id);
     DocumentSnapshot<Map<String, dynamic>> classSnapshot = await classRef.get();
     Map<String, dynamic> classMap = classSnapshot.data()!;
-    Query<Map<String, dynamic>> existingReservations = FirebaseFirestore.instance
-        .collection('reservations')
-        .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .where('date', isEqualTo: classMap['date']);
+    QuerySnapshot<Map<String, dynamic>> existingReservations =
+        await FirebaseFirestore.instance
+            .collection('reservations')
+            .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('date', isEqualTo: classMap['date'])
+            .get();
 
     try {
-      if(await verifyHours(existingReservations, classMap['date'].toDate(), convertToTimeOfDay(classMap['start']), convertToTimeOfDay(classMap['end'])) == false) {
+      if (await verifyHours(
+              '',
+              existingReservations.docs,
+              classMap['date'].toDate(),
+              convertToTimeOfDay(classMap['start']),
+              convertToTimeOfDay(classMap['end'])) ==
+          false) {
         _showMessage();
       } else if (classMap['reserved'] < classMap['capacity']) {
         await FirebaseFirestore.instance.collection('reservations').add({
@@ -53,6 +61,8 @@ class _ClassCardState extends State<ClassCard> {
           'class': classRef,
           'client': FirebaseAuth.instance.currentUser!.uid,
           'time': DateTime.now(),
+          'start': classMap['start'],
+          'end': classMap['end'],
         });
 
         setState(() {
@@ -127,17 +137,16 @@ class _ClassCardState extends State<ClassCard> {
             child: _isLoading
                 ? const CircularProgressIndicator()
                 : StreamBuilder(
-                  stream: FirebaseFirestore
-                      .instance
-                      .collection('classes')
-                      .doc(widget.fitnessClass.id)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
+                    stream: FirebaseFirestore.instance
+                        .collection('classes')
+                        .doc(widget.fitnessClass.id)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
 
-                    return Column(
+                      return Column(
                         children: [
                           Text(
                             widget.fitnessClass.className,
@@ -149,7 +158,8 @@ class _ClassCardState extends State<ClassCard> {
                           ),
                           const SizedBox(height: 10),
                           WhiteText(
-                              text: formatter.format(snapshot.data!['date'].toDate())),
+                              text: formatter
+                                  .format(snapshot.data!['date'].toDate())),
                           const SizedBox(height: 10),
                           WhiteText(
                             text:
@@ -158,7 +168,9 @@ class _ClassCardState extends State<ClassCard> {
                           const SizedBox(height: 10),
                           WhiteText(text: 'Antrenor: $_trainer'),
                           const SizedBox(height: 10),
-                          WhiteText(text: 'Sala: ${snapshot.data!['room'] =='Room.aerobic' ? 'Aerobic' : 'Functional'}'),
+                          WhiteText(
+                              text:
+                                  'Sala: ${snapshot.data!['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}'),
                           const SizedBox(height: 10),
                           WhiteText(
                               text:
@@ -195,8 +207,7 @@ class _ClassCardState extends State<ClassCard> {
                             ),
                         ],
                       );
-                  }
-                ),
+                    }),
           ),
         ),
       ),

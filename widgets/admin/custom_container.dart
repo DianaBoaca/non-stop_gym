@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class CustomContainer extends StatelessWidget {
-  const CustomContainer({super.key, required this.icon, required this.title, required this.color, required this.route});
+  const CustomContainer({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.color,
+    required this.route,
+  });
 
   final IconData icon;
   final String title;
@@ -23,7 +29,8 @@ class CustomContainer extends StatelessWidget {
           style: const TextStyle(
               fontSize: 23,
               fontWeight: FontWeight.w500,
-              color: Colors.white),
+              color: Colors.white,
+          ),
         ),
         tileColor: color,
         shape: RoundedRectangleBorder(
@@ -32,7 +39,7 @@ class CustomContainer extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (ctx) => route),
+            MaterialPageRoute(builder: (context) => route),
           );
         },
       ),

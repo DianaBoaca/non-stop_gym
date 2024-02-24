@@ -18,19 +18,19 @@ class ClientRuleScreen extends StatelessWidget {
           );
         }
 
-        final rules = snapshot.data!.docs;
-
-        if (!snapshot.hasData || rules.isEmpty) {
-          return const Center(
-            child: Text('Nu există reguli.'),
-          );
-        }
-
         if (snapshot.hasError) {
           return const Center(
             child: Text('Eroare!'),
           );
         }
+
+        if (snapshot.data!.docs.isEmpty) {
+          return const Center(
+            child: Text('Nu există reguli.'),
+          );
+        }
+
+        final rules = snapshot.data!.docs;
 
         return ListView.builder(
           itemCount: rules.length,
