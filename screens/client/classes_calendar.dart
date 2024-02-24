@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/client/class_card.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import '../../utils/ClassUtils.dart';
+import '../../utils/class_utils.dart';
 
 class ClassesCalendarScreen extends StatelessWidget {
   const ClassesCalendarScreen({super.key});
@@ -18,20 +18,19 @@ class ClassesCalendarScreen extends StatelessWidget {
           );
         }
 
-        final classes = snapshot.data!.docs;
-
-        if (!snapshot.hasData || classes.isEmpty) {
-          return const Center(
-            child: Text('Nu există clase.'),
-          );
-        }
-
         if (snapshot.hasError) {
           return const Center(
             child: Text('Eroare!'),
           );
         }
 
+        if (snapshot.data!.docs.isEmpty) {
+          return const Center(
+            child: Text('Nu există clase.'),
+          );
+        }
+
+        final classes = snapshot.data!.docs;
         final List<FitnessClass> appointments = <FitnessClass>[];
 
         for (final doc in classes) {

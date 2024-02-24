@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/admin/custom_container.dart';
-import 'ContactScreen.dart';
-import 'AdminRuleScreen.dart';
-import 'ClientsListScreen.dart';
-import 'TrainersListScreen.dart';
-import 'package:non_stop_gym/screens/AuthScreen.dart';
-import 'ClassesListScreen.dart';
+import 'admin_contact_details.dart';
+import 'admin_rules.dart';
+import 'clients_list.dart';
+import 'trainers_list.dart';
+import 'package:non_stop_gym/screens/auth_screen.dart';
+import 'classes_list.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -35,7 +35,7 @@ class AdminHomeScreen extends StatelessWidget {
           CustomContainer(
             icon: Icons.fitness_center,
             title: 'Antrenori',
-            color: Theme.of(context).colorScheme.onPrimaryContainer ,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
             route: const TrainersListScreen(),
           ),
           CustomContainer(
@@ -64,6 +64,6 @@ class AdminHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-     );
+    );
   }
 }

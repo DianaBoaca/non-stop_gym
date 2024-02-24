@@ -5,13 +5,18 @@ import 'package:flutter/services.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 import 'white_text.dart';
-import '../../utils/ClassUtils.dart';
+import '../../utils/class_utils.dart';
 
 class ReservationCard extends StatefulWidget {
-  const ReservationCard({super.key, required this.reservationSnapshot, required this.classSnapshot});
+  const ReservationCard(
+      {super.key,
+      required this.reservationSnapshot,
+      required this.classSnapshot,
+      required this.position});
 
   final DocumentSnapshot<Map<String, dynamic>> reservationSnapshot;
   final DocumentSnapshot<Map<String, dynamic>> classSnapshot;
+  final int position;
 
   @override
   State<ReservationCard> createState() => _ReservationCardState();
@@ -28,8 +33,10 @@ class _ReservationCardState extends State<ReservationCard> {
   }
 
   Future<bool> sendNotification(String token, String title, String text) async {
-    String jsonCredentials = await rootBundle.loadString('517570860ed0e887014067b5f426e130a86d7436');
-    ServiceAccountCredentials credentials = ServiceAccountCredentials.fromJson(jsonCredentials);
+    String jsonCredentials =
+        await rootBundle.loadString('517570860ed0e887014067b5f426e130a86d7436');
+    ServiceAccountCredentials credentials =
+        ServiceAccountCredentials.fromJson(jsonCredentials);
     AutoRefreshingAuthClient client = await clientViaServiceAccount(
       credentials,
       ['https://www.googleapis.com/auth/cloud-platform'],
@@ -45,7 +52,7 @@ class _ReservationCardState extends State<ReservationCard> {
     };
     Response response = await client.post(
       Uri.parse(
-        'https://fcm.googleapis.com/v1/projects/224380999505/messages:send'),
+          'https://fcm.googleapis.com/v1/projects/224380999505/messages:send'),
       headers: {
         'content-type': 'application/json',
       },
@@ -54,7 +61,7 @@ class _ReservationCardState extends State<ReservationCard> {
 
     client.close();
 
-    if(response.statusCode == 200) {
+    if (response.statusCode == 200) {
       return true;
     }
 
@@ -64,7 +71,6 @@ class _ReservationCardState extends State<ReservationCard> {
   Future<void> _cancelClass() async {
     try {
       widget.reservationSnapshot.reference.delete();
-      widget.classSnapshot.reference.update({'reserved': FieldValue.increment(-1)});
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,34 +79,45 @@ class _ReservationCardState extends State<ReservationCard> {
         ),
       );
 
-      QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
-          await FirebaseFirestore.instance
-          .collection('waitingList')
-          .where('class', isEqualTo: widget.classSnapshot.reference)
-          .orderBy('time')
-          .get();
+      if (widget.position == 0) {
+        widget.classSnapshot.reference
+            .update({'reserved': FieldValue.increment(-1)});
 
-      if (waitingListSnapshot.docs.isNotEmpty) {
-        DocumentSnapshot<Map<String, dynamic>> first = waitingListSnapshot.docs.first;
+        QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
+            await FirebaseFirestore.instance
+                .collection('waitingList')
+                .where('class', isEqualTo: widget.classSnapshot.reference)
+                .orderBy('time')
+                .get();
 
-        await FirebaseFirestore.instance.collection('reservations').add({
-          'class': widget.classSnapshot.reference,
-          'client': first['client'],
-          'date': widget.classSnapshot['date'],
-          'start': widget.classSnapshot['start'],
-          'end': widget.classSnapshot['end'],
-        });
+        if (waitingListSnapshot.docs.isNotEmpty) {
+          DocumentSnapshot<Map<String, dynamic>> first =
+              waitingListSnapshot.docs.first;
 
-        widget.classSnapshot.reference.update({'reserved': FieldValue.increment(1)});
+          await FirebaseFirestore.instance.collection('reservations').add({
+            'class': widget.classSnapshot.reference,
+            'client': first['client'],
+            'date': widget.classSnapshot['date'],
+            'start': widget.classSnapshot['start'],
+            'end': widget.classSnapshot['end'],
+          });
 
-        DocumentSnapshot<Map<String, dynamic>> userSnapshot = await FirebaseFirestore.instance.collection('users').doc(first['client']).get();
-        sendNotification(
-          userSnapshot['token'],
-          'Rezervare confirmată',
-          'A fost eliberat un loc la clasa de ${widget.classSnapshot['className']}. Rezervarea este confirmată!',
-        );
+          widget.classSnapshot.reference
+              .update({'reserved': FieldValue.increment(1)});
 
-        await first.reference.delete();
+          DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(first['client'])
+                  .get();
+          sendNotification(
+            userSnapshot['token'],
+            'Rezervare confirmată',
+            'A fost eliberat un loc la clasa de ${widget.classSnapshot['className']}. Rezervarea este confirmată!',
+          );
+
+          await first.reference.delete();
+        }
       }
     } on FirebaseException catch (error) {
       _showError(error);
@@ -114,74 +131,88 @@ class _ReservationCardState extends State<ReservationCard> {
       color: colors[widget.classSnapshot['className']],
       child: Padding(
         padding: const EdgeInsets.all(18),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.classSnapshot['className'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.classSnapshot['className'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    WhiteText(
+                      text:
+                          '${formatter.format(widget.classSnapshot['date'].toDate())}   ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 15),
-                WhiteText(
-                  text: '${formatter.format(widget.classSnapshot['date'].toDate())}   ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
-                ),
-              ],
-            ),
-            ElevatedButton(
-              child: const Text('Anulează'),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) {
-                    return Center(
-                      child: SingleChildScrollView(
-                        child: Card(
-                          margin: const EdgeInsets.all(20),
-                          color: colors[widget.classSnapshot['className']],
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              children: [
-                                WhiteText(text: 'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?'),
-                                const SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                ElevatedButton(
+                  child: const Text('Anulează'),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) {
+                        return Center(
+                          child: SingleChildScrollView(
+                            child: Card(
+                              margin: const EdgeInsets.all(20),
+                              color: colors[widget.classSnapshot['className']],
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        _cancelClass();
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Da'),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Nu'),
+                                    WhiteText(
+                                        text:
+                                            'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?'),
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            _cancelClass();
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Da'),
+                                        ),
+                                        const SizedBox(width: 20),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Nu'),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
-                );
-              },
+                ),
+              ],
             ),
+            const SizedBox(height: 15),
+            if (widget.position > 0)
+              WhiteText(
+                  text:
+                      'Sunteți pe locul ${widget.position} în lista de așteptare!'),
           ],
         ),
       ),

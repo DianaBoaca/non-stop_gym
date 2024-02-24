@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/ClassUtils.dart';
-import 'EditClass.dart';
-import 'NewClass.dart';
+import '../../utils/class_utils.dart';
+import '../../widgets/admin/edit_class.dart';
+import '../../widgets/admin/new_class.dart';
 
 class ClassesListScreen extends StatelessWidget {
   const ClassesListScreen({super.key});
@@ -41,19 +41,19 @@ class ClassesListScreen extends StatelessWidget {
             );
           }
 
-          final classes = snapshot.data!.docs;
-
-          if (!snapshot.hasData || classes.isEmpty) {
-            return const Center(
-              child: Text('Nu există clase.'),
-            );
-          }
-
           if (snapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
           }
+
+          if (snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text('Nu există clase.'),
+            );
+          }
+
+          final classes = snapshot.data!.docs;
 
           return ListView.builder(
             itemCount: classes.length,
@@ -89,8 +89,7 @@ class ClassesListScreen extends StatelessWidget {
                       leading: Icon(
                           classes[index].data()['room'] == 'Room.aerobic'
                               ? Icons.monitor_heart
-                              : Icons.fitness_center
-                      ),
+                              : Icons.fitness_center),
                       title: Text(
                         classes[index].data()['className'],
                         style: const TextStyle(
@@ -104,7 +103,8 @@ class ClassesListScreen extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                formatter.format(classes[index].data()['date'].toDate()),
+                                formatter.format(
+                                    classes[index].data()['date'].toDate()),
                                 style: const TextStyle(fontSize: 15),
                               ),
                               const SizedBox(width: 20),
@@ -131,7 +131,7 @@ class ClassesListScreen extends StatelessWidget {
                           backgroundColor: Colors.transparent,
                           context: context,
                           builder: (context) => EditClass(
-                              fitnessClass: classes[index].reference,
+                            fitnessClass: classes[index].reference,
                           ),
                         );
                       },

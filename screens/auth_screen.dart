@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:non_stop_gym/screens/admin/AdminHomeScreen.dart';
+import 'package:non_stop_gym/screens/admin/admin_home.dart';
 import 'package:non_stop_gym/screens/client/client_tabs.dart';
 import 'dart:math';
 
@@ -43,10 +43,12 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _route(Widget screen) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => screen),
+      );
+    }
   }
 
   void _submit() async {
@@ -90,7 +92,7 @@ class _AuthScreenState extends State<AuthScreen> {
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get();
-      final role = userData.data()!['role'];
+      String role = userData.data()!['role'];
       if (role == 'client') {
         _route(const ClientTabsScreen());
       } else {

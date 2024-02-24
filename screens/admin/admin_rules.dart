@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/admin/EditRule.dart';
-import 'NewRule.dart';
+import 'package:non_stop_gym/widgets/admin/edit_rule.dart';
+import '../../widgets/admin/new_rule.dart';
 
 class AdminRuleScreen extends StatelessWidget {
   const AdminRuleScreen({super.key});
@@ -39,19 +39,19 @@ class AdminRuleScreen extends StatelessWidget {
             );
           }
 
-          final rules = snapshot.data!.docs;
-
-          if (!snapshot.hasData || rules.isEmpty) {
-            return const Center(
-              child: Text('Nu există reguli.'),
-            );
-          }
-
           if (snapshot.hasError) {
             return const Center(
               child: Text('Eroare!'),
             );
           }
+
+          if (snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text('Nu există reguli.'),
+            );
+          }
+
+          final rules = snapshot.data!.docs;
 
           return ListView.builder(
             itemCount: rules.length,
@@ -92,7 +92,8 @@ class AdminRuleScreen extends StatelessWidget {
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
                       context: context,
-                      builder: (context) => EditRule(rule: rules[index].reference),
+                      builder: (context) =>
+                          EditRule(rule: rules[index].reference),
                     );
                   },
                 ),

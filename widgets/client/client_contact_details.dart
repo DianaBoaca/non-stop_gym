@@ -41,10 +41,12 @@ class ContactDetailsState extends State<ContactDetails> {
       final data = Map<String, dynamic>.from(json.decode(response.body));
 
       if (data['results'] != null && data['results'].isNotEmpty) {
-        setState(() {
-          lat = data['results'][0]['geometry']['location']['lat'];
-          long = data['results'][0]['geometry']['location']['lng'];
-        });
+        if (mounted) {
+          setState(() {
+            lat = data['results'][0]['geometry']['location']['lat'];
+            long = data['results'][0]['geometry']['location']['lng'];
+          });
+        }
       }
     }
   }
@@ -88,11 +90,6 @@ class ContactDetailsState extends State<ContactDetails> {
               'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$long&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C$lat,$long&key=$apiKey',
               fit: BoxFit.cover,
             ),
-          ),
-          Image.network(
-            widget.contactDetails['tarife'],
-            height: 500,
-            width: 480,
           ),
         ],
       ),
