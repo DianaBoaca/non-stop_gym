@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class ClientRuleScreen extends StatelessWidget {
-  const ClientRuleScreen({super.key});
+class RulesScreen extends StatelessWidget {
+  const RulesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

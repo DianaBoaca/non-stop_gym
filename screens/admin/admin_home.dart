@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/widgets/admin/custom_container.dart';
+import 'package:non_stop_gym/screens/admin/trainers_list.dart';
+import '../../widgets/admin/custom_container.dart';
+import '../authentification.dart';
 import 'admin_contact_details.dart';
 import 'admin_rules.dart';
-import 'clients_list.dart';
-import 'trainers_list.dart';
-import 'package:non_stop_gym/screens/auth_screen.dart';
 import 'classes_list.dart';
+import 'clients_list.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -22,13 +22,14 @@ class AdminHomeScreen extends StatelessWidget {
               FirebaseAuth.instance.signOut();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (ctx) => const AuthScreen()),
+                MaterialPageRoute(builder: (context) => const AuthScreen()),
               );
             },
             icon: const Icon(Icons.exit_to_app),
           ),
         ],
       ),
+      backgroundColor: Colors.lightBlueAccent,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

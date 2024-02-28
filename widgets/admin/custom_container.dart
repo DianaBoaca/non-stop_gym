@@ -17,6 +17,8 @@ class CustomContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.075,
       padding: const EdgeInsets.all(5),
       child: ListTile(
         leading: Icon(
@@ -27,9 +29,9 @@ class CustomContainer extends StatelessWidget {
         title: Text(
           title,
           style: const TextStyle(
-              fontSize: 23,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
+            fontSize: 23,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
           ),
         ),
         tileColor: color,
@@ -46,5 +48,3 @@ class CustomContainer extends StatelessWidget {
     );
   }
 }
-
-

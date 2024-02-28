@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/edit_user.dart';
+import 'package:non_stop_gym/widgets/admin/trainer_list_tile.dart';
 import '../../widgets/admin/new_trainer.dart';
 
 class TrainersListScreen extends StatelessWidget {
@@ -27,7 +27,8 @@ class TrainersListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder(
+      backgroundColor: Colors.lightBlueAccent,
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('users')
             .where('role', isEqualTo: 'trainer')
@@ -76,39 +77,8 @@ class TrainersListScreen extends StatelessWidget {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: ListTile(
-                  leading: const Icon(Icons.fitness_center),
-                  title: Text(
-                    trainers[index].data()['lastName'] +
-                        ' ' +
-                        trainers[index].data()['firstName'],
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  subtitle: Row(
-                    children: [
-                      Text(
-                        trainers[index].data()['email'],
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        trainers[index].data()['phone'],
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ),
-                  tileColor: Theme.of(context).colorScheme.primaryContainer,
-                  onTap: () {
-                    showModalBottomSheet(
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (context) =>
-                          EditUser(user: trainers[index].reference),
-                    );
-                  },
-                ),
+                padding: const EdgeInsets.all(8),
+                child: TrainerListTile(trainerQuery: trainers[index]),
               ),
             ),
           );

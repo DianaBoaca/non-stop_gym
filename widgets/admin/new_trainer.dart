@@ -10,12 +10,12 @@ class NewTrainer extends StatefulWidget {
 }
 
 class _NewTrainerState extends State<NewTrainer> {
-  final GlobalKey<FormState> _form = GlobalKey<FormState>();
-  String _enteredLastName = '';
-  String _enteredFirstName = '';
-  String _enteredPhone = '';
-  String _enteredEmail = '';
-  String _enteredPassword = '';
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late String _enteredLastName;
+  late String _enteredFirstName;
+  late String _enteredPhone;
+  late String _enteredEmail;
+  late String _enteredPassword;
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -31,11 +31,11 @@ class _NewTrainerState extends State<NewTrainer> {
   }
 
   void _onSave() async {
-    if (!_form.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    _form.currentState!.save();
+    _formKey.currentState!.save();
 
     try {
       final userCredentials =
@@ -70,7 +70,7 @@ class _NewTrainerState extends State<NewTrainer> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
-              key: _form,
+              key: _formKey,
               child: Column(
                 children: [
                   TextFormField(
