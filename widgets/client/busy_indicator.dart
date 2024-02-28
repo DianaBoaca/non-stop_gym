@@ -36,7 +36,6 @@ class _BusyIndicatorState extends State<BusyIndicator> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Column(

@@ -5,12 +5,12 @@ import 'package:non_stop_gym/screens/client/classes_calendar.dart';
 import 'package:non_stop_gym/screens/client/prices.dart';
 import '../../widgets/edit_user.dart';
 import 'client_home.dart';
-import '../auth_screen.dart';
+import '../authentification.dart';
 import 'client_reservations.dart';
-import 'client_rules.dart';
+import '../rules.dart';
 
 List<String> tabTitles = ['Rezervările mele', 'Calendar clase', 'Non-stop Gym', 'Regulament', 'Tarife'];
-List<Widget> activeTabs = [const ReservationsListScreen(), const ClassesCalendarScreen(), const ClientHomeScreen(), const ClientRuleScreen(), const PriceScreen()];
+List<Widget> activeTabs = [const ReservationsListScreen(), const ClassesCalendarScreen(), const ClientHomeScreen(), const RulesScreen(), const PriceScreen()];
 
 class ClientTabsScreen extends StatefulWidget {
   const ClientTabsScreen({super.key});
@@ -54,7 +54,7 @@ class _ClientTabsScreenState extends State<ClientTabsScreen> {
                   FirebaseAuth.instance.signOut();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (ctx) => const AuthScreen()),
+                    MaterialPageRoute(builder: (context) => const AuthScreen()),
                   );
                 },
                 icon: const Icon(Icons.exit_to_app),
