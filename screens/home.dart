@@ -2,21 +2,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/client/busy_indicator.dart';
-import '../../widgets/client/client_card.dart';
-import '../../widgets/client/client_contact_details.dart';
+import '../widgets/client/busy_indicator.dart';
+import '../widgets/client/client_card.dart';
+import '../widgets/client/client_contact_details.dart';
 
-class ClientHomeScreen extends StatefulWidget {
-  const ClientHomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<ClientHomeScreen> createState() => _ClientHomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _ClientHomeScreenState extends State<ClientHomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   late DocumentSnapshot<Map<String, dynamic>> _clientSnapshot;
   late DocumentSnapshot<Map<String, dynamic>> _contactSnapshot;
   late DocumentSnapshot<Map<String, dynamic>> _indicatorSnapshot;
+  late bool _isClient;
   bool _isLoading = true;
 
   Future<void> _loadData() async {
@@ -41,6 +42,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         _clientSnapshot = client;
         _indicatorSnapshot = indicator;
         _contactSnapshot = contact;
+        _isClient = client['role'] == 'client';
         _isLoading = false;
       });
     }
@@ -69,7 +71,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         : Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ClientCard(user: _clientSnapshot),
+              if (_isClient) ClientCard(user: _clientSnapshot),
               BusyIndicator(statistics: _indicatorSnapshot),
               ContactDetails(contactDetails: _contactSnapshot),
             ],
