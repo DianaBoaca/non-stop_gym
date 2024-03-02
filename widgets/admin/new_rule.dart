@@ -47,74 +47,77 @@ class _NewRuleState extends State<NewRule> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Card(
-          margin: const EdgeInsets.all(20),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _form,
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Titlu',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Introduceți titlul.';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredTitle = value!;
-                    },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Text',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    maxLines: null,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Introduceți textul.';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredText = value!;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Anulează'),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            margin: const EdgeInsets.all(20),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _form,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Titlu',
                       ),
-                      ElevatedButton(
-                        onPressed: _onSave,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți titlul.';
+                        }
+
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredTitle = value!;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Text',
+                      ),
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      maxLines: null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți textul.';
+                        }
+
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredText = value!;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Anulează'),
                         ),
-                        child: const Text('Adaugă'),
-                      ),
-                    ],
-                  ),
-                ],
+                        ElevatedButton(
+                          onPressed: _onSave,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                          ),
+                          child: const Text('Adaugă'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

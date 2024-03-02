@@ -70,77 +70,80 @@ class _EditRuleState extends State<EditRule> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: _isLoading
-          ? const CircularProgressIndicator()
-          : SingleChildScrollView(
-              child: Card(
-                margin: const EdgeInsets.all(20),
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Form(
-                    key: _form,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Titlu',
-                          ),
-                          controller: _titleController,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
-                          enableSuggestions: false,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Introduceți titlul.';
-                            }
-
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Text',
-                          ),
-                          controller: _textController,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
-                          maxLines: null,
-                          enableSuggestions: false,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Introduceți textul.';
-                            }
-
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Anulează'),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : SingleChildScrollView(
+                child: Card(
+                  margin: const EdgeInsets.all(20),
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _form,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Titlu',
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _onSave();
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Salvează'),
+                            controller: _titleController,
+                            autocorrect: false,
+                            textCapitalization: TextCapitalization.none,
+                            enableSuggestions: false,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Introduceți titlul.';
+                              }
+
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Text',
                             ),
-                          ],
-                        ),
-                      ],
+                            controller: _textController,
+                            autocorrect: false,
+                            textCapitalization: TextCapitalization.none,
+                            maxLines: null,
+                            enableSuggestions: false,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Introduceți textul.';
+                              }
+
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Anulează'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  _onSave();
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Salvează'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }

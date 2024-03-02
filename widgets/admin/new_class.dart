@@ -135,151 +135,159 @@ class _NewClassState extends State<NewClass> {
 
   @override
   Widget build(BuildContext context) {
-    return  Center(
-      child: SingleChildScrollView(
-        child: Card(
-          margin: const EdgeInsets.all(15),
-          child: Padding(
-            padding: const EdgeInsets.all(30),
-            child: Form(
-              key: _form,
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Nume clasă',
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Introduceți un nume de clasă.';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredName = value!;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _selectDate,
-                    child: Text(
-                      _selectedDate != null
-                          ? formatter.format(_selectedDate!)
-                          : 'Data',
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: _selectedDate != null
-                            ? _selectStart
-                            : null,
-                        child: Text(
-                          _selectedStart != null
-                              ? formatTime(_selectedStart!)
-                              : 'Start',
-                        ),
+    return  Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            margin: const EdgeInsets.all(15),
+            child: Padding(
+              padding: const EdgeInsets.all(30),
+              child: Form(
+                key: _form,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Nume clasă',
                       ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: _selectedStart != null
-                            ? _selectEnd
-                            : null,
-                        child: Text(
-                          _selectedEnd != null
-                              ? formatTime(_selectedEnd!)
-                              : 'Final',
-                        ),
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Introduceți un nume de clasă.';
+                        }
+
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredName = value!;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: _selectDate,
+                      child: Text(
+                        _selectedDate != null
+                            ? formatter.format(_selectedDate!)
+                            : 'Data',
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('users')
-                              .where('role', isEqualTo: 'trainer')
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const CircularProgressIndicator();
-                            }
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: _selectedDate != null
+                              ? _selectStart
+                              : null,
+                          child: Text(
+                            _selectedStart != null
+                                ? formatTime(_selectedStart!)
+                                : 'Start',
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: _selectedStart != null
+                              ? _selectEnd
+                              : null,
+                          child: Text(
+                            _selectedEnd != null
+                                ? formatTime(_selectedEnd!)
+                                : 'Final',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .where('role', isEqualTo: 'trainer')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              }
 
-                            if (snapshot.hasError) {
-                              return const Text('Eroare');
-                            }
+                              if (snapshot.hasError) {
+                                return const Text('Eroare');
+                              }
 
-                            List<DropdownMenuItem<DocumentReference>>trainers = snapshot.data!.docs
-                                .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
-                              return DropdownMenuItem(
-                                value: trainer.reference,
-                                child: Text(
-                                  '${trainer['lastName']} ${trainer['firstName']}',
-                                ),
-                              );
-                            },
-                            ).toList();
-
-                            return DropdownButton(
-                              items: trainers,
-                              onChanged: (value) {
-                                if (value == null) {
-                                  return;
-                                }
-                                setState(() {
-                                  _selectedTrainer = value;
-                                });
+                              List<DropdownMenuItem<DocumentReference>>trainers = snapshot.data!.docs
+                                  .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
+                                return DropdownMenuItem(
+                                  value: trainer.reference,
+                                  child: Text(
+                                    '${trainer['lastName']} ${trainer['firstName']}',
+                                  ),
+                                );
                               },
-                              value: _selectedTrainer,
-                              hint: const Text('Antrenor'),
-                            );
-                          }),
-                      const SizedBox(width: 10),
-                      DropdownButton(
-                        value: _selectedRoom,
-                        items: Room.values.map((room) => DropdownMenuItem(
-                          value: room,
-                          child: Text(room.name),
+                              ).toList();
+
+                              return DropdownButton(
+                                items: trainers,
+                                onChanged: (value) {
+                                  if (value == null) {
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    _selectedTrainer = value;
+                                  });
+                                },
+                                value: _selectedTrainer,
+                                hint: const Text('Antrenor'),
+                              );
+                            }),
+                        const SizedBox(width: 10),
+                        DropdownButton(
+                          value: _selectedRoom,
+                          items: Room.values.map((room) => DropdownMenuItem(
+                            value: room,
+                            child: Text(room.name),
+                          ),
+                          ).toList(),
+                          onChanged: (value) {
+                            if (value == null) {
+                              return;
+                            }
+
+                            setState(() {
+                              _selectedRoom = value;
+                            });
+                          },
+                          hint: const Text('Sala'),
                         ),
-                        ).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedRoom = value!;
-                          });
-                        },
-                        hint: const Text('Sala'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Anulează'),
-                      ),
-                      ElevatedButton(
-                        onPressed: _onSave,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Anulează'),
                         ),
-                        child: const Text('Adaugă'),
-                      ),
-                    ],
-                  ),
-                ],
+                        ElevatedButton(
+                          onPressed: _onSave,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          ),
+                          child: const Text('Adaugă'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

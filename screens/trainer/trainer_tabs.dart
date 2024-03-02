@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/screens/home.dart';
 import 'package:non_stop_gym/screens/rules.dart';
 import '../../widgets/edit_user.dart';
 import '../authentification.dart';
@@ -15,7 +16,7 @@ List<String> tabTitles = [
 List<Widget> activeTabs = [
   const Placeholder(),
   const Placeholder(),
-  const Placeholder(),
+  const HomeScreen(),
   const Placeholder(),
   const RulesScreen()
 ];

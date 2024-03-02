@@ -18,7 +18,6 @@ class _NewTrainerState extends State<NewTrainer> {
   late String _enteredPassword;
 
   void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(error.message ?? 'Eroare stocare date.'),
@@ -39,7 +38,7 @@ class _NewTrainerState extends State<NewTrainer> {
 
     try {
       final userCredentials =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _enteredEmail,
         password: _enteredPassword,
       );
@@ -63,134 +62,133 @@ class _NewTrainerState extends State<NewTrainer> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Card(
-          margin: const EdgeInsets.all(20),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Adresă de email',
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null ||
-                          value.trim().isEmpty ||
-                          !value.contains('@')) {
-                        return 'Introduceți o adresă de email validă.';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredEmail = value!;
-                    },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Parolă',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.trim().length < 6) {
-                        return 'Parola trebuie să aibă cel puțin 6 caractere!';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredPassword = value!;
-                    },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Nume',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Introduceți numele.';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredLastName = value!;
-                    },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Prenume',
-                    ),
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Introduceți prenumele.';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredFirstName = value!;
-                    },
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Număr de telefon',
-                    ),
-                    keyboardType: TextInputType.number,
-                    autocorrect: false,
-                    textCapitalization: TextCapitalization.none,
-                    enableSuggestions: false,
-                    validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          value.trim().length != 10) {
-                        return 'Introduceți un număr valid.';
-                      }
-
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredPhone = value!;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Anulează'),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            margin: const EdgeInsets.all(20),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Adresă de email',
                       ),
-                      ElevatedButton(
-                        onPressed: _onSave,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      validator: (value) {
+                        if (value == null ||
+                            value.trim().isEmpty ||
+                            !value.contains('@')) {
+                          return 'Introduceți o adresă de email validă.';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredEmail = value!;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Parolă',
+                      ),
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.trim().length < 6) {
+                          return 'Parola trebuie să aibă cel puțin 6 caractere!';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredPassword = value!;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Nume',
+                      ),
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți numele.';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredLastName = value!;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Prenume',
+                      ),
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți prenumele.';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredFirstName = value!;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Număr de telefon',
+                      ),
+                      keyboardType: TextInputType.number,
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.trim().length != 10) {
+                          return 'Introduceți un număr valid.';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _enteredPhone = value!;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Anulează'),
                         ),
-                        child: const Text('Adaugă'),
-                      ),
-                    ],
-                  ),
-                ],
+                        ElevatedButton(
+                          onPressed: _onSave,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer,
+                          ),
+                          child: const Text('Adaugă'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

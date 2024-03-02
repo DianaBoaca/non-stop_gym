@@ -74,95 +74,98 @@ class _EditUserState extends State<EditUser> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: _isLoading
-          ? const CircularProgressIndicator()
-          : SingleChildScrollView(
-              child: Card(
-                margin: const EdgeInsets.all(20),
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Form(
-                    key: _form,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Nume',
-                          ),
-                          controller: _lastNameController,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
-                          enableSuggestions: false,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Introduceți numele.';
-                            }
-
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Prenume',
-                          ),
-                          controller: _firstNameController,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
-                          enableSuggestions: false,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Introduceți prenumele.';
-                            }
-
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Număr de telefon',
-                          ),
-                          controller: _phoneController,
-                          keyboardType: TextInputType.number,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
-                          enableSuggestions: false,
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
-                                value.trim().length != 10) {
-                              return 'Introduceți un număr valid.';
-                            }
-
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Anulează'),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : SingleChildScrollView(
+                child: Card(
+                  margin: const EdgeInsets.all(20),
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _form,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Nume',
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _onSave();
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Salvează'),
+                            controller: _lastNameController,
+                            autocorrect: false,
+                            textCapitalization: TextCapitalization.none,
+                            enableSuggestions: false,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Introduceți numele.';
+                              }
+
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Prenume',
                             ),
-                          ],
-                        ),
-                      ],
+                            controller: _firstNameController,
+                            autocorrect: false,
+                            textCapitalization: TextCapitalization.none,
+                            enableSuggestions: false,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Introduceți prenumele.';
+                              }
+
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Număr de telefon',
+                            ),
+                            controller: _phoneController,
+                            keyboardType: TextInputType.number,
+                            autocorrect: false,
+                            textCapitalization: TextCapitalization.none,
+                            enableSuggestions: false,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.trim().length != 10) {
+                                return 'Introduceți un număr valid.';
+                              }
+
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Anulează'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  _onSave();
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Salvează'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }
