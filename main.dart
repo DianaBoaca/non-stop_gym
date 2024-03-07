@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:non_stop_gym/screens/admin/admin_home.dart';
 import 'package:non_stop_gym/screens/authentification.dart';
 import 'package:non_stop_gym/screens/client/client_tabs.dart';
+import 'package:non_stop_gym/screens/trainer/trainer_tabs.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -78,6 +79,8 @@ class App extends StatelessWidget {
                 return const ClientTabsScreen();
               } else if (role == 'admin') {
                 return const AdminHomeScreen();
+              } else if (role == 'trainer') {
+                return const TrainerTabsScreen();
               }
               return const AuthScreen();
             },

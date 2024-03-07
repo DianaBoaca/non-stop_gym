@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/client/reservation_card.dart';
-import '../../widgets/client/white_text.dart';
+import '../../widgets/users/reservation_card.dart';
+import '../../widgets/users/white_text.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ReservationsListScreen extends StatelessWidget {

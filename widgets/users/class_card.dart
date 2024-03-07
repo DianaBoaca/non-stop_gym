@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/widgets/client/white_text.dart';
+import 'package:non_stop_gym/widgets/users/white_text.dart';
 import '../../utils/class_utils.dart';
 
 class ClassCard extends StatefulWidget {
@@ -19,14 +19,14 @@ class _ClassCardState extends State<ClassCard> {
   bool _isLoading = true;
   bool _hasPassed = false;
   bool _isMyClass = false;
-  String _trainer = '';
+  String _trainerName = '';
 
   void _reserveClass() async {
-    DocumentReference<Map<String, dynamic>> classRef = FirebaseFirestore
-        .instance
-        .collection('classes')
-        .doc(widget.fitnessClass.id);
-    DocumentSnapshot<Map<String, dynamic>> classSnapshot = await classRef.get();
+    DocumentSnapshot<Map<String, dynamic>> classSnapshot =
+        await FirebaseFirestore.instance
+            .collection('classes')
+            .doc(widget.fitnessClass.id)
+            .get();
     Map<String, dynamic> classMap = classSnapshot.data()!;
     QuerySnapshot<Map<String, dynamic>> existingReservations =
         await FirebaseFirestore.instance
@@ -34,33 +34,57 @@ class _ClassCardState extends State<ClassCard> {
             .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .where('date', isEqualTo: classMap['date'])
             .get();
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
 
     try {
-      if (await verifyHours(
-              '',
-              existingReservations.docs,
-              classMap['date'].toDate(),
-              convertToTimeOfDay(classMap['start']),
-              convertToTimeOfDay(classMap['end'])) ==
-          false) {
-        _showMessage();
-      } else if (classMap['reserved'] < classMap['capacity']) {
+      if (userSnapshot['role'] == 'trainer') {
+        print(userSnapshot.reference);
+        if (await verifyTrainerAvailability(
+                '',
+                userSnapshot.reference,
+                classMap['date'].toDate(),
+                convertToTimeOfDay(classMap['start']),
+                convertToTimeOfDay(classMap['end'])) ==
+            false) {
+          _showMessage();
+          print("DA");
+          return;
+        }
+      } else {
+        if (await verifyHours(
+                '',
+                existingReservations.docs,
+                classMap['date'].toDate(),
+                convertToTimeOfDay(classMap['start']),
+                convertToTimeOfDay(classMap['end'])) ==
+            false) {
+          _showMessage();
+          return;
+        }
+      }
+
+      if (classMap['reserved'] < classMap['capacity']) {
         await FirebaseFirestore.instance.collection('reservations').add({
-          'class': classRef,
+          'class': classSnapshot.reference,
           'client': FirebaseAuth.instance.currentUser!.uid,
           'date': classMap['date'],
           'start': classMap['start'],
           'end': classMap['end'],
         });
 
-        await classRef.update({'reserved': FieldValue.increment(1)});
+        await classSnapshot.reference
+            .update({'reserved': FieldValue.increment(1)});
 
         setState(() {
           _alreadyReserved = true;
         });
       } else {
         await FirebaseFirestore.instance.collection('waitingList').add({
-          'class': classRef,
+          'class': classSnapshot.reference,
           'client': FirebaseAuth.instance.currentUser!.uid,
           'time': DateTime.now(),
           'start': classMap['start'],
@@ -112,7 +136,7 @@ class _ClassCardState extends State<ClassCard> {
       _isWaiting = waitingReservations.docs.isNotEmpty;
       _hasPassed = widget.fitnessClass.start.isBefore(DateTime.now());
       _isMyClass = widget.fitnessClass.trainer == userRef;
-      _trainer = name;
+      _trainerName = name;
       _isLoading = false;
     });
   }
@@ -173,7 +197,7 @@ class _ClassCardState extends State<ClassCard> {
                                 '${formatterTime.format(snapshot.data!['start'].toDate())} - ${formatterTime.format(snapshot.data!['end'].toDate())}',
                           ),
                           const SizedBox(height: 10),
-                          WhiteText(text: 'Antrenor: $_trainer'),
+                          WhiteText(text: 'Antrenor: $_trainerName'),
                           const SizedBox(height: 10),
                           WhiteText(
                               text:

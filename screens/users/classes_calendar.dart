@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/widgets/client/class_card.dart';
+import 'package:non_stop_gym/widgets/users/class_card.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../utils/class_utils.dart';
 

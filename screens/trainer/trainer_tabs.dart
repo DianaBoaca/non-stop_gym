@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/client/classes_calendar.dart';
-import 'package:non_stop_gym/screens/home.dart';
-import 'package:non_stop_gym/screens/rules.dart';
+import 'package:non_stop_gym/screens/users/classes_calendar.dart';
+import 'package:non_stop_gym/screens/users/home.dart';
+import 'package:non_stop_gym/screens/users/rules.dart';
 import '../../widgets/edit_user.dart';
 import '../authentification.dart';
+import '../users/reservations.dart';
 
 List<String> tabTitles = [
   'Rezervările mele',
@@ -15,7 +16,7 @@ List<String> tabTitles = [
   'Regulament'
 ];
 List<Widget> activeTabs = [
-  const Placeholder(),
+  const ReservationsListScreen(),
   const Placeholder(),
   const HomeScreen(),
   const ClassesCalendarScreen(),
