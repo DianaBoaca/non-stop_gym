@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/screens/client/classes_calendar.dart';
 import 'package:non_stop_gym/screens/home.dart';
 import 'package:non_stop_gym/screens/rules.dart';
 import '../../widgets/edit_user.dart';
@@ -17,7 +18,7 @@ List<Widget> activeTabs = [
   const Placeholder(),
   const Placeholder(),
   const HomeScreen(),
-  const Placeholder(),
+  const ClassesCalendarScreen(),
   const RulesScreen()
 ];
 

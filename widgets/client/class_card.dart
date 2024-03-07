@@ -17,6 +17,8 @@ class _ClassCardState extends State<ClassCard> {
   bool _alreadyReserved = false;
   bool _isWaiting = false;
   bool _isLoading = true;
+  bool _hasPassed = false;
+  bool _isMyClass = false;
   String _trainer = '';
 
   void _reserveClass() async {
@@ -101,10 +103,15 @@ class _ClassCardState extends State<ClassCard> {
             .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .get();
     String name = await getTrainerName(widget.fitnessClass.trainer);
+    DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
 
     setState(() {
       _alreadyReserved = existingReservations.docs.isNotEmpty;
       _isWaiting = waitingReservations.docs.isNotEmpty;
+      _hasPassed = widget.fitnessClass.start.isBefore(DateTime.now());
+      _isMyClass = widget.fitnessClass.trainer == userRef;
       _trainer = name;
       _isLoading = false;
     });
@@ -176,7 +183,10 @@ class _ClassCardState extends State<ClassCard> {
                               text:
                                   'Persoane înscrise: ${snapshot.data!['reserved']}/${snapshot.data!['capacity']}'),
                           const SizedBox(height: 15),
-                          if (!_alreadyReserved && !_isWaiting)
+                          if (!_alreadyReserved &&
+                              !_isWaiting &&
+                              !_hasPassed &&
+                              !_isMyClass)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

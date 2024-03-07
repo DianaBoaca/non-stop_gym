@@ -41,7 +41,7 @@ class ClassesCalendarScreen extends StatelessWidget {
               doc['start'].toDate(),
               doc['end'].toDate(),
               doc['date'].toDate(),
-              colors[doc['className']]!,
+              colors[doc['className']] ?? Colors.blue,
               doc['capacity'],
               doc['reserved'],
               doc['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional',
