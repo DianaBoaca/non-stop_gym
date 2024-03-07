@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import '../widgets/client/busy_indicator.dart';
-import '../widgets/client/client_card.dart';
-import '../widgets/client/client_contact_details.dart';
+import '../../widgets/users/busy_indicator.dart';
+import '../../widgets/client/client_card.dart';
+import '../../widgets/users/contact_details.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

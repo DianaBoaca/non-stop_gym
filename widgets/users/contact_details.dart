@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:non_stop_gym/widgets/client/custom_row.dart';
+import 'package:non_stop_gym/widgets/users/custom_row.dart';
 
 String apiKey = 'AIzaSyAjnIwY9BBxT-rT6g4qnv2xyqIR1FWqGho';
 

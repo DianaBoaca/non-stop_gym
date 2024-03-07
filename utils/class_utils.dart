@@ -93,7 +93,7 @@ Future<bool> verifyTrainerAvailability(String id, DocumentReference trainer,
     DateTime date, TimeOfDay start, TimeOfDay end) async {
   final existingClasses = await FirebaseFirestore.instance
       .collection('classes')
-      .where('room', isEqualTo: trainer)
+      .where('trainer', isEqualTo: trainer)
       .where('date', isEqualTo: date)
       .get();
 
