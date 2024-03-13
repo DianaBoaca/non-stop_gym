@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/users/classes_calendar.dart';
 import 'package:non_stop_gym/screens/client/prices.dart';
 import '../../widgets/edit_user.dart';
+import '../users/classes_calendar.dart';
 import '../users/home.dart';
 import '../authentification.dart';
 import '../users/reservations.dart';
