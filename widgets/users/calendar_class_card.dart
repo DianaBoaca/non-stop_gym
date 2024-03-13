@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/users/white_text.dart';
 import '../../utils/class_utils.dart';
 
-class ClassCard extends StatefulWidget {
-  const ClassCard({super.key, required this.fitnessClass});
+class CalendarClassCard extends StatefulWidget {
+  const CalendarClassCard({super.key, required this.fitnessClass});
 
   final FitnessClass fitnessClass;
 
   @override
-  State<ClassCard> createState() => _ClassCardState();
+  State<CalendarClassCard> createState() => _CalendarClassCardState();
 }
 
-class _ClassCardState extends State<ClassCard> {
+class _CalendarClassCardState extends State<CalendarClassCard> {
   bool _alreadyReserved = false;
   bool _isWaiting = false;
   bool _isLoading = true;

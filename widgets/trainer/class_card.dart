@@ -4,25 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
-import 'white_text.dart';
 import '../../utils/class_utils.dart';
+import '../users/white_text.dart';
 
-class ReservationCard extends StatefulWidget {
-  const ReservationCard(
-      {super.key,
-      required this.reservationSnapshot,
-      required this.classSnapshot,
-      required this.position});
+class ClassCard extends StatefulWidget {
+  const ClassCard({super.key, required this.classSnapshot});
 
-  final DocumentSnapshot<Map<String, dynamic>> reservationSnapshot;
   final DocumentSnapshot<Map<String, dynamic>> classSnapshot;
-  final int position;
 
   @override
-  State<ReservationCard> createState() => _ReservationCardState();
+  State<ClassCard> createState() => _ClassCardState();
 }
 
-class _ReservationCardState extends State<ReservationCard> {
+class _ClassCardState extends State<ClassCard> {
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -68,56 +62,55 @@ class _ReservationCardState extends State<ReservationCard> {
     return false;
   }
 
-  Future<void> _cancelReservation() async {
+  Future<void> _cancelClass() async {
     try {
-      widget.reservationSnapshot.reference.delete();
+      widget.classSnapshot.reference.delete();
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Rezervarea a fost anulată.'),
+          content: Text('Clasa a fost anulată.'),
         ),
       );
 
-      if (widget.position == 0) {
-        widget.classSnapshot.reference
-            .update({'reserved': FieldValue.increment(-1)});
-
-        QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
+      QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
+          await FirebaseFirestore.instance
+              .collection('waitingList')
+              .where('class', isEqualTo: widget.classSnapshot.reference)
+              .get();
+      for (QueryDocumentSnapshot waiting in waitingListSnapshot.docs) {
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
             await FirebaseFirestore.instance
-                .collection('waitingList')
-                .where('class', isEqualTo: widget.classSnapshot.reference)
-                .orderBy('time')
+                .collection('users')
+                .doc(waiting['client'])
                 .get();
+        sendNotification(
+          userSnapshot['token'],
+          'Anulare clasă',
+          'Clasa de ${widget.classSnapshot['className']} a fost anulată!',
+        );
 
-        if (waitingListSnapshot.docs.isNotEmpty) {
-          DocumentSnapshot<Map<String, dynamic>> first =
-              waitingListSnapshot.docs.first;
+        waiting.reference.delete();
+      }
 
-          await FirebaseFirestore.instance.collection('reservations').add({
-            'class': widget.classSnapshot.reference,
-            'client': first['client'],
-            'date': widget.classSnapshot['date'],
-            'start': widget.classSnapshot['start'],
-            'end': widget.classSnapshot['end'],
-          });
+      QuerySnapshot<Map<String, dynamic>> reservationsSnapshot =
+          await FirebaseFirestore.instance
+              .collection('reservations')
+              .where('class', isEqualTo: widget.classSnapshot.reference)
+              .get();
+      for (QueryDocumentSnapshot reservation in reservationsSnapshot.docs) {
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(reservation['client'])
+                .get();
+        sendNotification(
+          userSnapshot['token'],
+          'Anulare clasă',
+          'Clasa de ${widget.classSnapshot['className']} a fost anulată!',
+        );
 
-          widget.classSnapshot.reference
-              .update({'reserved': FieldValue.increment(1)});
-
-          DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-              await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(first['client'])
-                  .get();
-          sendNotification(
-            userSnapshot['token'],
-            'Rezervare confirmată',
-            'A fost eliberat un loc la clasa de ${widget.classSnapshot['className']}. Rezervarea este confirmată!',
-          );
-
-          await first.reference.delete();
-        }
+        reservation.reference.delete();
       }
     } on FirebaseException catch (error) {
       _showError(error);
@@ -128,7 +121,7 @@ class _ReservationCardState extends State<ReservationCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(10),
-      color: colors[widget.classSnapshot['className']],
+      color: colors[widget.classSnapshot['className']] ?? Colors.blue,
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -160,9 +153,13 @@ class _ReservationCardState extends State<ReservationCard> {
                     ),
                     const SizedBox(height: 15),
                     WhiteText(
-                      text:
-                          'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
-                    ),
+                        text:
+                            'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}'),
+                    const SizedBox(height: 15),
+                    WhiteText(
+                        text:
+                            'Persoane înscrise: ${widget.classSnapshot['reserved']}/${widget.classSnapshot['capacity']}'),
+                    const SizedBox(height: 15),
                   ],
                 ),
                 ElevatedButton(
@@ -184,7 +181,7 @@ class _ReservationCardState extends State<ReservationCard> {
                                   children: [
                                     WhiteText(
                                         text:
-                                            'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?'),
+                                            'Sunteți sigur că anulați clasa de ${widget.classSnapshot['className']}?'),
                                     const SizedBox(height: 20),
                                     Row(
                                       mainAxisAlignment:
@@ -192,7 +189,7 @@ class _ReservationCardState extends State<ReservationCard> {
                                       children: [
                                         ElevatedButton(
                                           onPressed: () {
-                                            _cancelReservation();
+                                            _cancelClass();
                                             Navigator.of(context).pop();
                                           },
                                           child: const Text('Da'),
@@ -218,11 +215,6 @@ class _ReservationCardState extends State<ReservationCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 15),
-            if (widget.position > 0)
-              WhiteText(
-                  text:
-                      'Sunteți pe locul ${widget.position} în lista de așteptare!'),
           ],
         ),
       ),
