@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
+import 'package:non_stop_gym/widgets/trainer/reserved_clients_list.dart';
 import '../../utils/class_utils.dart';
 import '../users/white_text.dart';
 
@@ -119,103 +120,116 @@ class _ClassCardState extends State<ClassCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(10),
-      color: colors[widget.classSnapshot['className']] ?? Colors.blue,
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.classSnapshot['className'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 20,
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          context: context,
+          builder: (context) =>
+              ReservedClientsList(classSnapshot: widget.classSnapshot),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.all(10),
+        color: colors[widget.classSnapshot['className']] ?? Colors.blue,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.classSnapshot['className'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 15),
-                    WhiteText(
-                      text: formatter
-                          .format(widget.classSnapshot['date'].toDate()),
-                    ),
-                    const SizedBox(height: 15),
-                    WhiteText(
-                      text:
-                          '${formatterTime.format(widget.classSnapshot['start'].toDate())} - ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
-                    ),
-                    const SizedBox(height: 15),
-                    WhiteText(
+                      const SizedBox(height: 15),
+                      WhiteText(
+                        text: formatter
+                            .format(widget.classSnapshot['date'].toDate()),
+                      ),
+                      const SizedBox(height: 15),
+                      WhiteText(
                         text:
-                            'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}'),
-                    const SizedBox(height: 15),
-                    WhiteText(
+                            '${formatterTime.format(widget.classSnapshot['start'].toDate())} - ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
+                      ),
+                      const SizedBox(height: 15),
+                      WhiteText(
                         text:
-                            'Persoane înscrise: ${widget.classSnapshot['reserved']}/${widget.classSnapshot['capacity']}'),
-                    const SizedBox(height: 15),
-                  ],
-                ),
-                ElevatedButton(
-                  child: const Text('Anulează'),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) {
-                        return Center(
-                          child: SingleChildScrollView(
-                            child: Card(
-                              margin: const EdgeInsets.all(20),
-                              color: colors[widget.classSnapshot['className']],
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  children: [
-                                    WhiteText(
-                                        text:
-                                            'Sunteți sigur că anulați clasa de ${widget.classSnapshot['className']}?'),
-                                    const SizedBox(height: 20),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            _cancelClass();
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Da'),
-                                        ),
-                                        const SizedBox(width: 20),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Nu'),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                            'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
+                      ),
+                      const SizedBox(height: 15),
+                      WhiteText(
+                        text:
+                            'Persoane înscrise: ${widget.classSnapshot['reserved']}/${widget.classSnapshot['capacity']}',
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    child: const Text('Anulează'),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) {
+                          return Center(
+                            child: SingleChildScrollView(
+                              child: Card(
+                                margin: const EdgeInsets.all(20),
+                                color:
+                                    colors[widget.classSnapshot['className']],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    children: [
+                                      WhiteText(
+                                          text:
+                                              'Sunteți sigur că anulați clasa de ${widget.classSnapshot['className']}?'),
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _cancelClass();
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text('Da'),
+                                          ),
+                                          const SizedBox(width: 20),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text('Nu'),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-          ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

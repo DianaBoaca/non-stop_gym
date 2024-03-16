@@ -170,7 +170,7 @@ class _EditClassState extends State<EditClass> {
     if (classData.exists) {
       Map<String, dynamic> classDataMap = classData.data()!;
       final fitnessClass = await widget.fitnessClass.get();
-      String name = await getTrainerName(fitnessClass['trainer']);
+      String name = await getUserName(fitnessClass['trainer']);
 
       setState(() {
         _nameController.text = classDataMap['className'];
