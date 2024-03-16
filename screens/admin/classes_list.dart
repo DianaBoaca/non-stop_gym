@@ -77,7 +77,7 @@ class ClassesListScreen extends StatelessWidget {
                 );
               },
               child: FutureBuilder(
-                future: getTrainerName(classes[index].data()['trainer']),
+                future: getUserName(classes[index].data()['trainer']),
                 builder: (context, trainerSnapshot) {
                   if (trainerSnapshot.hasError) {
                     return const Text('Eroare');

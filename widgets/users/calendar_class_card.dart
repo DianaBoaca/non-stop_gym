@@ -42,7 +42,6 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
 
     try {
       if (userSnapshot['role'] == 'trainer') {
-        print(userSnapshot.reference);
         if (await verifyTrainerAvailability(
                 '',
                 userSnapshot.reference,
@@ -51,7 +50,6 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
                 convertToTimeOfDay(classMap['end'])) ==
             false) {
           _showMessage();
-          print("DA");
           return;
         }
       } else {
@@ -70,7 +68,7 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
       if (classMap['reserved'] < classMap['capacity']) {
         await FirebaseFirestore.instance.collection('reservations').add({
           'class': classSnapshot.reference,
-          'client': FirebaseAuth.instance.currentUser!.uid,
+          'client': userSnapshot.reference,
           'date': classMap['date'],
           'start': classMap['start'],
           'end': classMap['end'],
@@ -85,7 +83,7 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
       } else {
         await FirebaseFirestore.instance.collection('waitingList').add({
           'class': classSnapshot.reference,
-          'client': FirebaseAuth.instance.currentUser!.uid,
+          'client': userSnapshot.reference,
           'time': DateTime.now(),
           'start': classMap['start'],
           'end': classMap['end'],
@@ -126,7 +124,7 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
             .where('class', isEqualTo: classRef)
             .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .get();
-    String name = await getTrainerName(widget.fitnessClass.trainer);
+    String name = await getUserName(widget.fitnessClass.trainer);
     DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid);

@@ -43,7 +43,7 @@ class FitnessClass {
   DocumentReference trainer;
 }
 
-Future<String> getTrainerName(DocumentReference ref) async {
+Future<String> getUserName(DocumentReference ref) async {
   DocumentSnapshot trainer = await ref.get();
   Map<String, dynamic> trainerData = trainer.data() as Map<String, dynamic>;
   return '${trainerData['lastName']} ${trainerData['firstName']}';
