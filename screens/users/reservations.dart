@@ -31,17 +31,19 @@ class ReservationsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    DocumentReference<Map<String, dynamic>> user = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
 
     Stream<List<QueryDocumentSnapshot>> stream = Rx.combineLatest2(
       FirebaseFirestore.instance
           .collection('reservations')
-          .where('client', isEqualTo: uid)
+          .where('client', isEqualTo: user)
           .where('end', isGreaterThanOrEqualTo: DateTime.now())
           .snapshots(),
       FirebaseFirestore.instance
           .collection('waitingList')
-          .where('client', isEqualTo: uid)
+          .where('client', isEqualTo: user)
           .where('end', isGreaterThanOrEqualTo: DateTime.now())
           .snapshots(),
       (QuerySnapshot reservationsQuery, QuerySnapshot waitingListQuery) {

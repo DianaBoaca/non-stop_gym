@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/screens/client/prices.dart';
 import '../../widgets/edit_user.dart';
@@ -9,14 +10,26 @@ import '../authentification.dart';
 import '../users/reservations.dart';
 import '../users/rules.dart';
 
-List<String> tabTitles = ['Rezervările mele', 'Calendar clase', 'Non-stop Gym', 'Regulament', 'Tarife'];
-List<Widget> activeTabs = [const ReservationsListScreen(), const ClassesCalendarScreen(), const HomeScreen(), const RulesScreen(), const PriceScreen()];
+List<String> tabTitles = [
+  'Rezervările mele',
+  'Calendar clase',
+  'Non-stop Gym',
+  'Regulament',
+  'Tarife'
+];
+List<Widget> activeTabs = [
+  const ReservationsListScreen(),
+  const ClassesCalendarScreen(),
+  const HomeScreen(),
+  const RulesScreen(),
+  const PriceScreen()
+];
 
 class ClientTabsScreen extends StatefulWidget {
   const ClientTabsScreen({super.key});
 
   @override
-  State<ClientTabsScreen> createState() =>  _ClientTabsScreenState();
+  State<ClientTabsScreen> createState() => _ClientTabsScreenState();
 }
 
 class _ClientTabsScreenState extends State<ClientTabsScreen> {
@@ -32,34 +45,40 @@ class _ClientTabsScreenState extends State<ClientTabsScreen> {
   Widget build(BuildContext context) {
     User user = FirebaseAuth.instance.currentUser!;
 
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if (mounted) _selectTab(0);
+    });
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(tabTitles[_selectedTab]),
-          actions: [
-            IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => EditUser(
-                      user: FirebaseFirestore.instance.collection('users').doc(user.uid)),
-                );
-              },
-              icon: const Icon(Icons.person),
-            ),
-            IconButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AuthScreen()),
-                  );
-                },
-                icon: const Icon(Icons.exit_to_app),
-              ),
-            ],
+        actions: [
+          IconButton(
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => EditUser(
+                    user: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)),
+              );
+            },
+            icon: const Icon(Icons.person),
+          ),
+          IconButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const AuthScreen()),
+              );
+            },
+            icon: const Icon(Icons.exit_to_app),
+          ),
+        ],
       ),
       backgroundColor: Colors.lightBlueAccent,
       body: activeTabs[_selectedTab],

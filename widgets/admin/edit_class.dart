@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 
 class EditClass extends StatefulWidget {
   const EditClass({super.key, required this.fitnessClass});

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 import '../users/white_text.dart';
 
 class ReservedClientsList extends StatelessWidget {

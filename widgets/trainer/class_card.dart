@@ -1,11 +1,7 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:googleapis_auth/auth_io.dart';
-import 'package:http/http.dart';
 import 'package:non_stop_gym/widgets/trainer/reserved_clients_list.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 import '../users/white_text.dart';
 
 class ClassCard extends StatefulWidget {
@@ -27,42 +23,6 @@ class _ClassCardState extends State<ClassCard> {
     );
   }
 
-  Future<bool> sendNotification(String token, String title, String text) async {
-    String jsonCredentials =
-        await rootBundle.loadString('517570860ed0e887014067b5f426e130a86d7436');
-    ServiceAccountCredentials credentials =
-        ServiceAccountCredentials.fromJson(jsonCredentials);
-    AutoRefreshingAuthClient client = await clientViaServiceAccount(
-      credentials,
-      ['https://www.googleapis.com/auth/cloud-platform'],
-    );
-    Map<String, Map<String, Object>> notification = {
-      'message': {
-        'token': token,
-        'notification': {
-          'title': title,
-          'body': text,
-        }
-      }
-    };
-    Response response = await client.post(
-      Uri.parse(
-          'https://fcm.googleapis.com/v1/projects/224380999505/messages:send'),
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: jsonEncode(notification),
-    );
-
-    client.close();
-
-    if (response.statusCode == 200) {
-      return true;
-    }
-
-    return false;
-  }
-
   Future<void> _cancelClass() async {
     try {
       widget.classSnapshot.reference.delete();
@@ -81,10 +41,8 @@ class _ClassCardState extends State<ClassCard> {
               .get();
       for (QueryDocumentSnapshot waiting in waitingListSnapshot.docs) {
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(waiting['client'])
-                .get();
+            await waiting['client'].get();
+
         sendNotification(
           userSnapshot['token'],
           'Anulare clasă',
@@ -101,10 +59,8 @@ class _ClassCardState extends State<ClassCard> {
               .get();
       for (QueryDocumentSnapshot reservation in reservationsSnapshot.docs) {
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(reservation['client'])
-                .get();
+            await reservation['client'].get();
+
         sendNotification(
           userSnapshot['token'],
           'Anulare clasă',
@@ -152,22 +108,22 @@ class _ClassCardState extends State<ClassCard> {
                           fontSize: 20,
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 8),
                       WhiteText(
                         text: formatter
                             .format(widget.classSnapshot['date'].toDate()),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 8),
                       WhiteText(
                         text:
                             '${formatterTime.format(widget.classSnapshot['start'].toDate())} - ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 8),
                       WhiteText(
                         text:
                             'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 8),
                       WhiteText(
                         text:
                             'Persoane înscrise: ${widget.classSnapshot['reserved']}/${widget.classSnapshot['capacity']}',

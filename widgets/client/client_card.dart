@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-DocumentReference<Map<String, dynamic>> firebase = FirebaseFirestore.instance.collection('statistics').doc('4WVH8oQxUkXv0bWq3pXn');
+DocumentReference<Map<String, dynamic>> firebase = FirebaseFirestore.instance
+    .collection('statistics')
+    .doc('4WVH8oQxUkXv0bWq3pXn');
 
 class ClientCard extends StatefulWidget {
   const ClientCard({super.key, required this.user});
 
-  final DocumentSnapshot<Map<String, dynamic>>  user;
+  final DocumentSnapshot<Map<String, dynamic>> user;
 
   @override
   State<ClientCard> createState() => _ClientCardState();
@@ -62,7 +64,8 @@ class _ClientCardState extends State<ClientCard> {
 
     try {
       await firebase.update({
-        'checkedInClients': _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
+        'checkedInClients':
+            _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
       });
 
       await FirebaseFirestore.instance
@@ -93,12 +96,13 @@ class _ClientCardState extends State<ClientCard> {
         .get();
 
     if (userData.exists) {
-      Map<String, dynamic> userDataMap = userData.data() as Map<String, dynamic>;
+      Map<String, dynamic> userDataMap =
+          userData.data() as Map<String, dynamic>;
 
       if (mounted) {
         setState(() {
-        _checkedIn = userDataMap['checkedIn'];
-      });
+          _checkedIn = userDataMap['checkedIn'];
+        });
       }
     }
   }
@@ -125,7 +129,7 @@ class _ClientCardState extends State<ClientCard> {
         margin: const EdgeInsets.all(12),
         color: Theme.of(context).colorScheme.primary,
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(13),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

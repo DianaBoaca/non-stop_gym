@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/users/white_text.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 
 class CalendarClassCard extends StatefulWidget {
   const CalendarClassCard({super.key, required this.fitnessClass});
@@ -108,6 +108,9 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
   }
 
   void _loadData() async {
+    DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
     DocumentReference<Map<String, dynamic>> classRef = FirebaseFirestore
         .instance
         .collection('classes')
@@ -116,18 +119,15 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
         await FirebaseFirestore.instance
             .collection('reservations')
             .where('class', isEqualTo: classRef)
-            .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('client', isEqualTo: userRef)
             .get();
     QuerySnapshot<Map<String, dynamic>> waitingReservations =
         await FirebaseFirestore.instance
             .collection('waitingList')
             .where('class', isEqualTo: classRef)
-            .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('client', isEqualTo: userRef)
             .get();
     String name = await getUserName(widget.fitnessClass.trainer);
-    DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
 
     setState(() {
       _alreadyReserved = existingReservations.docs.isNotEmpty;
@@ -198,12 +198,14 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
                           WhiteText(text: 'Antrenor: $_trainerName'),
                           const SizedBox(height: 10),
                           WhiteText(
-                              text:
-                                  'Sala: ${snapshot.data!['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}'),
+                            text:
+                                'Sala: ${snapshot.data!['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
+                          ),
                           const SizedBox(height: 10),
                           WhiteText(
-                              text:
-                                  'Persoane înscrise: ${snapshot.data!['reserved']}/${snapshot.data!['capacity']}'),
+                            text:
+                                'Persoane înscrise: ${snapshot.data!['reserved']}/${snapshot.data!['capacity']}',
+                          ),
                           const SizedBox(height: 15),
                           if (!_alreadyReserved &&
                               !_isWaiting &&

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 
 class NewClass extends StatefulWidget {
   const NewClass({super.key});
@@ -50,12 +50,16 @@ class _NewClassState extends State<NewClass> {
       _form.currentState!.save();
     }
 
-    if (await verifyTrainerAvailability('', _selectedTrainer!, _selectedDate!, _selectedStart!, _selectedEnd!) == false) {
+    if (await verifyTrainerAvailability('', _selectedTrainer!, _selectedDate!,
+            _selectedStart!, _selectedEnd!) ==
+        false) {
       _showBookingError('Antrenorul este ocupat în acel interval orar.');
       return;
     }
 
-    if (await verifyRoomAvailability('', _selectedDate!, _selectedRoom!.toString(), _selectedStart!, _selectedEnd!) == false) {
+    if (await verifyRoomAvailability('', _selectedDate!,
+            _selectedRoom!.toString(), _selectedStart!, _selectedEnd!) ==
+        false) {
       _showBookingError('Sala este ocupată în acel interval orar.');
       return;
     }
@@ -129,13 +133,14 @@ class _NewClassState extends State<NewClass> {
         _selectedEnd = end;
       });
     } else {
-      _showBookingError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
+      _showBookingError(
+          'Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
         child: SingleChildScrollView(
@@ -179,9 +184,8 @@ class _NewClassState extends State<NewClass> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
-                          onPressed: _selectedDate != null
-                              ? _selectStart
-                              : null,
+                          onPressed:
+                              _selectedDate != null ? _selectStart : null,
                           child: Text(
                             _selectedStart != null
                                 ? formatTime(_selectedStart!)
@@ -190,9 +194,7 @@ class _NewClassState extends State<NewClass> {
                         ),
                         const SizedBox(width: 10),
                         ElevatedButton(
-                          onPressed: _selectedStart != null
-                              ? _selectEnd
-                              : null,
+                          onPressed: _selectedStart != null ? _selectEnd : null,
                           child: Text(
                             _selectedEnd != null
                                 ? formatTime(_selectedEnd!)
@@ -220,15 +222,17 @@ class _NewClassState extends State<NewClass> {
                                 return const Text('Eroare');
                               }
 
-                              List<DropdownMenuItem<DocumentReference>>trainers = snapshot.data!.docs
-                                  .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
-                                return DropdownMenuItem(
-                                  value: trainer.reference,
-                                  child: Text(
-                                    '${trainer['lastName']} ${trainer['firstName']}',
-                                  ),
-                                );
-                              },
+                              List<DropdownMenuItem<DocumentReference>>
+                                  trainers = snapshot.data!.docs.map(
+                                (DocumentSnapshot<Map<String, dynamic>>
+                                    trainer) {
+                                  return DropdownMenuItem(
+                                    value: trainer.reference,
+                                    child: Text(
+                                      '${trainer['lastName']} ${trainer['firstName']}',
+                                    ),
+                                  );
+                                },
                               ).toList();
 
                               return DropdownButton(
@@ -249,11 +253,14 @@ class _NewClassState extends State<NewClass> {
                         const SizedBox(width: 10),
                         DropdownButton(
                           value: _selectedRoom,
-                          items: Room.values.map((room) => DropdownMenuItem(
-                            value: room,
-                            child: Text(room.name),
-                          ),
-                          ).toList(),
+                          items: Room.values
+                              .map(
+                                (room) => DropdownMenuItem(
+                                  value: room,
+                                  child: Text(room.name),
+                                ),
+                              )
+                              .toList(),
                           onChanged: (value) {
                             if (value == null) {
                               return;
@@ -280,7 +287,8 @@ class _NewClassState extends State<NewClass> {
                         ElevatedButton(
                           onPressed: _onSave,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
                           ),
                           child: const Text('Adaugă'),
                         ),
