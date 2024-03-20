@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 import '../../widgets/admin/edit_class.dart';
 import '../../widgets/admin/new_class.dart';
 

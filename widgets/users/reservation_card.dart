@@ -1,11 +1,7 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:googleapis_auth/auth_io.dart';
-import 'package:http/http.dart';
 import 'white_text.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 
 class ReservationCard extends StatefulWidget {
   const ReservationCard(
@@ -30,42 +26,6 @@ class _ReservationCardState extends State<ReservationCard> {
         content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
-  }
-
-  Future<bool> sendNotification(String token, String title, String text) async {
-    String jsonCredentials =
-        await rootBundle.loadString('517570860ed0e887014067b5f426e130a86d7436');
-    ServiceAccountCredentials credentials =
-        ServiceAccountCredentials.fromJson(jsonCredentials);
-    AutoRefreshingAuthClient client = await clientViaServiceAccount(
-      credentials,
-      ['https://www.googleapis.com/auth/cloud-platform'],
-    );
-    Map<String, Map<String, Object>> notification = {
-      'message': {
-        'token': token,
-        'notification': {
-          'title': title,
-          'body': text,
-        }
-      }
-    };
-    Response response = await client.post(
-      Uri.parse(
-          'https://fcm.googleapis.com/v1/projects/224380999505/messages:send'),
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: jsonEncode(notification),
-    );
-
-    client.close();
-
-    if (response.statusCode == 200) {
-      return true;
-    }
-
-    return false;
   }
 
   Future<void> _cancelReservation() async {
@@ -110,6 +70,7 @@ class _ReservationCardState extends State<ReservationCard> {
                   .collection('users')
                   .doc(first['client'])
                   .get();
+
           sendNotification(
             userSnapshot['token'],
             'Rezervare confirmată',

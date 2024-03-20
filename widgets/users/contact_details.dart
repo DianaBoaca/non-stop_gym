@@ -81,7 +81,7 @@ class ContactDetailsState extends State<ContactDetails> {
             icon: Icons.book,
             text: widget.contactDetails['location'],
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 25),
           GestureDetector(
             onTap: () {
               MapsLauncher.launchCoordinates(lat, long);

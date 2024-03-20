@@ -14,13 +14,14 @@ class CustomRow extends StatelessWidget {
         Icon(
           icon,
           color: Colors.white,
+          size: 15,
         ),
         const SizedBox(width: 10),
         Text(
           text,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 20,
+            fontSize: 16,
             color: Theme.of(context).colorScheme.primary,
           ),
         ),

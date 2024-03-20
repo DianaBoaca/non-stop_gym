@@ -48,33 +48,40 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _setNotifications() async {
+  void setNotifications() async {
     await FirebaseMessaging.instance.requestPermission();
     String? token = await FirebaseMessaging.instance.getToken();
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({'token': token});
+    if (FirebaseAuth.instance.currentUser != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'token': token});
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _loadData();
-    _setNotifications();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (_isClient) ClientCard(user: _clientSnapshot),
-              BusyIndicator(statistics: _indicatorSnapshot),
-              ContactDetails(contactDetails: _contactSnapshot),
-            ],
-          );
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        setNotifications();
+        return _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (_isClient) ClientCard(user: _clientSnapshot),
+                  BusyIndicator(statistics: _indicatorSnapshot),
+                  ContactDetails(contactDetails: _contactSnapshot),
+                ],
+              );
+      },
+    );
   }
 }

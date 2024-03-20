@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/users/calendar_class_card.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import '../../utils/class_utils.dart';
+import '../../utils/utils.dart';
 
 class ClassesCalendarScreen extends StatelessWidget {
   const ClassesCalendarScreen({super.key});
@@ -67,6 +67,7 @@ class ClassesCalendarScreen extends StatelessWidget {
             fontSize: 13,
           ),
           headerStyle: CalendarHeaderStyle(
+            backgroundColor: Colors.lightBlueAccent,
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontSize: 25,

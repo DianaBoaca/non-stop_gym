@@ -48,7 +48,7 @@ class _BusyIndicatorState extends State<BusyIndicator> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(25),
+          padding: const EdgeInsets.all(20),
           child: LayoutBuilder(
             builder: (context, constraints) {
               return Stack(
