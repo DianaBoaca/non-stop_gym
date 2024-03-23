@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/edit_user.dart';
+import '../../widgets/admin/user_list_tile.dart';
 
 class ClientsListScreen extends StatelessWidget {
   const ClientsListScreen({super.key});
@@ -32,13 +32,13 @@ class ClientsListScreen extends StatelessWidget {
             );
           }
 
-          if (snapshot.data!.docs.isEmpty) {
+          final clients = snapshot.data!.docs;
+
+          if (clients.isEmpty) {
             return const Center(
               child: Text('Nu există clienți.'),
             );
           }
-
-          final clients = snapshot.data!.docs;
 
           return ListView.builder(
             itemCount: clients.length,
@@ -63,38 +63,7 @@ class ClientsListScreen extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: ListTile(
-                  leading: const Icon(Icons.person),
-                  title: Text(
-                    clients[index].data()['lastName'] +
-                        ' ' +
-                        clients[index].data()['firstName'],
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  subtitle: Row(
-                    children: [
-                      Text(
-                        clients[index].data()['email'],
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                      const SizedBox(width: 20),
-                      Text(
-                        clients[index].data()['phone'],
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ),
-                  tileColor: Theme.of(context).colorScheme.primaryContainer,
-                  onTap: () {
-                    showModalBottomSheet(
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (context) =>
-                          EditUser(user: clients[index].reference),
-                    );
-                  },
-                ),
+                child: UserListTile(userSnapshot: clients[index]),
               ),
             ),
           );

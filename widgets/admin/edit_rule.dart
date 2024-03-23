@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class EditRule extends StatefulWidget {
-  const EditRule({super.key, required this.rule});
+  const EditRule({super.key, this.ruleRef});
 
-  final DocumentReference rule;
+  final DocumentReference<Map<String, dynamic>>? ruleRef;
 
   @override
   State<EditRule> createState() => _EditRuleState();
@@ -14,7 +14,53 @@ class _EditRuleState extends State<EditRule> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
-  bool _isLoading = true;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.ruleRef != null) _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    DocumentSnapshot<Map<String, dynamic>> ruleSnapshot = await widget.ruleRef!.get();
+
+    if (ruleSnapshot.exists) {
+      Map<String, dynamic> ruleMap = ruleSnapshot.data()!;
+
+      setState(() {
+        _titleController.text = ruleMap['title'];
+        _textController.text = ruleMap['text'];
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _onSave() async {
+    if (!_form.currentState!.validate()) return;
+
+    _form.currentState!.save();
+
+    try {
+      if (widget.ruleRef != null) {
+        await widget.ruleRef!.set({
+          'title': _titleController.text,
+          'text': _textController.text,
+        });
+      } else {
+        await FirebaseFirestore.instance.collection('rules').add({
+          'title': _titleController.text,
+          'text': _textController.text,
+        });
+      }
+    } on FirebaseException catch (error) {
+      _showError(error);
+    }
+  }
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -30,42 +76,6 @@ class _EditRuleState extends State<EditRule> {
     _titleController.dispose();
     _textController.dispose();
     super.dispose();
-  }
-
-  void _onSave() async {
-    if (_form.currentState!.validate()) {
-      _form.currentState!.save();
-    }
-
-    try {
-      await widget.rule.set({
-        'title': _titleController.text,
-        'text': _textController.text,
-      });
-    } on FirebaseException catch (error) {
-      _showError(error);
-    }
-  }
-
-  void _loadData() async {
-    var ruleData = await widget.rule.get();
-
-    if (ruleData.exists) {
-      Map<String, dynamic> userDataMap =
-          ruleData.data() as Map<String, dynamic>;
-
-      setState(() {
-        _titleController.text = userDataMap['title'];
-        _textController.text = userDataMap['text'];
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
   }
 
   @override

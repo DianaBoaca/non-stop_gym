@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/widgets/admin/edit_rule.dart';
-import '../../widgets/admin/new_rule.dart';
+import '../../widgets/admin/edit_rule.dart';
+import '../../widgets/admin/rule_list_tile.dart';
 
 class AdminRuleScreen extends StatelessWidget {
   const AdminRuleScreen({super.key});
@@ -20,14 +20,14 @@ class AdminRuleScreen extends StatelessWidget {
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 context: context,
-                builder: (context) => const NewRule(),
+                builder: (context) => const EditRule(),
               );
             },
             icon: const Icon(Icons.add),
           ),
         ],
       ),
-      body: StreamBuilder(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('rules')
             .orderBy('title')
@@ -45,13 +45,13 @@ class AdminRuleScreen extends StatelessWidget {
             );
           }
 
-          if (snapshot.data!.docs.isEmpty) {
+          final rules = snapshot.data!.docs;
+
+          if (rules.isEmpty) {
             return const Center(
               child: Text('Nu există reguli.'),
             );
           }
-
-          final rules = snapshot.data!.docs;
 
           return ListView.builder(
             itemCount: rules.length,
@@ -63,7 +63,7 @@ class AdminRuleScreen extends StatelessWidget {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Antrenorul a fost șters.'),
+                    content: const Text('Regula a fost ștearsă.'),
                     action: SnackBarAction(
                       label: 'Anulați',
                       onPressed: () {
@@ -76,27 +76,7 @@ class AdminRuleScreen extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: ListTile(
-                  leading: const Icon(Icons.rule),
-                  title: Text(
-                    rules[index].data()['title'],
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  subtitle: Text(
-                    rules[index].data()['text'],
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  tileColor: Theme.of(context).colorScheme.primaryContainer,
-                  onTap: () {
-                    showModalBottomSheet(
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (context) =>
-                          EditRule(rule: rules[index].reference),
-                    );
-                  },
-                ),
+                child: RuleListTile(ruleSnapshot: rules[index]),
               ),
             ),
           );

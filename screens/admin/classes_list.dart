@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/widgets/admin/class_list_tile.dart';
+import 'package:non_stop_gym/widgets/admin/edit_class.dart';
 import '../../utils/utils.dart';
-import '../../widgets/admin/edit_class.dart';
-import '../../widgets/admin/new_class.dart';
 
 class ClassesListScreen extends StatelessWidget {
   const ClassesListScreen({super.key});
@@ -21,14 +21,14 @@ class ClassesListScreen extends StatelessWidget {
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 context: context,
-                builder: (context) => const NewClass(),
+                builder: (context) => const EditClass(),
               );
             },
             icon: const Icon(Icons.add),
           ),
         ],
       ),
-      body: StreamBuilder(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('classes')
             .where('end', isGreaterThanOrEqualTo: DateTime.now())
@@ -47,13 +47,13 @@ class ClassesListScreen extends StatelessWidget {
             );
           }
 
-          if (snapshot.data!.docs.isEmpty) {
+          final classes = snapshot.data!.docs;
+
+          if (classes.isEmpty) {
             return const Center(
               child: Text('Nu există clase.'),
             );
           }
-
-          final classes = snapshot.data!.docs;
 
           return ListView.builder(
             itemCount: classes.length,
@@ -79,62 +79,19 @@ class ClassesListScreen extends StatelessWidget {
               child: FutureBuilder(
                 future: getUserName(classes[index].data()['trainer']),
                 builder: (context, trainerSnapshot) {
+                  if (trainerSnapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox();
+                  }
+
                   if (trainerSnapshot.hasError) {
                     return const Text('Eroare');
                   }
 
                   return Padding(
                     padding: const EdgeInsets.all(8),
-                    child: ListTile(
-                      leading: Icon(
-                          classes[index].data()['room'] == 'Room.aerobic'
-                              ? Icons.monitor_heart
-                              : Icons.fitness_center),
-                      title: Text(
-                        classes[index].data()['className'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                formatter.format(
-                                    classes[index].data()['date'].toDate()),
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                              const SizedBox(width: 20),
-                              Text(
-                                '${formatterTime.format(classes[index].data()['start'].toDate())} - ${formatterTime.format(classes[index].data()['end'].toDate())}',
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            '${trainerSnapshot.data}, ${classes[index].data()['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          Text(
-                            'Persoane înscrise: ${classes[index].data()['reserved']}/${classes[index].data()['capacity']}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                      tileColor: Theme.of(context).colorScheme.primaryContainer,
-                      onTap: () {
-                        showModalBottomSheet(
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          builder: (context) => EditClass(
-                            fitnessClass: classes[index].reference,
-                          ),
-                        );
-                      },
+                    child: ClassListTile(
+                      fitnessClassDoc: classes[index],
+                      trainerName: trainerSnapshot.data!,
                     ),
                   );
                 },

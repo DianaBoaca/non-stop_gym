@@ -25,10 +25,6 @@ class _NewTrainerState extends State<NewTrainer> {
     );
   }
 
-  void _changeScreen() {
-    Navigator.pop(context);
-  }
-
   void _onSave() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -53,8 +49,6 @@ class _NewTrainerState extends State<NewTrainer> {
         'phone': _enteredPhone,
         'role': 'trainer',
       });
-
-      _changeScreen();
     } on FirebaseException catch (error) {
       _showError(error);
     }
@@ -177,7 +171,10 @@ class _NewTrainerState extends State<NewTrainer> {
                           child: const Text('Anulează'),
                         ),
                         ElevatedButton(
-                          onPressed: _onSave,
+                          onPressed: () {
+                            _onSave();
+                            Navigator.pop(context);
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context)
                                 .colorScheme
