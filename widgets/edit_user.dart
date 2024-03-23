@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class EditUser extends StatefulWidget {
-  const EditUser({super.key, required this.user});
+  const EditUser({super.key, this.userRef});
 
-  final DocumentReference user;
+  final DocumentReference<Map<String, dynamic>>? userRef;
 
   @override
   State<EditUser> createState() => _EditUserState();
@@ -15,7 +16,69 @@ class _EditUserState extends State<EditUser> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  bool _isLoading = true;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.userRef != null) _loadData();
+  }
+
+  void _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+        await widget.userRef!.get();
+
+    if (userSnapshot.exists) {
+      Map<String, dynamic> userMap = userSnapshot.data()!;
+
+      setState(() {
+        _lastNameController.text = userMap['lastName'];
+        _firstNameController.text = userMap['firstName'];
+        _phoneController.text = userMap['phone'];
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _onSave() async {
+    if (!_form.currentState!.validate()) return;
+
+    _form.currentState!.save();
+
+    try {
+      if (widget.userRef != null) {
+        await widget.userRef!.update({
+          'lastName': _lastNameController.text,
+          'firstName': _firstNameController.text,
+          'phone': _phoneController.text,
+        });
+      } else {
+        final userCredentials = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passController.text,
+        );
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredentials.user!.uid)
+            .set({
+          'lastName': _lastNameController.text,
+          'firstName': _firstNameController.text,
+          'email': _emailController.text,
+          'phone': _phoneController.text,
+          'role': 'trainer',
+        });
+      }
+    } on FirebaseException catch (error) {
+      _showError(error);
+    }
+  }
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -31,45 +94,9 @@ class _EditUserState extends State<EditUser> {
     _lastNameController.dispose();
     _firstNameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
+    _passController.dispose();
     super.dispose();
-  }
-
-  void _onSave() async {
-    if (_form.currentState!.validate()) {
-      _form.currentState!.save();
-    }
-
-    try {
-      await widget.user.update({
-        'lastName': _lastNameController.text,
-        'firstName': _firstNameController.text,
-        'phone': _phoneController.text,
-      });
-    } on FirebaseException catch (error) {
-      _showError(error);
-    }
-  }
-
-  void _loadData() async {
-    DocumentSnapshot<Object?> userData = await widget.user.get();
-
-    if (userData.exists) {
-      Map<String, dynamic> userDataMap =
-          userData.data() as Map<String, dynamic>;
-
-      setState(() {
-        _lastNameController.text = userDataMap['lastName'];
-        _firstNameController.text = userDataMap['firstName'];
-        _phoneController.text = userDataMap['phone'];
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
   }
 
   @override
@@ -89,6 +116,40 @@ class _EditUserState extends State<EditUser> {
                       key: _form,
                       child: Column(
                         children: [
+                          if (widget.userRef == null)
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                labelText: 'Adresă de email',
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              autocorrect: false,
+                              textCapitalization: TextCapitalization.none,
+                              enableSuggestions: false,
+                              validator: (value) {
+                                if (value == null ||
+                                    value.trim().isEmpty ||
+                                    !value.contains('@')) {
+                                  return 'Introduceți o adresă de email validă.';
+                                }
+                                return null;
+                              },
+                            ),
+                          if (widget.userRef == null)
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                labelText: 'Parolă',
+                              ),
+                              autocorrect: false,
+                              textCapitalization: TextCapitalization.none,
+                              enableSuggestions: false,
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.trim().length < 6) {
+                                  return 'Parola trebuie să aibă cel puțin 6 caractere!';
+                                }
+                                return null;
+                              },
+                            ),
                           TextFormField(
                             decoration: const InputDecoration(
                               labelText: 'Nume',

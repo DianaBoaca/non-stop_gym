@@ -1,30 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import '../edit_user.dart';
 
-class TrainerListTile extends StatelessWidget {
-  const TrainerListTile({super.key, required this.trainerQuery});
+class UserListTile extends StatelessWidget {
+  const UserListTile({super.key, required this.userSnapshot});
 
-  final QueryDocumentSnapshot trainerQuery;
+  final QueryDocumentSnapshot<Map<String, dynamic>> userSnapshot;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const Icon(Icons.fitness_center),
+      leading: Icon(
+        userSnapshot['role'] == 'trainer' ? Icons.fitness_center : Icons.person,
+      ),
       title: Text(
-        trainerQuery['lastName'] + ' ' + trainerQuery['firstName'],
+        userSnapshot['lastName'] + ' ' + userSnapshot['firstName'],
         style: const TextStyle(fontSize: 20),
       ),
       subtitle: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            trainerQuery['email'],
+            userSnapshot['email'],
             style: const TextStyle(fontSize: 15),
           ),
-          const SizedBox(width: 10),
           Text(
-            trainerQuery['phone'],
+            userSnapshot['phone'],
             style: const TextStyle(fontSize: 15),
           ),
         ],
@@ -35,7 +36,7 @@ class TrainerListTile extends StatelessWidget {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           context: context,
-          builder: (context) => EditUser(user: trainerQuery.reference),
+          builder: (context) => EditUser(userRef: userSnapshot.reference),
         );
       },
     );

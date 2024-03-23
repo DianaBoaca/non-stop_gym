@@ -8,25 +8,79 @@ final _firebase = FirebaseFirestore.instance
     .collection('contact')
     .doc('XZc7U6u8uXpXVJsO1hIK');
 
-class ContactScreen extends StatefulWidget {
-  const ContactScreen({super.key});
+class ContactDetailsScreen extends StatefulWidget {
+  const ContactDetailsScreen({super.key});
 
   @override
-  State<ContactScreen> createState() {
-    return _ContactScreenState();
-  }
+  State<ContactDetailsScreen> createState() => _ContactDetailsScreenState();
 }
 
-class _ContactScreenState extends State<ContactScreen> {
-  final _addressController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _websiteController = TextEditingController();
+class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _websiteController = TextEditingController();
+  final GlobalKey<FormState> _form = GlobalKey<FormState>();
   bool _isEditable = false;
-  final _form = GlobalKey<FormState>();
+  bool _isLoading = true;
   File? _selectedImageFile;
   String? _imageUrl;
-  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    DocumentSnapshot<Map<String, dynamic>> contactSnapshot = await _firebase.get();
+
+    if (contactSnapshot.exists) {
+      Map<String, dynamic> contactMap = contactSnapshot.data()!;
+
+      setState(() {
+        _addressController.text = contactMap['location'];
+        _phoneController.text = contactMap['phone'];
+        _emailController.text = contactMap['email'];
+        _websiteController.text = contactMap['website'];
+        _imageUrl = contactMap['tarife'];
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _onSave() async {
+    if (!_form.currentState!.validate()) return;
+
+    _form.currentState!.save();
+
+    setState(() {
+      _isEditable = !_isEditable;
+    });
+
+    String url = '';
+
+    if (_selectedImageFile != null) {
+      Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child('tarife')
+          .child('tarife2024.jpg');
+      await storageRef.putFile(_selectedImageFile!);
+      url = await storageRef.getDownloadURL();
+    }
+
+    try {
+      await _firebase.update({
+        'location': _addressController.text,
+        'phone': _phoneController.text,
+        'email': _emailController.text,
+        'website': _websiteController.text,
+        'tarife': url,
+      });
+    } on FirebaseException catch (error) {
+      _showError(error);
+    }
+  }
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -37,6 +91,16 @@ class _ContactScreenState extends State<ContactScreen> {
     );
   }
 
+  Future<void> _selectImage() async {
+    final selectedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (selectedImage != null) {
+      setState(() {
+        _selectedImageFile = File(selectedImage.path);
+      });
+    }
+  }
+
   @override
   void dispose() {
     _addressController.dispose();
@@ -44,72 +108,6 @@ class _ContactScreenState extends State<ContactScreen> {
     _emailController.dispose();
     _websiteController.dispose();
     super.dispose();
-  }
-
-  void _onSave() async {
-    String url = '';
-
-    setState(() {
-      _isEditable = !_isEditable;
-    });
-
-    if (_form.currentState!.validate()) {
-      _form.currentState!.save();
-    }
-
-    if (_selectedImageFile != null) {
-      Reference storageRef = FirebaseStorage.instance
-          .ref()
-          .child('tarife')
-          .child('tarife2024.jpg');
-      await storageRef.putFile(_selectedImageFile!);
-      url = await storageRef.getDownloadURL();
-      try {
-        await _firebase.update({
-          'location': _addressController.text,
-          'phone': _phoneController.text,
-          'email': _emailController.text,
-          'website': _websiteController.text,
-          'tarife': url,
-        });
-      } on FirebaseException catch (error) {
-        _showError(error);
-      }
-    }
-  }
-
-  void _loadData() async {
-    DocumentSnapshot<Map<String, dynamic>> contactDetails =
-        await _firebase.get();
-    Map<String, dynamic> contactDetailsMap = contactDetails.data()!;
-
-    if (contactDetails.exists) {
-      setState(() {
-        _addressController.text = contactDetailsMap['location'];
-        _phoneController.text = contactDetailsMap['phone'];
-        _emailController.text = contactDetailsMap['email'];
-        _websiteController.text = contactDetailsMap['website'];
-        _imageUrl = contactDetailsMap['tarife'];
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  void _selectImage() async {
-    final selectedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (selectedImage != null) {
-      setState(() {
-        _selectedImageFile = File(selectedImage.path);
-      });
-    }
   }
 
   @override
@@ -141,12 +139,12 @@ class _ContactScreenState extends State<ContactScreen> {
                           child: Column(
                             children: [
                               TextFormField(
-                                decoration:
-                                    const InputDecoration(labelText: 'Adresă'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Adresă',
+                                ),
                                 controller: _addressController,
                                 enabled: _isEditable,
                                 keyboardType: TextInputType.streetAddress,
-                                //style: _isEditable ? null : const TextStyle(color: Colors.black),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Introduceți o adresă.';
@@ -156,7 +154,8 @@ class _ContactScreenState extends State<ContactScreen> {
                               ),
                               TextFormField(
                                 decoration: const InputDecoration(
-                                    labelText: 'Număr de telefon'),
+                                  labelText: 'Număr de telefon',
+                                ),
                                 controller: _phoneController,
                                 enabled: _isEditable,
                                 keyboardType: TextInputType.number,
@@ -170,8 +169,9 @@ class _ContactScreenState extends State<ContactScreen> {
                                 },
                               ),
                               TextFormField(
-                                decoration:
-                                    const InputDecoration(labelText: 'Email'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                ),
                                 controller: _emailController,
                                 enabled: _isEditable,
                                 keyboardType: TextInputType.emailAddress,
@@ -185,8 +185,9 @@ class _ContactScreenState extends State<ContactScreen> {
                                 },
                               ),
                               TextFormField(
-                                decoration:
-                                    const InputDecoration(labelText: 'Website'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Website',
+                                ),
                                 controller: _websiteController,
                                 enabled: _isEditable,
                                 validator: (value) {
@@ -204,13 +205,12 @@ class _ContactScreenState extends State<ContactScreen> {
                                   height: 160,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: _imageUrl == null &&
                                           _selectedImageFile == null
                                       ? Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.add_photo_alternate,

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../../utils/utils.dart';
 
 class EditClass extends StatefulWidget {
-  const EditClass({super.key, required this.fitnessClass});
+  const EditClass({super.key, this.fitnessClassRef});
 
-  final DocumentReference<Map<String, dynamic>> fitnessClass;
+  final DocumentReference<Map<String, dynamic>>? fitnessClassRef;
 
   @override
   State<EditClass> createState() => _EditClassState();
@@ -20,60 +20,48 @@ class _EditClassState extends State<EditClass> {
   DocumentReference? _selectedTrainer;
   Room? _selectedRoom;
   int? _counter;
-  bool _isLoading = true;
-
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date'),
-      ),
-    );
-  }
-
-  void _showBookingError(String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
+  bool _isLoading = false;
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    if (widget.fitnessClassRef != null) _loadData();
   }
 
-  void _onSave() async {
-    if (_form.currentState!.validate()) {
-      _form.currentState!.save();
-    }
+  void _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
 
-    try {
-      await widget.fitnessClass.set({
-        'className': _nameController.text,
-        'date': _selectedDate,
-        'start': convertToDateTime(_selectedDate!, _selectedStart!),
-        'end': convertToDateTime(_selectedDate!, _selectedEnd!),
-        'trainer': _selectedTrainer,
-        'room': _selectedRoom.toString(),
-        'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
-        'reserved': _counter,
+    DocumentSnapshot<Map<String, dynamic>> fitnessClassSnapshot =
+        await widget.fitnessClassRef!.get();
+
+    if (fitnessClassSnapshot.exists) {
+      Map<String, dynamic> fitnessClassMap = fitnessClassSnapshot.data()!;
+      //String name = await getUserName(fitnessClassSnapshot['trainer']);
+
+      setState(() {
+        _nameController.text = fitnessClassMap['className'];
+        _selectedDate = fitnessClassMap['date'].toDate();
+        _selectedStart = TimeOfDay.fromDateTime(fitnessClassMap['start'].toDate());
+        _selectedEnd = TimeOfDay.fromDateTime(fitnessClassMap['end'].toDate());
+        _selectedTrainer = fitnessClassMap['trainer'];
+        _selectedRoom = fitnessClassMap['room'] == 'Room.aerobic'
+            ? Room.aerobic
+            : Room.functional;
+        _counter = fitnessClassMap['reserved'];
+        _isLoading = false;
       });
-    } on FirebaseException catch (error) {
-      _showError(error);
     }
   }
 
   void _selectDate() async {
-    final lastDate = DateTime(
+    DateTime lastDate = DateTime(
       DateTime.now().year + 1,
       DateTime.now().month,
       DateTime.now().day,
     );
-    final date = await showDatePicker(
+    DateTime? date = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
       lastDate: lastDate,
@@ -91,20 +79,12 @@ class _EditClassState extends State<EditClass> {
       return;
     }
 
-    final start = await showTimePicker(
+    TimeOfDay? start = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
 
-    if (await verifyRoomAvailability(widget.fitnessClass.id, _selectedDate!,
-            _selectedRoom.toString(), start!, _selectedEnd!) ==
-        false) {
-      _showBookingError('Sala este ocupată în acel interval orar.');
-    } else if (await verifyTrainerAvailability(widget.fitnessClass.id,
-            _selectedTrainer!, _selectedDate!, start, _selectedEnd!) ==
-        false) {
-      _showBookingError('Antrenorul este ocupat în acel interval orar.');
-    } else {
+    if (start != null) {
       setState(() {
         _selectedStart = start;
       });
@@ -116,81 +96,102 @@ class _EditClassState extends State<EditClass> {
       return;
     }
 
-    final end = await showTimePicker(
+    TimeOfDay? end = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
 
-    if (toDouble(_selectedStart!) > toDouble(end!)) {
-      _showBookingError(
-          'Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
-    } else if (await verifyRoomAvailability(widget.fitnessClass.id,
-            _selectedDate!, _selectedRoom.toString(), _selectedStart!, end) ==
-        false) {
-      _showBookingError('Sala este ocupată în acel interval orar.');
-    } else if (await verifyTrainerAvailability(widget.fitnessClass.id,
-            _selectedTrainer!, _selectedDate!, _selectedStart!, end) ==
-        false) {
-      _showBookingError('Antrenorul este ocupat în acel interval orar.');
-    } else {
+    if (end != null) {
+      if (toDouble(_selectedStart!) > toDouble(end)) {
+        _showError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
+      }
+
       setState(() {
         _selectedEnd = end;
       });
     }
   }
 
-  void _selectTrainer(DocumentReference value) async {
-    if (await verifyTrainerAvailability(widget.fitnessClass.id, value,
-            _selectedDate!, _selectedStart!, _selectedEnd!) ==
-        false) {
-      _showBookingError('Antrenorul este ocupat în acel interval orar.');
-    } else {
-      setState(() {
-        _selectedTrainer = value;
-      });
+  void _onSave() async {
+    if (!_form.currentState!.validate() ||
+        _selectedDate == null ||
+        _selectedStart == null ||
+        _selectedEnd == null ||
+        _selectedTrainer == null ||
+        _selectedRoom == null) return;
+
+    _form.currentState!.save();
+
+    if (await verifyTrainerAvailability(
+          widget.fitnessClassRef != null ? widget.fitnessClassRef!.id : '',
+          _selectedTrainer!,
+          _selectedDate!,
+          _selectedStart!,
+          _selectedEnd!)
+        == false) {
+      _showError('Antrenorul este ocupat în acel interval orar.');
+      return;
+    }
+
+    if (await verifyRoomAvailability(
+            widget.fitnessClassRef != null ? widget.fitnessClassRef!.id : '',
+            _selectedDate!,
+            _selectedRoom!.toString(),
+            _selectedStart!,
+            _selectedEnd!)
+        == false) {
+      _showError('Sala este ocupată în acel interval orar.');
+      return;
+    }
+
+    try {
+      if (widget.fitnessClassRef != null) {
+        await widget.fitnessClassRef!.set({
+          'className': _nameController.text,
+          'date': _selectedDate,
+          'start': convertToDateTime(_selectedDate!, _selectedStart!),
+          'end': convertToDateTime(_selectedDate!, _selectedEnd!),
+          'trainer': _selectedTrainer,
+          'room': _selectedRoom.toString(),
+          'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
+          'reserved': _counter,
+        });
+      } else {
+        await FirebaseFirestore.instance.collection('classes').add({
+          'className': _nameController.text,
+          'date': _selectedDate,
+          'start': convertToDateTime(_selectedDate!, _selectedStart!),
+          'end': convertToDateTime(_selectedDate!, _selectedEnd!),
+          'trainer': _selectedTrainer,
+          'room': _selectedRoom.toString(),
+          'capacity': _selectedRoom == Room.aerobic ? 25 : 20,
+          'reserved': 0,
+        });
+      }
+
+      _changeScreen();
+    } on FirebaseException catch (error) {
+      _showError(error.message);
     }
   }
 
-  void _selectRoom(Room value) async {
-    if (await verifyRoomAvailability(widget.fitnessClass.id, _selectedDate!,
-            value.toString(), _selectedStart!, _selectedEnd!) ==
-        false) {
-      _showBookingError('Sala este ocupată în acel interval orar.');
-    } else {
-      setState(() {
-        _selectedRoom = value;
-      });
-    }
+  void _changeScreen() {
+    Navigator.pop(context);
   }
 
-  void _loadData() async {
-    DocumentSnapshot<Map<String, dynamic>> classData =
-        await widget.fitnessClass.get();
-
-    if (classData.exists) {
-      Map<String, dynamic> classDataMap = classData.data()!;
-      final fitnessClass = await widget.fitnessClass.get();
-      String name = await getUserName(fitnessClass['trainer']);
-
-      setState(() {
-        _nameController.text = classDataMap['className'];
-        _selectedDate = classDataMap['date'].toDate();
-        _selectedStart = TimeOfDay.fromDateTime(classDataMap['start'].toDate());
-        _selectedEnd = TimeOfDay.fromDateTime(classDataMap['end'].toDate());
-        _selectedTrainer = classDataMap['trainer'];
-        _selectedRoom = classDataMap['room'] == 'Room.aerobic'
-            ? Room.aerobic
-            : Room.functional;
-        _counter = classDataMap['reserved'];
-        _isLoading = false;
-      });
-    }
+  void _showError(String? message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message ?? 'Eroare'),
+      ),
+    );
   }
 
   @override
-  void initState() {
-    super.initState();
-    _loadData();
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -261,14 +262,13 @@ class _EditClassState extends State<EditClass> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              StreamBuilder(
-                                  stream: FirebaseFirestore.instance
+                              FutureBuilder(
+                                  future: FirebaseFirestore.instance
                                       .collection('users')
                                       .where('role', isEqualTo: 'trainer')
-                                      .snapshots(),
+                                      .get(),
                                   builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
                                       return const CircularProgressIndicator();
                                     }
 
@@ -276,10 +276,8 @@ class _EditClassState extends State<EditClass> {
                                       return const Text('Eroare');
                                     }
 
-                                    List<DropdownMenuItem<DocumentReference>>
-                                        trainers = snapshot.data!.docs.map(
-                                      (DocumentSnapshot<Map<String, dynamic>>
-                                          trainer) {
+                                    List<DropdownMenuItem<DocumentReference>> trainers =
+                                    snapshot.data!.docs.map((DocumentSnapshot<Map<String, dynamic>> trainer) {
                                         return DropdownMenuItem(
                                           value: trainer.reference,
                                           child: Text(
@@ -293,7 +291,9 @@ class _EditClassState extends State<EditClass> {
                                       items: trainers,
                                       onChanged: (value) {
                                         if (value != null) {
-                                          _selectTrainer(value);
+                                          setState(() {
+                                            _selectedTrainer = value;
+                                          });
                                         }
                                       },
                                       value: _selectedTrainer,
@@ -313,7 +313,9 @@ class _EditClassState extends State<EditClass> {
                                     .toList(),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    _selectRoom(value);
+                                    setState(() {
+                                      _selectedRoom = value;
+                                    });
                                   }
                                 },
                                 hint: const Text('Sala'),
@@ -331,10 +333,7 @@ class _EditClassState extends State<EditClass> {
                                 child: const Text('Anulează'),
                               ),
                               ElevatedButton(
-                                onPressed: () {
-                                  _onSave();
-                                  Navigator.pop(context);
-                                },
+                                onPressed: _onSave,
                                 child: const Text('Salvează'),
                               ),
                             ],
@@ -344,7 +343,7 @@ class _EditClassState extends State<EditClass> {
                     ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }

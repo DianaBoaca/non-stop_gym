@@ -56,7 +56,7 @@ class _TrainerTabsScreenState extends State<TrainerTabsScreen> {
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 builder: (context) => EditUser(
-                    user: FirebaseFirestore.instance
+                    userRef: FirebaseFirestore.instance
                         .collection('users')
                         .doc(user.uid)),
               );

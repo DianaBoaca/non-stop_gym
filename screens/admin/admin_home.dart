@@ -55,7 +55,7 @@ class AdminHomeScreen extends StatelessWidget {
             icon: Icons.contact_page,
             title: 'Date de contact',
             color: Theme.of(context).colorScheme.primary,
-            route: const ContactScreen(),
+            route: const ContactDetailsScreen(),
           ),
           CustomContainer(
             icon: Icons.rule,

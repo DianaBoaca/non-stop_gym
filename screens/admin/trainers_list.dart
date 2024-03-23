@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/widgets/admin/trainer_list_tile.dart';
-import '../../widgets/admin/new_trainer.dart';
+import 'package:non_stop_gym/widgets/admin/user_list_tile.dart';
+import 'package:non_stop_gym/widgets/edit_user.dart';
 
 class TrainersListScreen extends StatelessWidget {
   const TrainersListScreen({super.key});
@@ -20,7 +20,7 @@ class TrainersListScreen extends StatelessWidget {
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 context: context,
-                builder: (context) => const NewTrainer(),
+                builder: (context) => const EditUser(),
               );
             },
             icon: const Icon(Icons.add),
@@ -47,13 +47,13 @@ class TrainersListScreen extends StatelessWidget {
             );
           }
 
-          if (snapshot.data!.docs.isEmpty) {
+          final trainers = snapshot.data!.docs;
+
+          if (trainers.isEmpty) {
             return const Center(
               child: Text('Nu există antrenori.'),
             );
           }
-
-          final trainers = snapshot.data!.docs;
 
           return ListView.builder(
             itemCount: trainers.length,
@@ -78,7 +78,7 @@ class TrainersListScreen extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: TrainerListTile(trainerQuery: trainers[index]),
+                child: UserListTile(userSnapshot: trainers[index]),
               ),
             ),
           );
