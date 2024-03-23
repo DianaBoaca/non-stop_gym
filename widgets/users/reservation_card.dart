@@ -1,16 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../utils/methods.dart';
 import 'white_text.dart';
-import '../../utils/utils.dart';
+import '../../utils/class_utils.dart';
+import '../../utils/time_utils.dart';
 
 class ReservationCard extends StatefulWidget {
-  const ReservationCard(
-      {super.key,
-      required this.reservationSnapshot,
-      required this.classSnapshot,
-      required this.position});
+  const ReservationCard({
+    super.key,
+    required this.reservationRef,
+    required this.classSnapshot,
+    required this.position,
+  });
 
-  final DocumentSnapshot<Map<String, dynamic>> reservationSnapshot;
+  final DocumentReference<Map<String, dynamic>> reservationRef;
   final DocumentSnapshot<Map<String, dynamic>> classSnapshot;
   final int position;
 
@@ -19,18 +22,9 @@ class ReservationCard extends StatefulWidget {
 }
 
 class _ReservationCardState extends State<ReservationCard> {
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
-      ),
-    );
-  }
-
   Future<void> _cancelReservation() async {
     try {
-      widget.reservationSnapshot.reference.delete();
+      widget.reservationRef.delete();
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -40,8 +34,7 @@ class _ReservationCardState extends State<ReservationCard> {
       );
 
       if (widget.position == 0) {
-        widget.classSnapshot.reference
-            .update({'reserved': FieldValue.increment(-1)});
+        widget.classSnapshot.reference.update({'reserved': FieldValue.increment(-1)});
 
         QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
             await FirebaseFirestore.instance
@@ -51,8 +44,7 @@ class _ReservationCardState extends State<ReservationCard> {
                 .get();
 
         if (waitingListSnapshot.docs.isNotEmpty) {
-          DocumentSnapshot<Map<String, dynamic>> first =
-              waitingListSnapshot.docs.first;
+          DocumentSnapshot<Map<String, dynamic>> first = waitingListSnapshot.docs.first;
 
           await FirebaseFirestore.instance.collection('reservations').add({
             'class': widget.classSnapshot.reference,
@@ -62,8 +54,7 @@ class _ReservationCardState extends State<ReservationCard> {
             'end': widget.classSnapshot['end'],
           });
 
-          widget.classSnapshot.reference
-              .update({'reserved': FieldValue.increment(1)});
+          widget.classSnapshot.reference.update({'reserved': FieldValue.increment(1)});
 
           DocumentSnapshot<Map<String, dynamic>> userSnapshot =
               await FirebaseFirestore.instance
@@ -83,6 +74,15 @@ class _ReservationCardState extends State<ReservationCard> {
     } on FirebaseException catch (error) {
       _showError(error);
     }
+  }
+
+  void _showError(FirebaseException error) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message ?? 'Eroare stocare date.'),
+      ),
+    );
   }
 
   @override
@@ -111,18 +111,15 @@ class _ReservationCardState extends State<ReservationCard> {
                     ),
                     const SizedBox(height: 15),
                     WhiteText(
-                      text: formatter
-                          .format(widget.classSnapshot['date'].toDate()),
+                      text: formatter.format(widget.classSnapshot['date'].toDate()),
                     ),
                     const SizedBox(height: 15),
                     WhiteText(
-                      text:
-                          '${formatterTime.format(widget.classSnapshot['start'].toDate())} - ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
+                      text: '${formatterTime.format(widget.classSnapshot['start'].toDate())} - ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
                     ),
                     const SizedBox(height: 15),
                     WhiteText(
-                      text:
-                          'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
+                      text: 'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
                     ),
                   ],
                 ),
@@ -144,8 +141,7 @@ class _ReservationCardState extends State<ReservationCard> {
                                 child: Column(
                                   children: [
                                     WhiteText(
-                                        text:
-                                            'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?'),
+                                        text: 'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?'),
                                     const SizedBox(height: 20),
                                     Row(
                                       mainAxisAlignment:
@@ -182,8 +178,7 @@ class _ReservationCardState extends State<ReservationCard> {
             const SizedBox(height: 15),
             if (widget.position > 0)
               WhiteText(
-                  text:
-                      'Sunteți pe locul ${widget.position} în lista de așteptare!'),
+                  text: 'Sunteți pe locul ${widget.position} în lista de așteptare!'),
           ],
         ),
       ),

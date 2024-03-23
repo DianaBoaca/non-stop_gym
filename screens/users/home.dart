@@ -16,9 +16,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late DocumentSnapshot<Map<String, dynamic>> _clientSnapshot;
   late DocumentSnapshot<Map<String, dynamic>> _contactSnapshot;
-  late DocumentSnapshot<Map<String, dynamic>> _indicatorSnapshot;
+  late int _checkedInClients;
   late bool _isClient;
   bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
   Future<void> _loadData() async {
     DocumentSnapshot<Map<String, dynamic>> client = await FirebaseFirestore
@@ -26,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
-    DocumentSnapshot<Map<String, dynamic>> indicator = await FirebaseFirestore
+    DocumentSnapshot<Map<String, dynamic>> statistics = await FirebaseFirestore
         .instance
         .collection('statistics')
         .doc('4WVH8oQxUkXv0bWq3pXn')
@@ -40,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       setState(() {
         _clientSnapshot = client;
-        _indicatorSnapshot = indicator;
+        _checkedInClients = statistics['checkedInClients'];
         _contactSnapshot = contact;
         _isClient = client['role'] == 'client';
         _isLoading = false;
@@ -60,12 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
@@ -77,7 +77,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   if (_isClient) ClientCard(user: _clientSnapshot),
-                  BusyIndicator(statistics: _indicatorSnapshot),
+                  BusyIndicator(
+                    checkedInClients: _checkedInClients,
+                  ),
                   ContactDetails(contactDetails: _contactSnapshot),
                 ],
               );

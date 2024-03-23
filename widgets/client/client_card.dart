@@ -20,9 +20,66 @@ class ClientCard extends StatefulWidget {
 }
 
 class _ClientCardState extends State<ClientCard> {
-  late bool _checkedIn;
   final String _checkInTimeKey = 'checkInTime';
+  late bool _checkedIn;
   late Timer _timer;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    DocumentSnapshot<Object?> userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    if (userData.exists) {
+      Map<String, dynamic> userDataMap =
+      userData.data() as Map<String, dynamic>;
+
+      if (mounted) {
+        setState(() {
+          _checkedIn = userDataMap['checkedIn'];
+        });
+      }
+    }
+  }
+
+  void _checkIn() async {
+    setState(() {
+      _checkedIn = !_checkedIn;
+    });
+
+    try {
+      await firebase.update({
+        'checkedInClients':
+        _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
+      });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'checkedIn': _checkedIn});
+    } on FirebaseException catch (error) {
+      _showError(error);
+      return;
+    }
+
+    _showMessage();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (_checkedIn) {
+      prefs.setInt(_checkInTimeKey, DateTime.now().millisecondsSinceEpoch);
+      _timer = Timer.periodic(const Duration(hours: 2), (Timer timer) {
+        _automaticCheckOut();
+      });
+    }
+  }
 
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -55,67 +112,6 @@ class _ClientCardState extends State<ClientCard> {
         _checkIn();
       }
     }
-  }
-
-  void _checkIn() async {
-    setState(() {
-      _checkedIn = !_checkedIn;
-    });
-
-    try {
-      await firebase.update({
-        'checkedInClients':
-            _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
-      });
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({'checkedIn': _checkedIn});
-    } on FirebaseException catch (error) {
-      _showError(error);
-      return;
-    }
-
-    _showMessage();
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (_checkedIn) {
-      prefs.setInt(_checkInTimeKey, DateTime.now().millisecondsSinceEpoch);
-      _timer = Timer.periodic(const Duration(hours: 2), (Timer timer) {
-        _automaticCheckOut();
-      });
-    }
-  }
-
-  void _loadData() async {
-    DocumentSnapshot<Object?> userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
-
-    if (userData.exists) {
-      Map<String, dynamic> userDataMap =
-          userData.data() as Map<String, dynamic>;
-
-      if (mounted) {
-        setState(() {
-          _checkedIn = userDataMap['checkedIn'];
-        });
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override

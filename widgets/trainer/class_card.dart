@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/trainer/reserved_clients_list.dart';
-import '../../utils/utils.dart';
+import '../../utils/methods.dart';
+import '../../utils/time_utils.dart';
+import '../../utils/class_utils.dart';
 import '../users/white_text.dart';
 
 class ClassCard extends StatefulWidget {
@@ -14,15 +16,6 @@ class ClassCard extends StatefulWidget {
 }
 
 class _ClassCardState extends State<ClassCard> {
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
-      ),
-    );
-  }
-
   Future<void> _cancelClass() async {
     try {
       widget.classSnapshot.reference.delete();
@@ -39,6 +32,7 @@ class _ClassCardState extends State<ClassCard> {
               .collection('waitingList')
               .where('class', isEqualTo: widget.classSnapshot.reference)
               .get();
+
       for (QueryDocumentSnapshot waiting in waitingListSnapshot.docs) {
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
             await waiting['client'].get();
@@ -74,6 +68,15 @@ class _ClassCardState extends State<ClassCard> {
     }
   }
 
+  void _showError(FirebaseException error) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message ?? 'Eroare stocare date.'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -82,8 +85,7 @@ class _ClassCardState extends State<ClassCard> {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           context: context,
-          builder: (context) =>
-              ReservedClientsList(classSnapshot: widget.classSnapshot),
+          builder: (context) => ReservedClientsList(classSnapshot: widget.classSnapshot),
         );
       },
       child: Card(

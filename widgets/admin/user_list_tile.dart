@@ -5,7 +5,7 @@ import '../edit_user.dart';
 class UserListTile extends StatelessWidget {
   const UserListTile({super.key, required this.userSnapshot});
 
-  final QueryDocumentSnapshot<Map<String, dynamic>> userSnapshot;
+  final DocumentSnapshot<Map<String, dynamic>> userSnapshot;
 
   @override
   Widget build(BuildContext context) {

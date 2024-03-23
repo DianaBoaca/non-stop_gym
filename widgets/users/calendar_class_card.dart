@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/users/white_text.dart';
-import '../../utils/utils.dart';
+import '../../utils/class_utils.dart';
+import '../../utils/methods.dart';
+import '../../utils/time_utils.dart';
 
 class CalendarClassCard extends StatefulWidget {
   const CalendarClassCard({super.key, required this.fitnessClass});
@@ -20,6 +22,44 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
   bool _hasPassed = false;
   bool _isMyClass = false;
   String _trainerName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+    DocumentReference<Map<String, dynamic>> classRef = FirebaseFirestore
+        .instance
+        .collection('classes')
+        .doc(widget.fitnessClass.id);
+    QuerySnapshot<Map<String, dynamic>> existingReservations =
+        await FirebaseFirestore.instance
+            .collection('reservations')
+            .where('class', isEqualTo: classRef)
+            .where('client', isEqualTo: userRef)
+            .get();
+    QuerySnapshot<Map<String, dynamic>> waitingReservations =
+        await FirebaseFirestore.instance
+            .collection('waitingList')
+            .where('class', isEqualTo: classRef)
+            .where('client', isEqualTo: userRef)
+            .get();
+    String name = await getUserName(widget.fitnessClass.trainer);
+
+    setState(() {
+      _alreadyReserved = existingReservations.docs.isNotEmpty;
+      _isWaiting = waitingReservations.docs.isNotEmpty;
+      _hasPassed = widget.fitnessClass.start.isBefore(DateTime.now());
+      _isMyClass = widget.fitnessClass.trainer == userRef;
+      _trainerName = name;
+      _isLoading = false;
+    });
+  }
 
   void _reserveClass() async {
     DocumentSnapshot<Map<String, dynamic>> classSnapshot =
@@ -47,8 +87,8 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
                 userSnapshot.reference,
                 classMap['date'].toDate(),
                 convertToTimeOfDay(classMap['start']),
-                convertToTimeOfDay(classMap['end'])) ==
-            false) {
+                convertToTimeOfDay(classMap['end']))
+            == false) {
           _showMessage();
           return;
         }
@@ -58,8 +98,8 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
                 existingReservations.docs,
                 classMap['date'].toDate(),
                 convertToTimeOfDay(classMap['start']),
-                convertToTimeOfDay(classMap['end'])) ==
-            false) {
+                convertToTimeOfDay(classMap['end']))
+            == false) {
           _showMessage();
           return;
         }
@@ -107,38 +147,6 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
     );
   }
 
-  void _loadData() async {
-    DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
-    DocumentReference<Map<String, dynamic>> classRef = FirebaseFirestore
-        .instance
-        .collection('classes')
-        .doc(widget.fitnessClass.id);
-    QuerySnapshot<Map<String, dynamic>> existingReservations =
-        await FirebaseFirestore.instance
-            .collection('reservations')
-            .where('class', isEqualTo: classRef)
-            .where('client', isEqualTo: userRef)
-            .get();
-    QuerySnapshot<Map<String, dynamic>> waitingReservations =
-        await FirebaseFirestore.instance
-            .collection('waitingList')
-            .where('class', isEqualTo: classRef)
-            .where('client', isEqualTo: userRef)
-            .get();
-    String name = await getUserName(widget.fitnessClass.trainer);
-
-    setState(() {
-      _alreadyReserved = existingReservations.docs.isNotEmpty;
-      _isWaiting = waitingReservations.docs.isNotEmpty;
-      _hasPassed = widget.fitnessClass.start.isBefore(DateTime.now());
-      _isMyClass = widget.fitnessClass.trainer == userRef;
-      _trainerName = name;
-      _isLoading = false;
-    });
-  }
-
   void _showError(FirebaseException error) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -146,12 +154,6 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
         content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
   }
 
   @override
@@ -165,83 +167,66 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
             padding: const EdgeInsets.all(16),
             child: _isLoading
                 ? const CircularProgressIndicator()
-                : StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('classes')
-                        .doc(widget.fitnessClass.id)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      return Column(
-                        children: [
-                          Text(
-                            widget.fitnessClass.className,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 20,
+                : Column(
+                    children: [
+                      Text(
+                        widget.fitnessClass.className,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      WhiteText(
+                        text: formatter.format(widget.fitnessClass.date),
+                      ),
+                      const SizedBox(height: 10),
+                      WhiteText(
+                        text: '${formatterTime.format(widget.fitnessClass.start)} - ${formatterTime.format(widget.fitnessClass.end)}',
+                      ),
+                      const SizedBox(height: 10),
+                      WhiteText(text: 'Antrenor: $_trainerName'),
+                      const SizedBox(height: 10),
+                      WhiteText(
+                        text: 'Sala: ${widget.fitnessClass.room == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
+                      ),
+                      const SizedBox(height: 10),
+                      WhiteText(
+                        text: 'Persoane înscrise: ${widget.fitnessClass.reserved}/${widget.fitnessClass.capacity}',
+                      ),
+                      const SizedBox(height: 15),
+                      if (!_alreadyReserved && !_isWaiting && !_hasPassed && !_isMyClass)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Înapoi'),
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          WhiteText(
-                              text: formatter
-                                  .format(snapshot.data!['date'].toDate())),
-                          const SizedBox(height: 10),
-                          WhiteText(
-                            text:
-                                '${formatterTime.format(snapshot.data!['start'].toDate())} - ${formatterTime.format(snapshot.data!['end'].toDate())}',
-                          ),
-                          const SizedBox(height: 10),
-                          WhiteText(text: 'Antrenor: $_trainerName'),
-                          const SizedBox(height: 10),
-                          WhiteText(
-                            text:
-                                'Sala: ${snapshot.data!['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
-                          ),
-                          const SizedBox(height: 10),
-                          WhiteText(
-                            text:
-                                'Persoane înscrise: ${snapshot.data!['reserved']}/${snapshot.data!['capacity']}',
-                          ),
-                          const SizedBox(height: 15),
-                          if (!_alreadyReserved &&
-                              !_isWaiting &&
-                              !_hasPassed &&
-                              !_isMyClass)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Înapoi'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    _reserveClass();
-                                  },
-                                  child: const Text('Rezervă'),
-                                ),
-                              ],
+                            ElevatedButton(
+                              onPressed: () {
+                                _reserveClass();
+                              },
+                              child: const Text('Rezervă'),
                             ),
-                          if (_alreadyReserved || _isWaiting)
-                            Text(
-                              _alreadyReserved
-                                  ? 'Rezervare confirmată!'
-                                  : 'Sunteți pe lista de așteptare!',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.lightBlueAccent,
-                                fontSize: 20,
-                              ),
-                            ),
-                        ],
-                      );
-                    }),
+                          ],
+                        ),
+                      if (_alreadyReserved || _isWaiting)
+                        Text(
+                          _alreadyReserved
+                              ? 'Rezervare confirmată!'
+                              : 'Sunteți pe lista de așteptare!',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.lightBlueAccent,
+                            fontSize: 20,
+                          ),
+                        ),
+                    ],
+            ),
           ),
         ),
       ),

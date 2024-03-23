@@ -9,22 +9,18 @@ class ReservationsListScreen extends StatelessWidget {
   const ReservationsListScreen({super.key});
 
   Future<int> calculatePosition(
-    DocumentSnapshot<Map<String, dynamic>> reservationsSnapshot,
-  ) async {
+      DocumentSnapshot<Map<String, dynamic>> reservationsSnapshot) async {
     QuerySnapshot<Map<String, dynamic>> query = await FirebaseFirestore.instance
         .collection('waitingList')
         .orderBy('time')
         .get();
 
-    if (query.docs
-        .every((doc) => doc.reference != reservationsSnapshot.reference)) {
+    if (query.docs.every((doc) => doc.reference != reservationsSnapshot.reference)) {
       return 0;
     }
 
-    List<QueryDocumentSnapshot<Map<String, dynamic>>> waitingListDocs =
-        query.docs;
-    int position = waitingListDocs
-        .indexWhere((doc) => doc.reference == reservationsSnapshot.reference);
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> waitingListDocs = query.docs;
+    int position = waitingListDocs.indexWhere((doc) => doc.reference == reservationsSnapshot.reference);
 
     return position + 1;
   }
@@ -34,8 +30,8 @@ class ReservationsListScreen extends StatelessWidget {
     DocumentReference<Map<String, dynamic>> user = FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid);
-
-    Stream<List<QueryDocumentSnapshot>> stream = Rx.combineLatest2(
+    Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> stream =
+        Rx.combineLatest2(
       FirebaseFirestore.instance
           .collection('reservations')
           .where('client', isEqualTo: user)
@@ -46,31 +42,25 @@ class ReservationsListScreen extends StatelessWidget {
           .where('client', isEqualTo: user)
           .where('end', isGreaterThanOrEqualTo: DateTime.now())
           .snapshots(),
-      (QuerySnapshot reservationsQuery, QuerySnapshot waitingListQuery) {
-        List<QueryDocumentSnapshot> allReservations = [
+      (QuerySnapshot<Map<String, dynamic>> reservationsQuery,
+          QuerySnapshot<Map<String, dynamic>> waitingListQuery) {
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> allReservations = [
           ...reservationsQuery.docs,
           ...waitingListQuery.docs
         ];
+
         allReservations.sort((a, b) => (a['end']).compareTo(b['end']));
+
         return allReservations;
       },
     );
 
-    return StreamBuilder<List<DocumentSnapshot>>(
+    return StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
         stream: stream,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting ||
-              !snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
-            );
-          }
-
-          final combinedDocs = snapshot.data ?? [];
-
-          if (combinedDocs.isEmpty) {
-            return const Center(
-              child: WhiteText(text: 'Nu există rezervări viitoare!'),
             );
           }
 
@@ -80,34 +70,38 @@ class ReservationsListScreen extends StatelessWidget {
             );
           }
 
+          List<DocumentSnapshot<Map<String, dynamic>>> combinedDocs = snapshot.data ?? [];
+
+          if (combinedDocs.isEmpty) {
+            return const Center(
+              child: WhiteText(text: 'Nu există rezervări viitoare!'),
+            );
+          }
+
           return ListView.builder(
               itemCount: combinedDocs.length,
               itemBuilder: (context, index) {
                 return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   future: combinedDocs[index]['class'].get(),
                   builder: (context, classSnapshot) {
-                    if (!classSnapshot.hasData ||
-                        classSnapshot.connectionState ==
-                            ConnectionState.waiting) {
+                    if (classSnapshot.connectionState == ConnectionState.waiting ||
+                        !classSnapshot.hasData) {
                       return const SizedBox();
                     }
 
                     return FutureBuilder<int>(
-                      future: calculatePosition(combinedDocs[index]
-                          as DocumentSnapshot<Map<String, dynamic>>),
+                      future: calculatePosition(combinedDocs[index]),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const SizedBox();
-                        } else if (!snapshot.hasData) {
+                        if (snapshot.connectionState == ConnectionState.waiting ||
+                            !snapshot.hasData) {
                           return const SizedBox();
                         }
 
                         return ReservationCard(
-                            reservationSnapshot: combinedDocs[index]
-                                as DocumentSnapshot<Map<String, dynamic>>,
+                            reservationRef: combinedDocs[index].reference,
                             classSnapshot: classSnapshot.data!,
-                            position: snapshot.data!);
+                            position: snapshot.data!,
+                        );
                       },
                     );
                   },

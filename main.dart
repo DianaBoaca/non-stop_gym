@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:non_stop_gym/screens/admin/admin_home.dart';
 import 'package:non_stop_gym/screens/authentification.dart';
-import 'package:non_stop_gym/screens/client/client_tabs.dart';
-import 'package:non_stop_gym/screens/trainer/trainer_tabs.dart';
+import 'package:non_stop_gym/screens/users/user_tabs.dart';
+import 'package:non_stop_gym/utils/tabs_utils.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -76,11 +76,21 @@ class App extends StatelessWidget {
 
               final role = userSnapshot.data!.get('role');
               if (role == 'client') {
-                return const ClientTabsScreen();
+                return UserTabsScreen(
+                  tabTitles: clientTabTitles,
+                  activeTabs: clientActiveTabs,
+                  icons: clientIcons,
+                  tabLabels: clientTabLabels,
+                );
               } else if (role == 'admin') {
                 return const AdminHomeScreen();
               } else if (role == 'trainer') {
-                return const TrainerTabsScreen();
+                return UserTabsScreen(
+                  tabTitles: trainerTabTitles,
+                  activeTabs: trainerActiveTabs,
+                  icons: trainerIcons,
+                  tabLabels: trainerTabLabels,
+                );
               }
               return const AuthScreen();
             },

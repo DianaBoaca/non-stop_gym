@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:non_stop_gym/widgets/users/rule_card.dart';
 
 class RulesScreen extends StatelessWidget {
   const RulesScreen({super.key});
@@ -11,7 +12,7 @@ class RulesScreen extends StatelessWidget {
           .collection('rules')
           .orderBy('title')
           .snapshots(),
-      builder: (ctx, snapshot) {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -24,41 +25,17 @@ class RulesScreen extends StatelessWidget {
           );
         }
 
-        if (snapshot.data!.docs.isEmpty) {
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> rules = snapshot.data!.docs;
+
+        if (rules.isEmpty) {
           return const Center(
             child: Text('Nu există reguli.'),
           );
         }
 
-        final rules = snapshot.data!.docs;
-
         return ListView.builder(
           itemCount: rules.length,
-          itemBuilder: (ctx, index) => Card(
-            elevation: 3,
-            margin: const EdgeInsets.all(8),
-            child: ListTile(
-              leading: Icon(
-                Icons.rule,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              title: Text(
-                rules[index].data()['title'],
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.lightBlueAccent,
-                ),
-              ),
-              subtitle: Text(
-                rules[index].data()['text'],
-                style: const TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-              tileColor: Theme.of(context).colorScheme.primaryContainer,
-            ),
-          ),
+          itemBuilder: (context, index) => RuleCard(ruleSnapshot: rules[index]),
         );
       },
     );
