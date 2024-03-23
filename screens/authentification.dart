@@ -1,21 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/trainer/trainer_tabs.dart';
 import 'dart:math';
+import '../utils/tabs_utils.dart';
 import 'admin/admin_home.dart';
-import 'client/client_tabs.dart';
-
-String generateRandomString() {
-  Random random = Random();
-  String randomString = '';
-
-  for (int i = 0; i < 10; i++) {
-    randomString += random.nextInt(10).toString();
-  }
-
-  return randomString;
-}
+import 'users/user_tabs.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -26,38 +15,20 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _isLogin = true;
   late String _enteredLastName;
   late String _enteredFirstName;
   late String _enteredPhone;
   late String _enteredEmail;
   late String _enteredPassword;
+  bool _isLogin = true;
   bool _isLoading = false;
-
-  void _showError(FirebaseAuthException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare de autentificare.'),
-      ),
-    );
-  }
-
-  void _route(Widget screen) {
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => screen),
-      );
-    }
-  }
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
 
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-    }
+    if (!_formKey.currentState!.validate()) return;
+
+    _formKey.currentState!.save();
 
     try {
       setState(() {
@@ -67,14 +38,12 @@ class _AuthScreenState extends State<AuthScreen> {
       UserCredential userCredentials;
 
       if (_isLogin) {
-        userCredentials =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
+        userCredentials = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
         );
       } else {
-        userCredentials =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        userCredentials = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
         );
@@ -93,16 +62,30 @@ class _AuthScreenState extends State<AuthScreen> {
         });
       }
 
-      DocumentSnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot = await FirebaseFirestore
           .instance
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get();
 
-      if (userData['role'] == 'client') {
-        _route(const ClientTabsScreen());
-      } else if (userData['role'] == 'trainer') {
-        _route(const TrainerTabsScreen());
+      if (userSnapshot['role'] == 'client') {
+        _route(
+          UserTabsScreen(
+            tabTitles: clientTabTitles,
+            activeTabs: clientActiveTabs,
+            icons: clientIcons,
+            tabLabels: clientTabLabels,
+          ),
+        );
+      } else if (userSnapshot['role'] == 'trainer') {
+        _route(
+          UserTabsScreen(
+            tabTitles: trainerTabTitles,
+            activeTabs: trainerActiveTabs,
+            icons: trainerIcons,
+            tabLabels: trainerTabLabels,
+          ),
+        );
       } else {
         _route(const AdminHomeScreen());
       }
@@ -117,12 +100,41 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  String generateRandomString() {
+    Random random = Random();
+    String randomString = '';
+
+    for (int i = 0; i < 10; i++) {
+      randomString += random.nextInt(10).toString();
+    }
+
+    return randomString;
+  }
+
+  void _route(Widget screen) {
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => screen),
+      );
+    }
+  }
+
   Future<void> _resetPassword() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _enteredEmail);
     } on FirebaseAuthException catch (error) {
       _showError(error);
     }
+  }
+
+  void _showError(FirebaseAuthException error) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message ?? 'Eroare de autentificare.'),
+      ),
+    );
   }
 
   @override
@@ -136,8 +148,7 @@ class _AuthScreenState extends State<AuthScreen> {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.85,
                 height: MediaQuery.of(context).size.height * 0.2,
-                child:
-                    Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
               ),
               Card(
                 margin: const EdgeInsets.all(20),
@@ -160,6 +171,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 !value.contains('@')) {
                               return 'Introduceți o adresă de email validă.';
                             }
+
                             return null;
                           },
                           onSaved: (value) {
@@ -176,6 +188,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             if (value == null || value.trim().length < 6) {
                               return 'Parola trebuie să aibă cel puțin 6 caractere!';
                             }
+
                             return null;
                           },
                           onSaved: (value) {
@@ -192,6 +205,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Introduceți numele.';
                               }
+
                               return null;
                             },
                             onSaved: (value) {
@@ -207,6 +221,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Introduceți prenumele.';
                               }
+
                               return null;
                             },
                             onSaved: (value) {

@@ -9,10 +9,9 @@ class MyClassesListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-
-    DocumentReference userRef =
-        FirebaseFirestore.instance.collection('users').doc(uid);
+    DocumentReference userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: FirebaseFirestore.instance
@@ -27,20 +26,19 @@ class MyClassesListScreen extends StatelessWidget {
           );
         }
 
-        if (snapshot.data!.docs.isEmpty) {
-          return const Center(
-            child: WhiteText(text: 'Nu există clase viitoare!'),
-          );
-        }
-
         if (snapshot.hasError) {
           return const Center(
             child: Text('Eroare!'),
           );
         }
 
-        List<DocumentSnapshot<Map<String, dynamic>>> classes =
-            snapshot.data!.docs;
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> classes = snapshot.data!.docs;
+
+        if (classes.isEmpty) {
+          return const Center(
+            child: WhiteText(text: 'Nu există clase viitoare!'),
+          );
+        }
 
         return ListView.builder(
           itemCount: classes.length,

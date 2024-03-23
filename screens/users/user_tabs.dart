@@ -1,37 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/trainer/trainer_classes.dart';
-import 'package:non_stop_gym/screens/users/home.dart';
-import 'package:non_stop_gym/screens/users/rules.dart';
 import '../../widgets/edit_user.dart';
 import '../authentification.dart';
-import '../users/classes_calendar.dart';
-import '../users/reservations.dart';
 
-List<String> tabTitles = [
-  'Rezervările mele',
-  'Clasele mele',
-  'Non-stop Gym',
-  'Calendar clase',
-  'Regulament'
-];
-List<Widget> activeTabs = [
-  const ReservationsListScreen(),
-  const MyClassesListScreen(),
-  const HomeScreen(),
-  const ClassesCalendarScreen(),
-  const RulesScreen()
-];
+class UserTabsScreen extends StatefulWidget {
+  const UserTabsScreen({
+    super.key,
+    required this.tabTitles,
+    required this.activeTabs,
+    required this.tabLabels,
+    required this.icons,
+  });
 
-class TrainerTabsScreen extends StatefulWidget {
-  const TrainerTabsScreen({super.key});
+  final List<String> tabTitles;
+  final List<Widget> activeTabs;
+  final List<IconData> icons;
+  final List<String> tabLabels;
 
   @override
-  State<TrainerTabsScreen> createState() => _TrainerTabsScreenState();
+  State<UserTabsScreen> createState() => _UserTabsScreenState();
 }
 
-class _TrainerTabsScreenState extends State<TrainerTabsScreen> {
+class _UserTabsScreenState extends State<UserTabsScreen> {
   int _selectedTab = 2;
 
   void _selectTab(int index) {
@@ -44,10 +36,14 @@ class _TrainerTabsScreenState extends State<TrainerTabsScreen> {
   Widget build(BuildContext context) {
     User user = FirebaseAuth.instance.currentUser!;
 
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if (mounted) _selectTab(0);
+    });
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(tabTitles[_selectedTab]),
+        title: Text(widget.tabTitles[_selectedTab]),
         actions: [
           IconButton(
             onPressed: () {
@@ -76,7 +72,7 @@ class _TrainerTabsScreenState extends State<TrainerTabsScreen> {
         ],
       ),
       backgroundColor: Colors.lightBlueAccent,
-      body: activeTabs[_selectedTab],
+      body: widget.activeTabs[_selectedTab],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: _selectTab,
@@ -84,26 +80,26 @@ class _TrainerTabsScreenState extends State<TrainerTabsScreen> {
         unselectedItemColor: Colors.white,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         currentIndex: _selectedTab,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.access_time),
-            label: 'Rezervări',
+            icon: Icon(widget.icons[0]),
+            label: widget.tabLabels[0],
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.sports_gymnastics),
-            label: 'Clase',
+            icon: Icon(widget.icons[1]),
+            label: widget.tabLabels[1],
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Acasă',
+            icon: Icon(widget.icons[2]),
+            label: widget.tabLabels[2],
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Calendar',
+            icon: Icon(widget.icons[3]),
+            label: widget.tabLabels[3],
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.rule),
-            label: 'Regulament',
+            icon: Icon(widget.icons[4]),
+            label: widget.tabLabels[4],
           ),
         ],
       ),

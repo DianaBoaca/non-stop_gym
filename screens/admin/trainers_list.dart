@@ -47,7 +47,7 @@ class TrainersListScreen extends StatelessWidget {
             );
           }
 
-          final trainers = snapshot.data!.docs;
+          List<QueryDocumentSnapshot<Map<String, dynamic>>> trainers = snapshot.data!.docs;
 
           if (trainers.isEmpty) {
             return const Center(

@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-final List<int> emojis = [0x1F60A, 0x1F605, 0x1F633];
-final List<String> texts = ['Lejer', 'Destul de aglomerat', 'Foarte aglomerat'];
-final List<MaterialColor> colors = [Colors.green, Colors.yellow, Colors.red];
 
 class BusyIndicator extends StatefulWidget {
   const BusyIndicator({
     super.key,
-    required this.statistics,
+    required this.checkedInClients,
   });
 
-  final DocumentSnapshot<Map<String, dynamic>> statistics;
+  final int checkedInClients;
 
   @override
   State<BusyIndicator> createState() => _BusyIndicatorState();
 }
 
 class _BusyIndicatorState extends State<BusyIndicator> {
+  final List<int> emojis = [0x1F60A, 0x1F605, 0x1F633];
+  final List<String> texts = [
+    'Lejer',
+    'Destul de aglomerat',
+    'Foarte aglomerat'
+  ];
+  final List<MaterialColor> colors = [Colors.green, Colors.yellow, Colors.red];
   double percentage = 0;
   int index = 0;
 
@@ -25,7 +27,7 @@ class _BusyIndicatorState extends State<BusyIndicator> {
   void initState() {
     super.initState();
     setState(() {
-      percentage = widget.statistics['checkedInClients'] / 50;
+      percentage = widget.checkedInClients / 50;
       if (percentage <= 0.33) {
         index = 0;
       } else if (percentage <= 0.66) {
@@ -58,7 +60,7 @@ class _BusyIndicatorState extends State<BusyIndicator> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: colors,
-                        stops: const [0.0, 0.5, 1.0],
+                        stops: const [0, 0.5, 1],
                       ),
                     ),
                   ),
@@ -72,7 +74,7 @@ class _BusyIndicatorState extends State<BusyIndicator> {
                   ),
                 ],
               );
-              },
+            },
           ),
         ),
       ],

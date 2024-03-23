@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/utils.dart';
+import '../../utils/time_utils.dart';
 import 'edit_class.dart';
 
 class ClassListTile extends StatelessWidget {
@@ -10,7 +10,7 @@ class ClassListTile extends StatelessWidget {
     required this.trainerName,
   });
 
-  final QueryDocumentSnapshot<Map<String, dynamic>> fitnessClassDoc;
+  final DocumentSnapshot<Map<String, dynamic>> fitnessClassDoc;
   final String trainerName;
 
   @override

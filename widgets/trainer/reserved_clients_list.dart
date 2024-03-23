@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../utils/utils.dart';
+import '../../utils/class_utils.dart';
+import '../../utils/methods.dart';
 import '../users/white_text.dart';
 
 class ReservedClientsList extends StatelessWidget {
@@ -28,6 +29,9 @@ class ReservedClientsList extends StatelessWidget {
           );
         }
 
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> classes =
+            snapshot.data!.docs;
+
         return Center(
           child: Card(
             margin: const EdgeInsets.all(10),
@@ -36,18 +40,16 @@ class ReservedClientsList extends StatelessWidget {
               padding: const EdgeInsets.all(13),
               child: Column(
                 children: [
-                  classSnapshot['reserved'] != 0
+                  classes.isNotEmpty
                       ? ListView.builder(
                           shrinkWrap: true,
                           itemCount: classSnapshot['reserved'],
                           itemBuilder: (context, index) {
-                            return FutureBuilder(
-                              future: getUserName(
-                                  snapshot.data!.docs[index].data()['client']),
+                            return FutureBuilder<String>(
+                              future: getUserName(classes[index].data()['client']),
                               builder: (context, nameSnapshot) {
-                                if (nameSnapshot.connectionState ==
-                                        ConnectionState.waiting ||
-                                    !nameSnapshot.hasData) {
+                                if (nameSnapshot.connectionState == ConnectionState.waiting
+                                    || nameSnapshot.data!.isEmpty) {
                                   return const SizedBox();
                                 }
 
@@ -60,12 +62,10 @@ class ReservedClientsList extends StatelessWidget {
                                 return Row(
                                   children: [
                                     SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.3),
+                                        width: MediaQuery.of(context).size.width * 0.3,
+                                    ),
                                     WhiteText(
-                                      text:
-                                          '${index + 1}. ${nameSnapshot.data}',
+                                      text: '${index + 1}. ${nameSnapshot.data}',
                                     ),
                                   ],
                                 );

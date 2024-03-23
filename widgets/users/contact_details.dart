@@ -5,8 +5,6 @@ import 'package:http/http.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:non_stop_gym/widgets/users/custom_row.dart';
 
-String apiKey = 'AIzaSyAjnIwY9BBxT-rT6g4qnv2xyqIR1FWqGho';
-
 class ContactDetails extends StatefulWidget {
   const ContactDetails({
     super.key,
@@ -20,6 +18,7 @@ class ContactDetails extends StatefulWidget {
 }
 
 class ContactDetailsState extends State<ContactDetails> {
+  String apiKey = 'AIzaSyAjnIwY9BBxT-rT6g4qnv2xyqIR1FWqGho';
   double lat = 0;
   double long = 0;
 

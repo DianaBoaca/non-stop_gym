@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/admin/class_list_tile.dart';
 import 'package:non_stop_gym/widgets/admin/edit_class.dart';
-import '../../utils/utils.dart';
+import '../../utils/methods.dart';
 
 class ClassesListScreen extends StatelessWidget {
   const ClassesListScreen({super.key});
@@ -47,11 +47,11 @@ class ClassesListScreen extends StatelessWidget {
             );
           }
 
-          final classes = snapshot.data!.docs;
+          List<QueryDocumentSnapshot<Map<String, dynamic>>> classes = snapshot.data!.docs;
 
           if (classes.isEmpty) {
             return const Center(
-              child: Text('Nu există clase.'),
+              child: Text('Nu există clase viitoare!'),
             );
           }
 
@@ -76,7 +76,7 @@ class ClassesListScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: FutureBuilder(
+              child: FutureBuilder<String>(
                 future: getUserName(classes[index].data()['trainer']),
                 builder: (context, trainerSnapshot) {
                   if (trainerSnapshot.connectionState == ConnectionState.waiting) {

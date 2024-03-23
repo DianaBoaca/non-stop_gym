@@ -31,8 +31,7 @@ class _EditUserState extends State<EditUser> {
       _isLoading = true;
     });
 
-    DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-        await widget.userRef!.get();
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot = await widget.userRef!.get();
 
     if (userSnapshot.exists) {
       Map<String, dynamic> userMap = userSnapshot.data()!;
@@ -59,7 +58,8 @@ class _EditUserState extends State<EditUser> {
           'phone': _phoneController.text,
         });
       } else {
-        final userCredentials = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final userCredentials =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passController.text,
         );
@@ -116,7 +116,7 @@ class _EditUserState extends State<EditUser> {
                       key: _form,
                       child: Column(
                         children: [
-                          if (widget.userRef == null)
+                          if (widget.userRef == null) ...[
                             TextFormField(
                               decoration: const InputDecoration(
                                 labelText: 'Adresă de email',
@@ -131,10 +131,10 @@ class _EditUserState extends State<EditUser> {
                                     !value.contains('@')) {
                                   return 'Introduceți o adresă de email validă.';
                                 }
+
                                 return null;
                               },
                             ),
-                          if (widget.userRef == null)
                             TextFormField(
                               decoration: const InputDecoration(
                                 labelText: 'Parolă',
@@ -147,9 +147,11 @@ class _EditUserState extends State<EditUser> {
                                 if (value == null || value.trim().length < 6) {
                                   return 'Parola trebuie să aibă cel puțin 6 caractere!';
                                 }
+
                                 return null;
                               },
                             ),
+                          ],
                           TextFormField(
                             decoration: const InputDecoration(
                               labelText: 'Nume',
@@ -225,7 +227,7 @@ class _EditUserState extends State<EditUser> {
                     ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }
