@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late DocumentSnapshot<Map<String, dynamic>> _contactSnapshot;
   late int _checkedInClients;
   late bool _isClient;
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -27,6 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     DocumentSnapshot<Map<String, dynamic>> client = await FirebaseFirestore
         .instance
         .collection('users')
@@ -54,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void setNotifications() async {
+  Future<void> setNotifications() async {
     await FirebaseMessaging.instance.requestPermission();
     String? token = await FirebaseMessaging.instance.getToken();
     if (FirebaseAuth.instance.currentUser != null) {
@@ -67,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         setNotifications();
@@ -82,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ContactDetails(contactDetails: _contactSnapshot),
                 ],
-              );
+        );
       },
     );
   }

@@ -8,8 +8,7 @@ import 'package:rxdart/rxdart.dart';
 class ReservationsListScreen extends StatelessWidget {
   const ReservationsListScreen({super.key});
 
-  Future<int> calculatePosition(
-      DocumentSnapshot<Map<String, dynamic>> reservationsSnapshot) async {
+  Future<int> calculatePosition(DocumentSnapshot<Map<String, dynamic>> reservationsSnapshot) async {
     QuerySnapshot<Map<String, dynamic>> query = await FirebaseFirestore.instance
         .collection('waitingList')
         .orderBy('time')
@@ -56,57 +55,59 @@ class ReservationsListScreen extends StatelessWidget {
     );
 
     return StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-        stream: stream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      stream: stream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('Eroare!'),
-            );
-          }
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text('Eroare!'),
+          );
+        }
 
-          List<DocumentSnapshot<Map<String, dynamic>>> combinedDocs = snapshot.data ?? [];
+        List<DocumentSnapshot<Map<String, dynamic>>> combinedDocs = snapshot.data ?? [];
 
-          if (combinedDocs.isEmpty) {
-            return const Center(
-              child: WhiteText(text: 'Nu există rezervări viitoare!'),
-            );
-          }
+        if (combinedDocs.isEmpty) {
+          return const Center(
+            child: WhiteText(text: 'Nu există rezervări viitoare!'),
+          );
+        }
 
-          return ListView.builder(
-              itemCount: combinedDocs.length,
-              itemBuilder: (context, index) {
-                return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  future: combinedDocs[index]['class'].get(),
-                  builder: (context, classSnapshot) {
-                    if (classSnapshot.connectionState == ConnectionState.waiting ||
-                        !classSnapshot.hasData) {
+        return ListView.builder(
+          itemCount: combinedDocs.length,
+          itemBuilder: (context, index) {
+            return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              future: combinedDocs[index]['class'].get(),
+              builder: (context, classSnapshot) {
+                if (classSnapshot.connectionState == ConnectionState.waiting ||
+                    !classSnapshot.hasData) {
+                  return const SizedBox();
+                }
+
+                return FutureBuilder<int>(
+                  future: calculatePosition(combinedDocs[index]),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting ||
+                        !snapshot.hasData) {
                       return const SizedBox();
                     }
 
-                    return FutureBuilder<int>(
-                      future: calculatePosition(combinedDocs[index]),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting ||
-                            !snapshot.hasData) {
-                          return const SizedBox();
-                        }
-
-                        return ReservationCard(
-                            reservationRef: combinedDocs[index].reference,
-                            classSnapshot: classSnapshot.data!,
-                            position: snapshot.data!,
-                        );
-                      },
+                    return ReservationCard(
+                      reservationRef: combinedDocs[index].reference,
+                      classSnapshot: classSnapshot.data!,
+                      position: snapshot.data!,
                     );
                   },
                 );
-              });
-        });
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }

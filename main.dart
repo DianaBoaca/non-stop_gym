@@ -8,7 +8,7 @@ import 'package:non_stop_gym/screens/users/user_tabs.dart';
 import 'package:non_stop_gym/utils/tabs_utils.dart';
 import 'firebase_options.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -34,8 +34,9 @@ class App extends StatelessWidget {
           ),
         ),
         colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color.fromARGB(255, 104, 76, 159))
-            .copyWith(background: Colors.white),
+                seedColor: const Color.fromARGB(255, 104, 76, 159)).copyWith(
+            background: Colors.white,
+        ),
       ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -74,7 +75,7 @@ class App extends StatelessWidget {
                 return const AuthScreen();
               }
 
-              final role = userSnapshot.data!.get('role');
+              String role = userSnapshot.data!.get('role');
               if (role == 'client') {
                 return UserTabsScreen(
                   tabTitles: clientTabTitles,

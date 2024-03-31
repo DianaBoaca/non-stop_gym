@@ -29,7 +29,7 @@ class _EditClassState extends State<EditClass> {
     if (widget.fitnessClassRef != null) _loadData();
   }
 
-  void _loadData() async {
+  Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
     });
@@ -44,7 +44,8 @@ class _EditClassState extends State<EditClass> {
       setState(() {
         _nameController.text = fitnessClassMap['className'];
         _selectedDate = fitnessClassMap['date'].toDate();
-        _selectedStart = TimeOfDay.fromDateTime(fitnessClassMap['start'].toDate());
+        _selectedStart =
+            TimeOfDay.fromDateTime(fitnessClassMap['start'].toDate());
         _selectedEnd = TimeOfDay.fromDateTime(fitnessClassMap['end'].toDate());
         _selectedTrainer = fitnessClassMap['trainer'];
         _selectedRoom = fitnessClassMap['room'] == 'Room.aerobic'
@@ -56,7 +57,7 @@ class _EditClassState extends State<EditClass> {
     }
   }
 
-  void _selectDate() async {
+  Future<void> _selectDate() async {
     DateTime lastDate = DateTime(
       DateTime.now().year + 1,
       DateTime.now().month,
@@ -75,7 +76,7 @@ class _EditClassState extends State<EditClass> {
     }
   }
 
-  void _selectStart() async {
+  Future<void> _selectStart() async {
     if (_selectedDate == null) {
       return;
     }
@@ -92,7 +93,7 @@ class _EditClassState extends State<EditClass> {
     }
   }
 
-  void _selectEnd() async {
+  Future<void> _selectEnd() async {
     if (_selectedStart == null) {
       return;
     }
@@ -104,7 +105,8 @@ class _EditClassState extends State<EditClass> {
 
     if (end != null) {
       if (toDouble(_selectedStart!) > toDouble(end)) {
-        _showError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
+        _showError(
+            'Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
       }
 
       setState(() {
@@ -113,7 +115,7 @@ class _EditClassState extends State<EditClass> {
     }
   }
 
-  void _onSave() async {
+  Future<void> _onSave() async {
     if (!_form.currentState!.validate() ||
         _selectedDate == null ||
         _selectedStart == null ||
@@ -124,12 +126,12 @@ class _EditClassState extends State<EditClass> {
     _form.currentState!.save();
 
     if (await verifyTrainerAvailability(
-          widget.fitnessClassRef != null ? widget.fitnessClassRef!.id : '',
-          _selectedTrainer!,
-          _selectedDate!,
-          _selectedStart!,
-          _selectedEnd!)
-        == false) {
+            widget.fitnessClassRef != null ? widget.fitnessClassRef!.id : '',
+            _selectedTrainer!,
+            _selectedDate!,
+            _selectedStart!,
+            _selectedEnd!) ==
+        false) {
       _showError('Antrenorul este ocupat în acel interval orar.');
       return;
     }
@@ -139,8 +141,8 @@ class _EditClassState extends State<EditClass> {
             _selectedDate!,
             _selectedRoom!.toString(),
             _selectedStart!,
-            _selectedEnd!)
-        == false) {
+            _selectedEnd!) ==
+        false) {
       _showError('Sala este ocupată în acel interval orar.');
       return;
     }
@@ -263,13 +265,14 @@ class _EditClassState extends State<EditClass> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              FutureBuilder(
+                              FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
                                   future: FirebaseFirestore.instance
                                       .collection('users')
                                       .where('role', isEqualTo: 'trainer')
                                       .get(),
                                   builder: (context, snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
                                       return const CircularProgressIndicator();
                                     }
 
@@ -277,8 +280,10 @@ class _EditClassState extends State<EditClass> {
                                       return const Text('Eroare');
                                     }
 
-                                    List<DropdownMenuItem<DocumentReference>> trainers =
-                                    snapshot.data!.docs.map((DocumentSnapshot<Map<String, dynamic>> trainer) {
+                                    List<DropdownMenuItem<DocumentReference>>
+                                        trainers = snapshot.data!.docs.map(
+                                      (DocumentSnapshot<Map<String, dynamic>>
+                                          trainer) {
                                         return DropdownMenuItem(
                                           value: trainer.reference,
                                           child: Text(

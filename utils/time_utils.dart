@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-final formatter = DateFormat('dd/MM/yyyy');
-final formatterTime = DateFormat.jm();
+DateFormat formatter = DateFormat('dd/MM/yyyy');
+DateFormat formatterTime = DateFormat.jm();
 
 TimeOfDay convertToTimeOfDay(Timestamp timestamp) {
   DateTime dateTime = timestamp.toDate();
@@ -26,7 +26,7 @@ double toDouble(TimeOfDay time) {
 
 Future<bool> verifyRoomAvailability(String id, DateTime date, String room,
     TimeOfDay start, TimeOfDay end) async {
-  final existingClasses = await FirebaseFirestore.instance
+  QuerySnapshot<Map<String, dynamic>> existingClasses = await FirebaseFirestore.instance
       .collection('classes')
       .where('date', isEqualTo: date)
       .where('room', isEqualTo: room)
@@ -37,7 +37,7 @@ Future<bool> verifyRoomAvailability(String id, DateTime date, String room,
 
 Future<bool> verifyTrainerAvailability(String id, DocumentReference trainer,
     DateTime date, TimeOfDay start, TimeOfDay end) async {
-  final existingClasses = await FirebaseFirestore.instance
+  QuerySnapshot<Map<String, dynamic>> existingClasses = await FirebaseFirestore.instance
       .collection('classes')
       .where('trainer', isEqualTo: trainer)
       .where('date', isEqualTo: date)

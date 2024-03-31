@@ -13,7 +13,7 @@ class ClientsListScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Clienți'),
       ),
-      body: StreamBuilder(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('users')
             .where('role', isEqualTo: 'client')
@@ -32,7 +32,8 @@ class ClientsListScreen extends StatelessWidget {
             );
           }
 
-          List<QueryDocumentSnapshot<Map<String, dynamic>>> clients = snapshot.data!.docs;
+          List<QueryDocumentSnapshot<Map<String, dynamic>>> clients =
+              snapshot.data!.docs;
 
           if (clients.isEmpty) {
             return const Center(

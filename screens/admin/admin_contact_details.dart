@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
-final _firebase = FirebaseFirestore.instance
+DocumentReference<Map<String, dynamic>> _firebase = FirebaseFirestore.instance
     .collection('contact')
     .doc('XZc7U6u8uXpXVJsO1hIK');
 
@@ -22,7 +22,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   final TextEditingController _websiteController = TextEditingController();
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   bool _isEditable = false;
-  bool _isLoading = true;
+  bool _isLoading = false;
   File? _selectedImageFile;
   String? _imageUrl;
 
@@ -33,6 +33,10 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   }
 
   Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     DocumentSnapshot<Map<String, dynamic>> contactSnapshot = await _firebase.get();
 
     if (contactSnapshot.exists) {
@@ -92,7 +96,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   }
 
   Future<void> _selectImage() async {
-    final selectedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    XFile? selectedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (selectedImage != null) {
       setState(() {
@@ -234,7 +238,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                     ),
                   ],
                 ),
-              ),
+        ),
       ),
     );
   }

@@ -18,7 +18,7 @@ class CalendarClassCard extends StatefulWidget {
 class _CalendarClassCardState extends State<CalendarClassCard> {
   bool _alreadyReserved = false;
   bool _isWaiting = false;
-  bool _isLoading = true;
+  bool _isLoading = false;
   bool _hasPassed = false;
   bool _isMyClass = false;
   String _trainerName = '';
@@ -29,7 +29,11 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
     _loadData();
   }
 
-  void _loadData() async {
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid);
@@ -61,7 +65,7 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
     });
   }
 
-  void _reserveClass() async {
+  Future<void> _reserveClass() async {
     DocumentSnapshot<Map<String, dynamic>> classSnapshot =
         await FirebaseFirestore.instance
             .collection('classes')

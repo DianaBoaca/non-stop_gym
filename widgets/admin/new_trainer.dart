@@ -17,15 +17,7 @@ class _NewTrainerState extends State<NewTrainer> {
   late String _enteredEmail;
   late String _enteredPassword;
 
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
-      ),
-    );
-  }
-
-  void _onSave() async {
+  Future<void> _onSave() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -33,7 +25,7 @@ class _NewTrainerState extends State<NewTrainer> {
     _formKey.currentState!.save();
 
     try {
-      final userCredentials =
+      UserCredential userCredentials =
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _enteredEmail,
         password: _enteredPassword,
@@ -52,6 +44,20 @@ class _NewTrainerState extends State<NewTrainer> {
     } on FirebaseException catch (error) {
       _showError(error);
     }
+
+    _changeScreen();
+  }
+
+  void _showError(FirebaseException error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message ?? 'Eroare stocare date.'),
+      ),
+    );
+  }
+
+  void _changeScreen() {
+    Navigator.pop(context);
   }
 
   @override
@@ -173,7 +179,6 @@ class _NewTrainerState extends State<NewTrainer> {
                         ElevatedButton(
                           onPressed: () {
                             _onSave();
-                            Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context)
