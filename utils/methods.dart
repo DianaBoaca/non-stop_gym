@@ -2,11 +2,16 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart';
 
-Future<String> getUserName(DocumentReference ref) async {
-  DocumentSnapshot trainer = await ref.get();
-  Map<String, dynamic> trainerData = trainer.data() as Map<String, dynamic>;
+Future<String> getUserName(DocumentReference<Map<String, dynamic>> ref) async {
+  DocumentSnapshot<Map<String, dynamic>> trainer = await ref.get();
 
-  return '${trainerData['lastName']} ${trainerData['firstName']}';
+  if (trainer.exists) {
+    Map<String, dynamic> trainerData = trainer.data()!;
+
+    return '${trainerData['lastName']} ${trainerData['firstName']}';
+  }
+
+  return 'Eroare';
 }
 
 Future<bool> sendNotification(String token, String title, String text) async {

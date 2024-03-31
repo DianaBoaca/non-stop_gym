@@ -9,7 +9,7 @@ class ClassesCalendarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: FirebaseFirestore.instance.collection('classes').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -27,7 +27,7 @@ class ClassesCalendarScreen extends StatelessWidget {
         List<QueryDocumentSnapshot<Map<String, dynamic>>> classes = snapshot.data!.docs;
         List<FitnessClass> appointments = <FitnessClass>[];
 
-        for (final doc in classes) {
+        for (var doc in classes) {
           appointments.add(
             FitnessClass(
               doc.id,

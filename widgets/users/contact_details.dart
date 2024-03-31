@@ -18,9 +18,9 @@ class ContactDetails extends StatefulWidget {
 }
 
 class ContactDetailsState extends State<ContactDetails> {
-  String apiKey = 'AIzaSyAjnIwY9BBxT-rT6g4qnv2xyqIR1FWqGho';
-  double lat = 0;
-  double long = 0;
+  final String _apiKey = 'AIzaSyAjnIwY9BBxT-rT6g4qnv2xyqIR1FWqGho';
+  double _lat = 0;
+  double _long = 0;
 
   @override
   void initState() {
@@ -32,18 +32,18 @@ class ContactDetailsState extends State<ContactDetails> {
     String address = widget.contactDetails['location'];
     Response response = await get(
       Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$apiKey',
+        'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$_apiKey',
       ),
     );
 
     if (response.statusCode == 200) {
-      final data = Map<String, dynamic>.from(json.decode(response.body));
+      Map<String, dynamic> data = Map<String, dynamic>.from(json.decode(response.body));
 
       if (data['results'] != null && data['results'].isNotEmpty) {
         if (mounted) {
           setState(() {
-            lat = data['results'][0]['geometry']['location']['lat'];
-            long = data['results'][0]['geometry']['location']['lng'];
+            _lat = data['results'][0]['geometry']['location']['lat'];
+            _long = data['results'][0]['geometry']['location']['lng'];
           });
         }
       }
@@ -83,10 +83,10 @@ class ContactDetailsState extends State<ContactDetails> {
           const SizedBox(height: 25),
           GestureDetector(
             onTap: () {
-              MapsLauncher.launchCoordinates(lat, long);
+              MapsLauncher.launchCoordinates(_lat, _long);
             },
             child: Image.network(
-              'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$long&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C$lat,$long&key=$apiKey',
+              'https://maps.googleapis.com/maps/api/staticmap?center=$_lat,$_long&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C$_lat,$_long&key=$_apiKey',
               fit: BoxFit.cover,
             ),
           ),

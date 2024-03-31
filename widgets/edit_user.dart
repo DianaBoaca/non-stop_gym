@@ -26,7 +26,7 @@ class _EditUserState extends State<EditUser> {
     if (widget.userRef != null) _loadData();
   }
 
-  void _loadData() async {
+  Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
     });
@@ -45,7 +45,7 @@ class _EditUserState extends State<EditUser> {
     }
   }
 
-  void _onSave() async {
+  Future<void> _onSave() async {
     if (!_form.currentState!.validate()) return;
 
     _form.currentState!.save();
@@ -58,7 +58,7 @@ class _EditUserState extends State<EditUser> {
           'phone': _phoneController.text,
         });
       } else {
-        final userCredentials =
+        UserCredential userCredentials =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passController.text,
@@ -78,6 +78,8 @@ class _EditUserState extends State<EditUser> {
     } on FirebaseException catch (error) {
       _showError(error);
     }
+
+    _changeScreen();
   }
 
   void _showError(FirebaseException error) {
@@ -87,6 +89,10 @@ class _EditUserState extends State<EditUser> {
         content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
+  }
+
+  void _changeScreen() {
+    Navigator.pop(context);
   }
 
   @override
@@ -216,7 +222,6 @@ class _EditUserState extends State<EditUser> {
                               ElevatedButton(
                                 onPressed: () {
                                   _onSave();
-                                  Navigator.pop(context);
                                 },
                                 child: const Text('Salvează'),
                               ),

@@ -60,6 +60,7 @@ class _EditRuleState extends State<EditRule> {
     } on FirebaseException catch (error) {
       _showError(error);
     }
+    _changeScreen();
   }
 
   void _showError(FirebaseException error) {
@@ -69,6 +70,10 @@ class _EditRuleState extends State<EditRule> {
         content: Text(error.message ?? 'Eroare stocare date.'),
       ),
     );
+  }
+
+  void _changeScreen() {
+    Navigator.pop(context);
   }
 
   @override
@@ -141,7 +146,6 @@ class _EditRuleState extends State<EditRule> {
                               ElevatedButton(
                                 onPressed: () {
                                   _onSave();
-                                  Navigator.pop(context);
                                 },
                                 child: const Text('Salvează'),
                               ),
@@ -152,7 +156,7 @@ class _EditRuleState extends State<EditRule> {
                     ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }

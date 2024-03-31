@@ -13,27 +13,27 @@ class BusyIndicator extends StatefulWidget {
 }
 
 class _BusyIndicatorState extends State<BusyIndicator> {
-  final List<int> emojis = [0x1F60A, 0x1F605, 0x1F633];
-  final List<String> texts = [
+  final List<int> _emojis = [0x1F60A, 0x1F605, 0x1F633];
+  final List<String> _texts = [
     'Lejer',
     'Destul de aglomerat',
     'Foarte aglomerat'
   ];
-  final List<MaterialColor> colors = [Colors.green, Colors.yellow, Colors.red];
-  double percentage = 0;
-  int index = 0;
+  final List<MaterialColor> _colors = [Colors.green, Colors.yellow, Colors.red];
+  double _percentage = 0;
+  int _index = 0;
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      percentage = widget.checkedInClients / 50;
-      if (percentage <= 0.33) {
-        index = 0;
-      } else if (percentage <= 0.66) {
-        index = 1;
+      _percentage = widget.checkedInClients / 50;
+      if (_percentage <= 0.33) {
+        _index = 0;
+      } else if (_percentage <= 0.66) {
+        _index = 1;
       } else {
-        index = 2;
+        _index = 2;
       }
     });
   }
@@ -43,10 +43,10 @@ class _BusyIndicatorState extends State<BusyIndicator> {
     return Column(
       children: [
         Text(
-          '${texts[index]} ${String.fromCharCode(emojis[index])}',
+          '${_texts[_index]} ${String.fromCharCode(_emojis[_index])}',
           style: TextStyle(
             fontSize: 25,
-            color: colors[index],
+            color: _colors[_index],
           ),
         ),
         Padding(
@@ -59,13 +59,13 @@ class _BusyIndicatorState extends State<BusyIndicator> {
                     height: 30,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: colors,
+                        colors: _colors,
                         stops: const [0, 0.5, 1],
                       ),
                     ),
                   ),
                   Positioned(
-                    left: constraints.maxWidth * (percentage),
+                    left: constraints.maxWidth * (_percentage),
                     child: Container(
                       width: 5,
                       height: 30,

@@ -23,23 +23,21 @@ class _ClientCardState extends State<ClientCard> {
   final String _checkInTimeKey = 'checkInTime';
   late bool _checkedIn;
   late Timer _timer;
-
-
+  
   @override
   void initState() {
     super.initState();
     _loadData();
   }
 
-  void _loadData() async {
-    DocumentSnapshot<Object?> userData = await FirebaseFirestore.instance
+  Future<void> _loadData() async {
+    DocumentSnapshot<Map<String, dynamic>> userData = await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
 
     if (userData.exists) {
-      Map<String, dynamic> userDataMap =
-      userData.data() as Map<String, dynamic>;
+      Map<String, dynamic> userDataMap = userData.data()!;
 
       if (mounted) {
         setState(() {
@@ -49,7 +47,7 @@ class _ClientCardState extends State<ClientCard> {
     }
   }
 
-  void _checkIn() async {
+  Future<void> _checkIn() async {
     setState(() {
       _checkedIn = !_checkedIn;
     });
@@ -99,13 +97,12 @@ class _ClientCardState extends State<ClientCard> {
     );
   }
 
-  void _automaticCheckOut() async {
+  Future<void> _automaticCheckOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? checkInTime = prefs.getInt(_checkInTimeKey);
 
     if (_checkedIn && checkInTime != null) {
-      final currentTime = DateTime.now().millisecondsSinceEpoch;
-      final elapsedTime = currentTime - checkInTime;
+      int elapsedTime = DateTime.now().millisecondsSinceEpoch - checkInTime;
 
       if (elapsedTime >= 2 * 60 * 60 * 1000) {
         _timer.cancel();

@@ -112,23 +112,19 @@ class _ClassCardState extends State<ClassCard> {
                       ),
                       const SizedBox(height: 8),
                       WhiteText(
-                        text: formatter
-                            .format(widget.classSnapshot['date'].toDate()),
+                        text: formatter.format(widget.classSnapshot['date'].toDate()),
                       ),
                       const SizedBox(height: 8),
                       WhiteText(
-                        text:
-                            '${formatterTime.format(widget.classSnapshot['start'].toDate())} - ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
+                        text: '${formatterTime.format(widget.classSnapshot['start'].toDate())} - ${formatterTime.format(widget.classSnapshot['end'].toDate())}',
                       ),
                       const SizedBox(height: 8),
                       WhiteText(
-                        text:
-                            'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
+                        text: 'Sala: ${widget.classSnapshot['room'] == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
                       ),
                       const SizedBox(height: 8),
                       WhiteText(
-                        text:
-                            'Persoane înscrise: ${widget.classSnapshot['reserved']}/${widget.classSnapshot['capacity']}',
+                        text: 'Persoane înscrise: ${widget.classSnapshot['reserved']}/${widget.classSnapshot['capacity']}',
                       ),
                     ],
                   ),
@@ -144,15 +140,14 @@ class _ClassCardState extends State<ClassCard> {
                             child: SingleChildScrollView(
                               child: Card(
                                 margin: const EdgeInsets.all(20),
-                                color:
-                                    colors[widget.classSnapshot['className']],
+                                color: colors[widget.classSnapshot['className']],
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Column(
                                     children: [
                                       WhiteText(
-                                          text:
-                                              'Sunteți sigur că anulați clasa de ${widget.classSnapshot['className']}?'),
+                                          text: 'Sunteți sigur că anulați clasa de ${widget.classSnapshot['className']}?',
+                                      ),
                                       const SizedBox(height: 20),
                                       Row(
                                         mainAxisAlignment:

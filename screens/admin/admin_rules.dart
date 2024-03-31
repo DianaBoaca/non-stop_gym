@@ -45,7 +45,7 @@ class AdminRuleScreen extends StatelessWidget {
             );
           }
 
-          final rules = snapshot.data!.docs;
+          List<QueryDocumentSnapshot<Map<String, dynamic>>> rules = snapshot.data!.docs;
 
           if (rules.isEmpty) {
             return const Center(
