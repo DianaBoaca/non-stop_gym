@@ -27,7 +27,6 @@ class TrainersListScreen extends StatelessWidget {
           ),
         ],
       ),
-      backgroundColor: Colors.lightBlueAccent,
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('users')

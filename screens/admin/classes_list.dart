@@ -71,10 +71,16 @@ class ClassesListScreen extends StatelessWidget {
                       onPressed: () {
                         classes[index].reference.set(deletedClass!.data()!);
                         deletedClass = null;
+                        return;
                       },
                     ),
                   ),
                 );
+                // sendNotification(
+                //   userSnapshot['token'],
+                //   'Anulare clasă',
+                //   'Clasa de ${classes[index]['className']} a fost anulată!',
+                // );
               },
               child: FutureBuilder<String>(
                 future: getUserName(classes[index].data()['trainer']),

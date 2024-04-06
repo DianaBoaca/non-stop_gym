@@ -4,13 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 enum Room { aerobic, functional }
 
 Map<String, Color> colors = {
-  'Cycling': Colors.purpleAccent,
-  'Zumba': Colors.pink,
+  'Cycling': Colors.purple.shade400,
+  'Zumba': Colors.pink.shade200,
   'Pilates': Colors.green,
-  'TRX': Colors.orange,
-  'Kickbox': Colors.lightGreen,
-  'Yoga': Colors.yellow,
-  'Circuit Training': Colors.grey,
+  'TRX': Colors.orange.shade300,
+  'Kickbox': Colors.redAccent,
+  'Yoga': Colors.yellow.shade300,
+  'Circuit Training': Colors.grey.shade300,
 };
 
 class FitnessClass {

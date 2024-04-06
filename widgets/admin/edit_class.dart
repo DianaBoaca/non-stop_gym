@@ -21,7 +21,6 @@ class _EditClassState extends State<EditClass> {
   DocumentReference? _selectedTrainer;
   Room? _selectedRoom;
   int? _counter;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -30,29 +29,22 @@ class _EditClassState extends State<EditClass> {
   }
 
   Future<void> _loadData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
     DocumentSnapshot<Map<String, dynamic>> fitnessClassSnapshot =
         await widget.fitnessClassRef!.get();
 
     if (fitnessClassSnapshot.exists) {
       Map<String, dynamic> fitnessClassMap = fitnessClassSnapshot.data()!;
-      //String name = await getUserName(fitnessClassSnapshot['trainer']);
 
       setState(() {
         _nameController.text = fitnessClassMap['className'];
         _selectedDate = fitnessClassMap['date'].toDate();
-        _selectedStart =
-            TimeOfDay.fromDateTime(fitnessClassMap['start'].toDate());
+        _selectedStart = TimeOfDay.fromDateTime(fitnessClassMap['start'].toDate());
         _selectedEnd = TimeOfDay.fromDateTime(fitnessClassMap['end'].toDate());
         _selectedTrainer = fitnessClassMap['trainer'];
         _selectedRoom = fitnessClassMap['room'] == 'Room.aerobic'
             ? Room.aerobic
             : Room.functional;
         _counter = fitnessClassMap['reserved'];
-        _isLoading = false;
       });
     }
   }
@@ -105,8 +97,7 @@ class _EditClassState extends State<EditClass> {
 
     if (end != null) {
       if (toDouble(_selectedStart!) > toDouble(end)) {
-        _showError(
-            'Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
+        _showError('Ora de sfârșit a clasei nu poate fi înaintea orei de începere.');
       }
 
       setState(() {
@@ -202,154 +193,146 @@ class _EditClassState extends State<EditClass> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
-        child: _isLoading
-            ? const CircularProgressIndicator()
-            : SingleChildScrollView(
-                child: Card(
-                  margin: const EdgeInsets.all(20),
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Form(
-                      key: _form,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              labelText: 'Nume',
-                            ),
-                            controller: _nameController,
-                            autocorrect: false,
-                            textCapitalization: TextCapitalization.none,
-                            enableSuggestions: false,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Introduceți numele.';
-                              }
+        child: FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                future: FirebaseFirestore.instance
+                    .collection('users')
+                    .where('role', isEqualTo: 'trainer')
+                    .get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox();
+                  }
 
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          ElevatedButton(
-                            onPressed: _selectDate,
-                            child: Text(
-                              _selectedDate != null
-                                  ? formatter.format(_selectedDate!)
-                                  : 'Data',
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                  if (snapshot.hasError) {
+                    return const Text('Eroare');
+                  }
+
+                  List<DropdownMenuItem<DocumentReference>> trainers = snapshot
+                      .data!.docs
+                      .map((DocumentSnapshot<Map<String, dynamic>> trainer) {
+                    return DropdownMenuItem(
+                      value: trainer.reference,
+                      child: Text(
+                        '${trainer['lastName']} ${trainer['firstName']}',
+                      ),
+                    );
+                  }).toList();
+
+                  return SingleChildScrollView(
+                    child: Card(
+                      margin: const EdgeInsets.all(20),
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Form(
+                          key: _form,
+                          child: Column(
                             children: [
-                              ElevatedButton(
-                                onPressed: _selectStart,
-                                child: Text(
-                                  _selectedStart != null
-                                      ? formatTime(_selectedStart!)
-                                      : 'Start',
+                              TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: 'Nume',
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              ElevatedButton(
-                                onPressed: _selectEnd,
-                                child: Text(
-                                  _selectedEnd != null
-                                      ? formatTime(_selectedEnd!)
-                                      : 'Final',
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                                  future: FirebaseFirestore.instance
-                                      .collection('users')
-                                      .where('role', isEqualTo: 'trainer')
-                                      .get(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const CircularProgressIndicator();
-                                    }
-
-                                    if (snapshot.hasError) {
-                                      return const Text('Eroare');
-                                    }
-
-                                    List<DropdownMenuItem<DocumentReference>>
-                                        trainers = snapshot.data!.docs.map(
-                                      (DocumentSnapshot<Map<String, dynamic>>
-                                          trainer) {
-                                        return DropdownMenuItem(
-                                          value: trainer.reference,
-                                          child: Text(
-                                            '${trainer['lastName']} ${trainer['firstName']}',
-                                          ),
-                                        );
-                                      },
-                                    ).toList();
-
-                                    return DropdownButton(
-                                      items: trainers,
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            _selectedTrainer = value;
-                                          });
-                                        }
-                                      },
-                                      value: _selectedTrainer,
-                                      hint: const Text('Antrenor'),
-                                    );
-                                  }),
-                              const SizedBox(width: 10),
-                              DropdownButton(
-                                value: _selectedRoom,
-                                items: Room.values
-                                    .map(
-                                      (room) => DropdownMenuItem(
-                                        value: room,
-                                        child: Text(room.name),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedRoom = value;
-                                    });
+                                controller: _nameController,
+                                autocorrect: false,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Introduceți numele.';
                                   }
+
+                                  return null;
                                 },
-                                hint: const Text('Sala'),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('Anulează'),
-                              ),
+                              const SizedBox(height: 15),
                               ElevatedButton(
-                                onPressed: _onSave,
-                                child: const Text('Salvează'),
+                                onPressed: _selectDate,
+                                child: Text(
+                                  _selectedDate != null
+                                      ? formatter.format(_selectedDate!)
+                                      : 'Data',
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: _selectStart,
+                                    child: Text(
+                                      _selectedStart != null
+                                          ? formatTime(_selectedStart!)
+                                          : 'Start',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ElevatedButton(
+                                    onPressed: _selectEnd,
+                                    child: Text(
+                                      _selectedEnd != null
+                                          ? formatTime(_selectedEnd!)
+                                          : 'Final',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  DropdownButton(
+                                    items: trainers,
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          _selectedTrainer = value;
+                                        });
+                                      }
+                                    },
+                                    value: _selectedTrainer,
+                                    hint: const Text('Antrenor'),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  DropdownButton(
+                                    value: _selectedRoom,
+                                    items: Room.values
+                                        .map(
+                                          (room) => DropdownMenuItem(
+                                            value: room,
+                                            child: Text(room.name),
+                                          ),
+                                        ).toList(),
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          _selectedRoom = value;
+                                        });
+                                      }
+                                    },
+                                    hint: const Text('Sala'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Anulează'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: _onSave,
+                                    child: const Text('Salvează'),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-        ),
+                  );
+                }),
       ),
     );
   }

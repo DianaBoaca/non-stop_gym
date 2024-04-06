@@ -10,14 +10,22 @@ class RuleListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const Icon(Icons.rule),
+      leading: const Icon(
+        Icons.rule,
+        color: Color.fromARGB(255, 156, 124, 222),
+      ),
       title: Text(
         ruleSnapshot['title'],
-        style: const TextStyle(fontSize: 20),
+        style: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 18,
+        ),
       ),
       subtitle: Text(
         ruleSnapshot['text'],
-        style: const TextStyle(fontSize: 16),
+        style: const TextStyle(
+          fontSize: 16,
+        ),
       ),
       tileColor: Theme.of(context).colorScheme.primaryContainer,
       onTap: () {

@@ -106,8 +106,6 @@ class _EditRuleState extends State<EditRule> {
                             ),
                             controller: _titleController,
                             autocorrect: false,
-                            textCapitalization: TextCapitalization.none,
-                            enableSuggestions: false,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Introduceți titlul.';
@@ -122,9 +120,7 @@ class _EditRuleState extends State<EditRule> {
                             ),
                             controller: _textController,
                             autocorrect: false,
-                            textCapitalization: TextCapitalization.none,
                             maxLines: null,
-                            enableSuggestions: false,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Introduceți textul.';

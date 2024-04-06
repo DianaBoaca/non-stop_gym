@@ -71,12 +71,11 @@ class _UserTabsScreenState extends State<UserTabsScreen> {
           ),
         ],
       ),
-      backgroundColor: Colors.lightBlueAccent,
       body: widget.activeTabs[_selectedTab],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: _selectTab,
-        selectedItemColor: Colors.lightBlueAccent,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Colors.white,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         currentIndex: _selectedTab,

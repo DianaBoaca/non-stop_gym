@@ -12,10 +12,14 @@ class UserListTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         userSnapshot['role'] == 'trainer' ? Icons.fitness_center : Icons.person,
+        color: const Color.fromARGB(255, 156, 124, 222),
       ),
       title: Text(
         userSnapshot['lastName'] + ' ' + userSnapshot['firstName'],
-        style: const TextStyle(fontSize: 20),
+        style: const TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w500,
+        ),
       ),
       subtitle: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

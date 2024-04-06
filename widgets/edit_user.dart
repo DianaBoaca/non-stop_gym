@@ -115,7 +115,7 @@ class _EditUserState extends State<EditUser> {
             : SingleChildScrollView(
                 child: Card(
                   margin: const EdgeInsets.all(20),
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: Theme.of(context).colorScheme.background,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Form(
@@ -129,8 +129,6 @@ class _EditUserState extends State<EditUser> {
                               ),
                               keyboardType: TextInputType.emailAddress,
                               autocorrect: false,
-                              textCapitalization: TextCapitalization.none,
-                              enableSuggestions: false,
                               validator: (value) {
                                 if (value == null ||
                                     value.trim().isEmpty ||
@@ -146,7 +144,6 @@ class _EditUserState extends State<EditUser> {
                                 labelText: 'Parolă',
                               ),
                               autocorrect: false,
-                              textCapitalization: TextCapitalization.none,
                               enableSuggestions: false,
                               obscureText: true,
                               validator: (value) {
@@ -164,8 +161,6 @@ class _EditUserState extends State<EditUser> {
                             ),
                             controller: _lastNameController,
                             autocorrect: false,
-                            textCapitalization: TextCapitalization.none,
-                            enableSuggestions: false,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Introduceți numele.';
@@ -180,8 +175,6 @@ class _EditUserState extends State<EditUser> {
                             ),
                             controller: _firstNameController,
                             autocorrect: false,
-                            textCapitalization: TextCapitalization.none,
-                            enableSuggestions: false,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Introduceți prenumele.';
@@ -197,8 +190,6 @@ class _EditUserState extends State<EditUser> {
                             controller: _phoneController,
                             keyboardType: TextInputType.number,
                             autocorrect: false,
-                            textCapitalization: TextCapitalization.none,
-                            enableSuggestions: false,
                             validator: (value) {
                               if (value == null ||
                                   value.isEmpty ||

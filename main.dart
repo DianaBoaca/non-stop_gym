@@ -4,15 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:non_stop_gym/screens/admin/admin_home.dart';
 import 'package:non_stop_gym/screens/authentification.dart';
+import 'package:non_stop_gym/screens/loading.dart';
 import 'package:non_stop_gym/screens/users/user_tabs.dart';
 import 'package:non_stop_gym/utils/tabs_utils.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const App());
 }
 
@@ -24,27 +23,23 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Non-stop Gym',
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          color: Color.fromARGB(255, 104, 76, 159),
-          iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          appBarTheme: const AppBarTheme(
+            color: Color.fromARGB(255, 76, 140, 159),
+            iconTheme: IconThemeData(color: Colors.white),
+            titleTextStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color.fromARGB(255, 104, 76, 159)).copyWith(
-            background: Colors.white,
-        ),
-      ),
+          colorScheme: ColorScheme.fromSeed(
+                  seedColor: const Color.fromARGB(255, 76, 140, 159))
+              .copyWith(background: const Color.fromARGB(255, 159, 205, 220))),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const LoadingScreen();
           }
 
           if (snapshot.hasError) {
@@ -62,9 +57,7 @@ class App extends StatelessWidget {
                 .get(),
             builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const LoadingScreen();
               }
 
               if (userSnapshot.hasError) {

@@ -68,21 +68,21 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
       Reference storageRef = FirebaseStorage.instance
           .ref()
           .child('tarife')
-          .child('tarife2024.jpg');
+          .child('tarife2024');
       await storageRef.putFile(_selectedImageFile!);
       url = await storageRef.getDownloadURL();
-    }
 
-    try {
-      await _firebase.update({
-        'location': _addressController.text,
-        'phone': _phoneController.text,
-        'email': _emailController.text,
-        'website': _websiteController.text,
-        'tarife': url,
-      });
-    } on FirebaseException catch (error) {
-      _showError(error);
+      try {
+        await _firebase.update({
+          'location': _addressController.text,
+          'phone': _phoneController.text,
+          'email': _emailController.text,
+          'website': _websiteController.text,
+          'tarife': url,
+        });
+      } on FirebaseException catch (error) {
+        _showError(error);
+      }
     }
   }
 
