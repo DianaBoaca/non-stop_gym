@@ -15,16 +15,17 @@ class RuleCard extends StatelessWidget {
       elevation: 3,
       margin: const EdgeInsets.all(8),
       child: ListTile(
-        leading: Icon(
+        leading: const Icon(
           Icons.rule,
-          color: Theme.of(context).colorScheme.primary,
+          color: Color.fromARGB(
+            255, 156, 124, 222,
+          ),
         ),
         title: Text(
           ruleSnapshot['title'],
           style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.lightBlueAccent,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
           ),
         ),
         subtitle: Text(

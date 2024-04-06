@@ -20,12 +20,13 @@ class ClassListTile extends StatelessWidget {
         fitnessClassDoc['room'] == 'Room.aerobic'
             ? Icons.monitor_heart
             : Icons.fitness_center,
+        color: const Color.fromARGB(255, 156, 124, 222),
       ),
       title: Text(
         fitnessClassDoc['className'],
         style: const TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 20,
+          fontSize: 18,
         ),
       ),
       subtitle: Column(
@@ -60,7 +61,8 @@ class ClassListTile extends StatelessWidget {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           context: context,
-          builder: (context) => EditClass(fitnessClassRef: fitnessClassDoc.reference),
+          builder: (context) =>
+              EditClass(fitnessClassRef: fitnessClassDoc.reference),
         );
       },
     );

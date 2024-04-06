@@ -122,7 +122,7 @@ class _ClientCardState extends State<ClientCard> {
         margin: const EdgeInsets.all(12),
         color: Theme.of(context).colorScheme.primary,
         child: Padding(
-          padding: const EdgeInsets.all(13),
+          padding: const EdgeInsets.all(17),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -138,7 +138,7 @@ class _ClientCardState extends State<ClientCard> {
                       widget.user['lastName'] + ' ' + widget.user['firstName'],
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Colors.lightBlueAccent,
+                        color: Colors.white,
                         fontSize: 21,
                       ),
                       textAlign: TextAlign.center,
@@ -148,7 +148,7 @@ class _ClientCardState extends State<ClientCard> {
                       widget.user['id'],
                       style: const TextStyle(
                         fontSize: 16,
-                        color: Colors.lightBlueAccent,
+                        color: Colors.white,
                       ),
                     ),
                   ],

@@ -61,7 +61,7 @@ class ClassesCalendarScreen extends StatelessWidget {
             fontSize: 13,
           ),
           headerStyle: CalendarHeaderStyle(
-            backgroundColor: Colors.lightBlueAccent,
+            backgroundColor: Theme.of(context).colorScheme.background,
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontSize: 25,

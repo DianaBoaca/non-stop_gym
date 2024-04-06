@@ -80,8 +80,6 @@ class _NewTrainerState extends State<NewTrainer> {
                       ),
                       keyboardType: TextInputType.emailAddress,
                       autocorrect: false,
-                      textCapitalization: TextCapitalization.none,
-                      enableSuggestions: false,
                       validator: (value) {
                         if (value == null ||
                             value.trim().isEmpty ||
@@ -99,7 +97,6 @@ class _NewTrainerState extends State<NewTrainer> {
                         labelText: 'Parolă',
                       ),
                       autocorrect: false,
-                      textCapitalization: TextCapitalization.none,
                       enableSuggestions: false,
                       obscureText: true,
                       validator: (value) {
@@ -117,8 +114,6 @@ class _NewTrainerState extends State<NewTrainer> {
                         labelText: 'Nume',
                       ),
                       autocorrect: false,
-                      textCapitalization: TextCapitalization.none,
-                      enableSuggestions: false,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Introduceți numele.';
@@ -134,8 +129,6 @@ class _NewTrainerState extends State<NewTrainer> {
                         labelText: 'Prenume',
                       ),
                       autocorrect: false,
-                      textCapitalization: TextCapitalization.none,
-                      enableSuggestions: false,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Introduceți prenumele.';
@@ -152,8 +145,6 @@ class _NewTrainerState extends State<NewTrainer> {
                       ),
                       keyboardType: TextInputType.number,
                       autocorrect: false,
-                      textCapitalization: TextCapitalization.none,
-                      enableSuggestions: false,
                       validator: (value) {
                         if (value == null ||
                             value.isEmpty ||

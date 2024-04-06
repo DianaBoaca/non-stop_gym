@@ -29,14 +29,13 @@ class AdminHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      backgroundColor: Colors.lightBlueAccent,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CustomContainer(
             icon: Icons.fitness_center,
             title: 'Antrenori',
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: Theme.of(context).colorScheme.tertiary,
             route: const TrainersListScreen(),
           ),
           CustomContainer(
@@ -48,7 +47,7 @@ class AdminHomeScreen extends StatelessWidget {
           CustomContainer(
             icon: Icons.person,
             title: 'Clienți',
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: Theme.of(context).colorScheme.tertiary,
             route: const ClientsListScreen(),
           ),
           CustomContainer(
@@ -60,7 +59,7 @@ class AdminHomeScreen extends StatelessWidget {
           CustomContainer(
             icon: Icons.rule,
             title: 'Regulament',
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: Theme.of(context).colorScheme.tertiary,
             route: const AdminRuleScreen(),
           ),
         ],
