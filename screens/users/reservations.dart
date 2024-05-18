@@ -1,28 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../utils/methods.dart';
 import '../../widgets/users/reservation_card.dart';
 import '../../widgets/users/white_text.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ReservationsListScreen extends StatelessWidget {
   const ReservationsListScreen({super.key});
-
-  Future<int> calculatePosition(DocumentSnapshot<Map<String, dynamic>> reservationsSnapshot) async {
-    QuerySnapshot<Map<String, dynamic>> query = await FirebaseFirestore.instance
-        .collection('waitingList')
-        .orderBy('time')
-        .get();
-
-    if (query.docs.every((doc) => doc.reference != reservationsSnapshot.reference)) {
-      return 0;
-    }
-
-    List<QueryDocumentSnapshot<Map<String, dynamic>>> waitingListDocs = query.docs;
-    int position = waitingListDocs.indexWhere((doc) => doc.reference == reservationsSnapshot.reference);
-
-    return position + 1;
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -61,8 +61,7 @@ class ClassListTile extends StatelessWidget {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           context: context,
-          builder: (context) =>
-              EditClass(fitnessClassRef: fitnessClassDoc.reference),
+          builder: (context) => EditClass(fitnessClassSnapshot: fitnessClassDoc),
         );
       },
     );

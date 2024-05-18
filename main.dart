@@ -33,8 +33,10 @@ class App extends StatelessWidget {
             ),
           ),
           colorScheme: ColorScheme.fromSeed(
-                  seedColor: const Color.fromARGB(255, 76, 140, 159))
-              .copyWith(background: const Color.fromARGB(255, 159, 205, 220))),
+              seedColor: const Color.fromARGB(255, 76, 140, 159)).copyWith(
+            background: const Color.fromARGB(255, 159, 205, 220),
+          ),
+      ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -69,6 +71,7 @@ class App extends StatelessWidget {
               }
 
               String role = userSnapshot.data!.get('role');
+
               if (role == 'client') {
                 return UserTabsScreen(
                   tabTitles: clientTabTitles,
@@ -86,6 +89,7 @@ class App extends StatelessWidget {
                   tabLabels: trainerTabLabels,
                 );
               }
+
               return const AuthScreen();
             },
           );

@@ -34,14 +34,15 @@ class _ClassCardState extends State<ClassCard> {
               .get();
 
       for (QueryDocumentSnapshot waiting in waitingListSnapshot.docs) {
-        DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-            await waiting['client'].get();
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot = await waiting['client'].get();
 
-        sendNotification(
-          userSnapshot['token'],
-          'Anulare clasă',
-          'Clasa de ${widget.classSnapshot['className']} a fost anulată!',
-        );
+        if (userSnapshot.exists) {
+          sendNotification(
+            userSnapshot['token'],
+            'Anulare clasă',
+            'Clasa de ${widget.classSnapshot['className']} a fost anulată!',
+          );
+        }
 
         waiting.reference.delete();
       }
@@ -55,11 +56,13 @@ class _ClassCardState extends State<ClassCard> {
         DocumentSnapshot<Map<String, dynamic>> userSnapshot =
             await reservation['client'].get();
 
-        sendNotification(
-          userSnapshot['token'],
-          'Anulare clasă',
-          'Clasa de ${widget.classSnapshot['className']} a fost anulată!',
-        );
+        if (userSnapshot.exists) {
+          sendNotification(
+            userSnapshot['token'],
+            'Anulare clasă',
+            'Clasa de ${widget.classSnapshot['className']} a fost anulată!',
+          );
+        }
 
         reservation.reference.delete();
       }

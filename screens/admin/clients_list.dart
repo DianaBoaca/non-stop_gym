@@ -32,8 +32,7 @@ class ClientsListScreen extends StatelessWidget {
             );
           }
 
-          List<QueryDocumentSnapshot<Map<String, dynamic>>> clients =
-              snapshot.data!.docs;
+          List<QueryDocumentSnapshot<Map<String, dynamic>>> clients = snapshot.data!.docs;
 
           if (clients.isEmpty) {
             return const Center(

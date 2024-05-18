@@ -86,6 +86,7 @@ class _NewTrainerState extends State<NewTrainer> {
                             !value.contains('@')) {
                           return 'Introduceți o adresă de email validă.';
                         }
+
                         return null;
                       },
                       onSaved: (value) {
@@ -103,6 +104,7 @@ class _NewTrainerState extends State<NewTrainer> {
                         if (value == null || value.trim().length < 6) {
                           return 'Parola trebuie să aibă cel puțin 6 caractere!';
                         }
+
                         return null;
                       },
                       onSaved: (value) {
@@ -118,6 +120,7 @@ class _NewTrainerState extends State<NewTrainer> {
                         if (value == null || value.isEmpty) {
                           return 'Introduceți numele.';
                         }
+
                         return null;
                       },
                       onSaved: (value) {
@@ -133,6 +136,7 @@ class _NewTrainerState extends State<NewTrainer> {
                         if (value == null || value.isEmpty) {
                           return 'Introduceți prenumele.';
                         }
+
                         return null;
                       },
                       onSaved: (value) {
@@ -151,6 +155,7 @@ class _NewTrainerState extends State<NewTrainer> {
                             value.trim().length != 10) {
                           return 'Introduceți un număr valid.';
                         }
+
                         return null;
                       },
                       onSaved: (value) {
@@ -172,9 +177,7 @@ class _NewTrainerState extends State<NewTrainer> {
                             _onSave();
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .primaryContainer,
+                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                           ),
                           child: const Text('Adaugă'),
                         ),
