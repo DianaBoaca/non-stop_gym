@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/edit_user.dart';
-import '../authentification.dart';
+import '../authentication.dart';
 
 class UserTabsScreen extends StatefulWidget {
   const UserTabsScreen({
