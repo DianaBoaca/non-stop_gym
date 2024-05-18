@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:non_stop_gym/screens/admin/admin_home.dart';
-import 'package:non_stop_gym/screens/authentification.dart';
+import 'package:non_stop_gym/screens/authentication.dart';
 import 'package:non_stop_gym/screens/loading.dart';
 import 'package:non_stop_gym/screens/users/user_tabs.dart';
 import 'package:non_stop_gym/utils/tabs_utils.dart';
