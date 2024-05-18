@@ -78,12 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return _isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: _isClient ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.center,
                 children: [
                   if (_isClient) ClientCard(user: _clientSnapshot),
-                  BusyIndicator(
-                    checkedInClients: _checkedInClients,
-                  ),
+                  BusyIndicator(checkedInClients: _checkedInClients),
+                  if (!_isClient) const SizedBox(height: 50),
                   ContactDetails(contactDetails: _contactSnapshot),
                 ],
         );

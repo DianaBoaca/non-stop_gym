@@ -37,11 +37,9 @@ class _ClientCardState extends State<ClientCard> {
         .get();
 
     if (userData.exists) {
-      Map<String, dynamic> userDataMap = userData.data()!;
-
       if (mounted) {
         setState(() {
-          _checkedIn = userDataMap['checkedIn'];
+          _checkedIn = userData['checkedIn'];
         });
       }
     }
@@ -54,8 +52,7 @@ class _ClientCardState extends State<ClientCard> {
 
     try {
       await firebase.update({
-        'checkedInClients':
-        _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
+        'checkedInClients': _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
       });
 
       await FirebaseFirestore.instance

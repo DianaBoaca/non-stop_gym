@@ -34,42 +34,7 @@ class _ReservationCardState extends State<ReservationCard> {
       );
 
       if (widget.position == 0) {
-        widget.classSnapshot.reference.update({'reserved': FieldValue.increment(-1)});
-
-        QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
-            await FirebaseFirestore.instance
-                .collection('waitingList')
-                .where('class', isEqualTo: widget.classSnapshot.reference)
-                .orderBy('time')
-                .get();
-
-        if (waitingListSnapshot.docs.isNotEmpty) {
-          DocumentSnapshot<Map<String, dynamic>> first = waitingListSnapshot.docs.first;
-
-          await FirebaseFirestore.instance.collection('reservations').add({
-            'class': widget.classSnapshot.reference,
-            'client': first['client'],
-            'date': widget.classSnapshot['date'],
-            'start': widget.classSnapshot['start'],
-            'end': widget.classSnapshot['end'],
-          });
-
-          widget.classSnapshot.reference.update({'reserved': FieldValue.increment(1)});
-
-          DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-              await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(first['client'])
-                  .get();
-
-          sendNotification(
-            userSnapshot['token'],
-            'Rezervare confirmată',
-            'A fost eliberat un loc la clasa de ${widget.classSnapshot['className']}. Rezervarea este confirmată!',
-          );
-
-          await first.reference.delete();
-        }
+        upgradeFirstWaitingToReserved(widget.classSnapshot);
       }
     } on FirebaseException catch (error) {
       _showError(error);
@@ -89,7 +54,7 @@ class _ReservationCardState extends State<ReservationCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(10),
-      color: colors[widget.classSnapshot['className']],
+      color: colors[widget.classSnapshot['className']] ?? Colors.blue,
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -141,7 +106,8 @@ class _ReservationCardState extends State<ReservationCard> {
                                 child: Column(
                                   children: [
                                     WhiteText(
-                                        text: 'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?'),
+                                        text: 'Sunteți sigur că anulați rezervarea la ${widget.classSnapshot['className']}?',
+                                    ),
                                     const SizedBox(height: 20),
                                     Row(
                                       mainAxisAlignment:
@@ -178,7 +144,8 @@ class _ReservationCardState extends State<ReservationCard> {
             const SizedBox(height: 15),
             if (widget.position > 0)
               WhiteText(
-                  text: 'Sunteți pe locul ${widget.position} în lista de așteptare!'),
+                  text: 'Sunteți pe locul ${widget.position} în lista de așteptare!',
+              ),
           ],
         ),
       ),

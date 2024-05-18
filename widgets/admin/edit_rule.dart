@@ -30,11 +30,9 @@ class _EditRuleState extends State<EditRule> {
     DocumentSnapshot<Map<String, dynamic>> ruleSnapshot = await widget.ruleRef!.get();
 
     if (ruleSnapshot.exists) {
-      Map<String, dynamic> ruleMap = ruleSnapshot.data()!;
-
       setState(() {
-        _titleController.text = ruleMap['title'];
-        _textController.text = ruleMap['text'];
+        _titleController.text = ruleSnapshot['title'];
+        _textController.text = ruleSnapshot['text'];
         _isLoading = false;
       });
     }
@@ -60,6 +58,7 @@ class _EditRuleState extends State<EditRule> {
     } on FirebaseException catch (error) {
       _showError(error);
     }
+
     _changeScreen();
   }
 

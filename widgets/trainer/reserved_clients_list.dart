@@ -17,7 +17,8 @@ class ReservedClientsList extends StatelessWidget {
           .where('class', isEqualTo: classSnapshot.reference)
           .get(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting ||
+            snapshot.data!.docs.isEmpty) {
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -29,8 +30,7 @@ class ReservedClientsList extends StatelessWidget {
           );
         }
 
-        List<QueryDocumentSnapshot<Map<String, dynamic>>> classes =
-            snapshot.data!.docs;
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> reservations = snapshot.data!.docs;
 
         return Center(
           child: Card(
@@ -40,13 +40,13 @@ class ReservedClientsList extends StatelessWidget {
               padding: const EdgeInsets.all(13),
               child: Column(
                 children: [
-                  classes.isNotEmpty
+                  reservations.isNotEmpty
                       ? ListView.builder(
                           shrinkWrap: true,
                           itemCount: classSnapshot['reserved'],
                           itemBuilder: (context, index) {
                             return FutureBuilder<String>(
-                              future: getUserName(classes[index].data()['client']),
+                              future: getUserName(reservations[index].data()['client']),
                               builder: (context, nameSnapshot) {
                                 if (nameSnapshot.connectionState == ConnectionState.waiting
                                     || nameSnapshot.data!.isEmpty) {

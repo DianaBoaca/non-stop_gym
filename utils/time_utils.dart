@@ -20,7 +20,7 @@ String formatTime(TimeOfDay time) {
   ));
 }
 
-double toDouble(TimeOfDay time) {
+double convertToDouble(TimeOfDay time) {
   return time.hour + time.minute / 60.0;
 }
 

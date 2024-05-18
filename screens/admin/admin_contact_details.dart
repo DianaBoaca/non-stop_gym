@@ -40,14 +40,12 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     DocumentSnapshot<Map<String, dynamic>> contactSnapshot = await _firebase.get();
 
     if (contactSnapshot.exists) {
-      Map<String, dynamic> contactMap = contactSnapshot.data()!;
-
       setState(() {
-        _addressController.text = contactMap['location'];
-        _phoneController.text = contactMap['phone'];
-        _emailController.text = contactMap['email'];
-        _websiteController.text = contactMap['website'];
-        _imageUrl = contactMap['tarife'];
+        _addressController.text = contactSnapshot['location'];
+        _phoneController.text = contactSnapshot['phone'];
+        _emailController.text = contactSnapshot['email'];
+        _websiteController.text = contactSnapshot['website'];
+        _imageUrl = contactSnapshot['tarife'];
         _isLoading = false;
       });
     }
@@ -65,10 +63,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     String url = '';
 
     if (_selectedImageFile != null) {
-      Reference storageRef = FirebaseStorage.instance
-          .ref()
-          .child('tarife')
-          .child('tarife2024');
+      Reference storageRef = FirebaseStorage.instance.ref().child('tarife').child('tarife2024');
       await storageRef.putFile(_selectedImageFile!);
       url = await storageRef.getDownloadURL();
 
@@ -96,7 +91,8 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   }
 
   Future<void> _selectImage() async {
-    XFile? selectedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    XFile? selectedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (selectedImage != null) {
       setState(() {
@@ -153,6 +149,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Introduceți o adresă.';
                                   }
+
                                   return null;
                                 },
                               ),
@@ -169,6 +166,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                       value.trim().length != 10) {
                                     return 'Introduceți un număr valid.';
                                   }
+
                                   return null;
                                 },
                               ),
@@ -185,6 +183,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                       !value.contains('@')) {
                                     return 'Introduceți o adresă de email validă.';
                                   }
+
                                   return null;
                                 },
                               ),
@@ -198,6 +197,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Introduceți un website.';
                                   }
+
                                   return null;
                                 },
                               ),
@@ -219,9 +219,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                             Icon(
                                               Icons.add_photo_alternate,
                                               size: 40,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
+                                              color: Theme.of(context).colorScheme.primary,
                                             ),
                                             const Text('Tarife'),
                                           ],
@@ -238,7 +236,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                     ),
                   ],
                 ),
-        ),
+              ),
       ),
     );
   }

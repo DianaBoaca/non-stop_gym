@@ -118,8 +118,7 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
           'end': classMap['end'],
         });
 
-        await classSnapshot.reference
-            .update({'reserved': FieldValue.increment(1)});
+        await classSnapshot.reference.update({'reserved': FieldValue.increment(1)});
 
         setState(() {
           _alreadyReserved = true;
@@ -129,8 +128,6 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
           'class': classSnapshot.reference,
           'client': userSnapshot.reference,
           'time': DateTime.now(),
-          'start': classMap['start'],
-          'end': classMap['end'],
         });
 
         setState(() {
@@ -163,76 +160,84 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: SingleChildScrollView(
-        child: Card(
-          margin: const EdgeInsets.all(20),
-          color: widget.fitnessClass.color,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: _isLoading
-                ? const CircularProgressIndicator()
-                : Column(
-                    children: [
-                      Text(
-                        widget.fitnessClass.className,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      WhiteText(
-                        text: formatter.format(widget.fitnessClass.date),
-                      ),
-                      const SizedBox(height: 10),
-                      WhiteText(
-                        text: '${formatterTime.format(widget.fitnessClass.start)} - ${formatterTime.format(widget.fitnessClass.end)}',
-                      ),
-                      const SizedBox(height: 10),
-                      WhiteText(text: 'Antrenor: $_trainerName'),
-                      const SizedBox(height: 10),
-                      WhiteText(
-                        text: 'Sala: ${widget.fitnessClass.room == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
-                      ),
-                      const SizedBox(height: 10),
-                      WhiteText(
-                        text: 'Persoane înscrise: ${widget.fitnessClass.reserved}/${widget.fitnessClass.capacity}',
-                      ),
-                      const SizedBox(height: 15),
-                      if (!_alreadyReserved && !_isWaiting && !_hasPassed && !_isMyClass)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Înapoi'),
+      child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        future: FirebaseFirestore.instance
+            .collection('classes')
+            .doc(widget.fitnessClass.id)
+            .get(),
+        builder: (context, snapshot) {
+          return SingleChildScrollView(
+            child: Card(
+              margin: const EdgeInsets.all(20),
+              color: widget.fitnessClass.color,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : Column(
+                        children: [
+                          Text(
+                            widget.fitnessClass.className,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20,
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _reserveClass();
-                              },
-                              child: const Text('Rezervă'),
-                            ),
-                          ],
-                        ),
-                      if (_alreadyReserved || _isWaiting)
-                        Text(
-                          _alreadyReserved
-                              ? 'Rezervare confirmată!'
-                              : 'Sunteți pe lista de așteptare!',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.lightBlueAccent,
-                            fontSize: 20,
                           ),
-                        ),
-                    ],
+                          const SizedBox(height: 10),
+                          WhiteText(
+                            text: formatter.format(widget.fitnessClass.date),
+                          ),
+                          const SizedBox(height: 10),
+                          WhiteText(
+                            text: '${formatterTime.format(widget.fitnessClass.start)} - ${formatterTime.format(widget.fitnessClass.end)}',
+                          ),
+                          const SizedBox(height: 10),
+                          WhiteText(text: 'Antrenor: $_trainerName'),
+                          const SizedBox(height: 10),
+                          WhiteText(
+                            text: 'Sala: ${widget.fitnessClass.room == 'Room.aerobic' ? 'Aerobic' : 'Functional'}',
+                          ),
+                          const SizedBox(height: 10),
+                          WhiteText(
+                            text: 'Persoane înscrise: ${snapshot.data!['reserved']}/${widget.fitnessClass.capacity}',
+                          ),
+                          const SizedBox(height: 15),
+                          if (!_alreadyReserved && !_isWaiting && !_hasPassed && !_isMyClass)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Înapoi'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    _reserveClass();
+                                  },
+                                  child: const Text('Rezervă'),
+                                ),
+                              ],
+                            ),
+                          if (_alreadyReserved || _isWaiting)
+                            Text(
+                              _alreadyReserved
+                                  ? 'Rezervare confirmată!'
+                                  : 'Sunteți pe lista de așteptare!',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.lightBlueAccent,
+                                fontSize: 20,
+                              ),
+                            ),
+                        ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        }
       ),
     );
   }

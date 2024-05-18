@@ -59,7 +59,7 @@ class ClassesListScreen extends StatelessWidget {
             itemCount: classes.length,
             itemBuilder: (context, index) => Dismissible(
               key: ValueKey(classes[index]),
-              onDismissed: (direction) {
+              onDismissed: (direction) async {
                 deletedClass = classes[index];
                 classes[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
@@ -76,16 +76,42 @@ class ClassesListScreen extends StatelessWidget {
                     ),
                   ),
                 );
-                // sendNotification(
-                //   userSnapshot['token'],
-                //   'Anulare clasă',
-                //   'Clasa de ${classes[index]['className']} a fost anulată!',
-                // );
+
+                QuerySnapshot<Map<String, dynamic>> waitingListSnapshot =
+                await FirebaseFirestore.instance
+                    .collection('waitingList')
+                    .where('class', isEqualTo: classes[index].reference)
+                    .get();
+
+                for (var waiting in waitingListSnapshot.docs) {
+                  waiting.reference.delete();
+                }
+
+                QuerySnapshot<Map<String, dynamic>> reservationsSnapshot =
+                    await FirebaseFirestore.instance
+                        .collection('reservations')
+                        .where('class', isEqualTo: classes[index].reference)
+                        .get();
+
+                for (var reservation in reservationsSnapshot.docs) {
+                  DocumentSnapshot<Map<String, dynamic>> userSnapshot = await reservation['client'].get();
+
+                  reservation.reference.delete();
+
+                  if (userSnapshot.exists) {
+                    sendNotification(
+                      userSnapshot['token'],
+                      'Anulare clasă',
+                      'Clasa de ${classes[index]['className']} a fost anulată!',
+                    );
+                  }
+                }
               },
               child: FutureBuilder<String>(
                 future: getUserName(classes[index].data()['trainer']),
                 builder: (context, trainerSnapshot) {
-                  if (trainerSnapshot.connectionState == ConnectionState.waiting) {
+                  if (trainerSnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const SizedBox();
                   }
 

@@ -28,10 +28,7 @@ class AdminRuleScreen extends StatelessWidget {
         ],
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('rules')
-            .orderBy('title')
-            .snapshots(),
+        stream: FirebaseFirestore.instance.collection('rules').orderBy('title').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
