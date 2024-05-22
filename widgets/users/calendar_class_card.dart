@@ -93,7 +93,7 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
                 convertToTimeOfDay(classMap['start']),
                 convertToTimeOfDay(classMap['end']))
             == false) {
-          _showMessage();
+          _showMessage('Sunteți înscris la o altă clasă în acest interval!');
           return;
         }
       } else {
@@ -104,7 +104,7 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
                 convertToTimeOfDay(classMap['start']),
                 convertToTimeOfDay(classMap['end']))
             == false) {
-          _showMessage();
+          _showMessage('Sunteți înscris la o altă clasă în acest interval!');
           return;
         }
       }
@@ -135,24 +135,15 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
         });
       }
     } on FirebaseException catch (error) {
-      _showError(error);
+      _showMessage(error.message);
     }
   }
 
-  void _showMessage() {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Sunteți înscris la o altă clasă în acest interval!'),
-      ),
-    );
-  }
-
-  void _showError(FirebaseException error) {
+  void _showMessage(String? message) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
+        content: Text(message ?? 'Eroare'),
       ),
     );
   }

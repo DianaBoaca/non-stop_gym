@@ -42,22 +42,18 @@ class _NewTrainerState extends State<NewTrainer> {
         'role': 'trainer',
       });
     } on FirebaseException catch (error) {
-      _showError(error);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message ?? 'Eroare stocare date.'),
+          ),
+        );
+      }
     }
 
-    _changeScreen();
-  }
-
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
-      ),
-    );
-  }
-
-  void _changeScreen() {
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override

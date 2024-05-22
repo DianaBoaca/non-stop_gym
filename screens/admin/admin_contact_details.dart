@@ -76,18 +76,16 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
           'tarife': url,
         });
       } on FirebaseException catch (error) {
-        _showError(error);
+        if (mounted) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error.message ?? 'Eroare stocare date.'),
+            ),
+          );
+        }
       }
     }
-  }
-
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
-      ),
-    );
   }
 
   Future<void> _selectImage() async {

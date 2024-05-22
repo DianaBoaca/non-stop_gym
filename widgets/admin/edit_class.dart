@@ -150,14 +150,12 @@ class _EditClassState extends State<EditClass> {
         });
       }
 
-      _changeScreen();
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } on FirebaseException catch (error) {
       _showMessage(error.message);
     }
-  }
-
-  void _changeScreen() {
-    Navigator.pop(context);
   }
 
   void _showMessage(String? message) {

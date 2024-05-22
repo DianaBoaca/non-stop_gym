@@ -6,7 +6,6 @@ import '../authentication.dart';
 import 'admin_contact_details.dart';
 import 'admin_rules.dart';
 import 'classes_list.dart';
-import 'clients_list.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -36,19 +35,19 @@ class AdminHomeScreen extends StatelessWidget {
             icon: Icons.fitness_center,
             title: 'Antrenori',
             color: Theme.of(context).colorScheme.tertiary,
-            route: const TrainersListScreen(),
-          ),
-          CustomContainer(
-            icon: Icons.calendar_today,
-            title: 'Clase',
-            color: Theme.of(context).colorScheme.primary,
-            route: const ClassesListScreen(),
+            route: const UsersListScreen(showTrainers: true),
           ),
           CustomContainer(
             icon: Icons.person,
             title: 'Clienți',
+            color: Theme.of(context).colorScheme.primary,
+            route: const UsersListScreen(showTrainers: false),
+          ),
+          CustomContainer(
+            icon: Icons.calendar_today,
+            title: 'Clase',
             color: Theme.of(context).colorScheme.tertiary,
-            route: const ClientsListScreen(),
+            route: const ClassesListScreen(),
           ),
           CustomContainer(
             icon: Icons.contact_page,
