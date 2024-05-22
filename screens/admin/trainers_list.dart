@@ -3,17 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:non_stop_gym/widgets/admin/user_list_tile.dart';
 import 'package:non_stop_gym/widgets/edit_user.dart';
 
-class TrainersListScreen extends StatelessWidget {
-  const TrainersListScreen({super.key});
+class UsersListScreen extends StatelessWidget {
+  const UsersListScreen({super.key, required this.showTrainers});
+
+  final bool showTrainers;
 
   @override
   Widget build(BuildContext context) {
-    DocumentSnapshot<Map<String, dynamic>>? deletedTrainer;
+    DocumentSnapshot<Map<String, dynamic>>? deletedUser;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Antrenori'),
-        actions: [
+        title: Text(showTrainers ? 'Antrenori' : 'Clienti'),
+        actions: showTrainers ? [
           IconButton(
             onPressed: () {
               showModalBottomSheet(
@@ -25,12 +27,13 @@ class TrainersListScreen extends StatelessWidget {
             },
             icon: const Icon(Icons.add),
           ),
-        ],
+        ]
+            : [],
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('users')
-            .where('role', isEqualTo: 'trainer')
+            .where('role', isEqualTo: showTrainers ? 'trainer' : 'client')
             .orderBy('lastName')
             .snapshots(),
         builder: (context, snapshot) {
@@ -46,30 +49,34 @@ class TrainersListScreen extends StatelessWidget {
             );
           }
 
-          List<QueryDocumentSnapshot<Map<String, dynamic>>> trainers = snapshot.data!.docs;
+          List<QueryDocumentSnapshot<Map<String, dynamic>>> users = snapshot.data!.docs;
 
-          if (trainers.isEmpty) {
-            return const Center(
-              child: Text('Nu există antrenori.'),
+          if (users.isEmpty) {
+            return Center(
+              child: Text(
+                'Nu există ${showTrainers ? 'antrenori' : 'clienți'}.',
+              ),
             );
           }
 
           return ListView.builder(
-            itemCount: trainers.length,
+            itemCount: users.length,
             itemBuilder: (context, index) => Dismissible(
-              key: ValueKey(trainers[index]),
+              key: ValueKey(users[index]),
               onDismissed: (direction) {
-                deletedTrainer = trainers[index];
-                trainers[index].reference.delete();
+                deletedUser = users[index];
+                users[index].reference.delete();
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Antrenorul a fost șters.'),
+                    content: Text(
+                      '${showTrainers ? 'Antrenorul' : 'Clientul'} a fost șters.',
+                    ),
                     action: SnackBarAction(
                       label: 'Anulați',
                       onPressed: () {
-                        trainers[index].reference.set(deletedTrainer!.data()!);
-                        deletedTrainer = null;
+                        users[index].reference.set(deletedUser!.data()!);
+                        deletedUser = null;
                       },
                     ),
                   ),
@@ -77,7 +84,7 @@ class TrainersListScreen extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: UserListTile(userSnapshot: trainers[index]),
+                child: UserListTile(userSnapshot: users[index]),
               ),
             ),
           );

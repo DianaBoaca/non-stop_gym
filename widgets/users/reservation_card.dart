@@ -37,17 +37,15 @@ class _ReservationCardState extends State<ReservationCard> {
         upgradeFirstWaitingToReserved(widget.classSnapshot);
       }
     } on FirebaseException catch (error) {
-      _showError(error);
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message ?? 'Eroare stocare date.'),
+          ),
+        );
+      }
     }
-  }
-
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
-      ),
-    );
   }
 
   @override

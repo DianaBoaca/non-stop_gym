@@ -23,19 +23,19 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Non-stop Gym',
       theme: ThemeData(
-          appBarTheme: const AppBarTheme(
-            color: Color.fromARGB(255, 76, 140, 159),
-            iconTheme: IconThemeData(color: Colors.white),
-            titleTextStyle: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+        appBarTheme: const AppBarTheme(
+          color: Color.fromARGB(255, 76, 140, 159),
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 76, 140, 159)).copyWith(
-            background: const Color.fromARGB(255, 159, 205, 220),
-          ),
+        ),
+        colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color.fromARGB(255, 76, 140, 159)).copyWith(
+          background: const Color.fromARGB(255, 159, 205, 220),
+        ),
       ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -66,28 +66,26 @@ class App extends StatelessWidget {
                 return const Text('Eroare!');
               }
 
-              if (!userSnapshot.hasData) {
-                return const AuthScreen();
-              }
+              if (userSnapshot.hasData) {
+                String role = userSnapshot.data!['role'];
 
-              String role = userSnapshot.data!.get('role');
-
-              if (role == 'client') {
-                return UserTabsScreen(
-                  tabTitles: clientTabTitles,
-                  activeTabs: clientActiveTabs,
-                  icons: clientIcons,
-                  tabLabels: clientTabLabels,
-                );
-              } else if (role == 'admin') {
-                return const AdminHomeScreen();
-              } else if (role == 'trainer') {
-                return UserTabsScreen(
-                  tabTitles: trainerTabTitles,
-                  activeTabs: trainerActiveTabs,
-                  icons: trainerIcons,
-                  tabLabels: trainerTabLabels,
-                );
+                if (role == 'client') {
+                  return UserTabsScreen(
+                    tabTitles: clientTabTitles,
+                    activeTabs: clientActiveTabs,
+                    icons: clientIcons,
+                    tabLabels: clientTabLabels,
+                  );
+                } else if (role == 'admin') {
+                  return const AdminHomeScreen();
+                } else if (role == 'trainer') {
+                  return UserTabsScreen(
+                    tabTitles: trainerTabTitles,
+                    activeTabs: trainerActiveTabs,
+                    icons: trainerIcons,
+                    tabLabels: trainerTabLabels,
+                  );
+                }
               }
 
               return const AuthScreen();

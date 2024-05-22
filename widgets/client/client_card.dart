@@ -60,11 +60,25 @@ class _ClientCardState extends State<ClientCard> {
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .update({'checkedIn': _checkedIn});
     } on FirebaseException catch (error) {
-      _showError(error);
+     if (mounted) {
+       ScaffoldMessenger.of(context).clearSnackBars();
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+           content: Text(error.message ?? 'Eroare stocare date.'),
+         ),
+       );
+     }
       return;
     }
 
-    _showMessage();
+    if (mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Check-${_checkedIn ? 'in' : 'out'} înregistrat.'),
+        ),
+      );
+    }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -74,24 +88,6 @@ class _ClientCardState extends State<ClientCard> {
         _automaticCheckOut();
       });
     }
-  }
-
-  void _showError(FirebaseException error) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? 'Eroare stocare date.'),
-      ),
-    );
-  }
-
-  void _showMessage() {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Check-${_checkedIn ? 'in' : 'out'} înregistrat.'),
-      ),
-    );
   }
 
   Future<void> _automaticCheckOut() async {
