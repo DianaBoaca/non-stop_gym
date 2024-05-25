@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> setNotifications() async {
+  Future<void> _setNotifications() async {
     await FirebaseMessaging.instance.requestPermission();
     String? token = await FirebaseMessaging.instance.getToken();
     if (FirebaseAuth.instance.currentUser != null) {
@@ -74,14 +74,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        setNotifications();
+        _setNotifications();
         return _isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(
                 mainAxisAlignment: _isClient ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.center,
                 children: [
                   if (_isClient) ClientCard(user: _clientSnapshot),
-                  BusyIndicator(checkedInClients: _checkedInClients),
+                  BusyIndicator(
+                    checkedInClients: _checkedInClients,
+                    capacity: _contactSnapshot['capacity'],
+                  ),
                   if (!_isClient) const SizedBox(height: 50),
                   ContactDetails(contactDetails: _contactSnapshot),
                 ],

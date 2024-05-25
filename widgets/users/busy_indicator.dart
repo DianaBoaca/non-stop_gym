@@ -4,9 +4,11 @@ class BusyIndicator extends StatefulWidget {
   const BusyIndicator({
     super.key,
     required this.checkedInClients,
+    required this.capacity,
   });
 
   final int checkedInClients;
+  final int capacity;
 
   @override
   State<BusyIndicator> createState() => _BusyIndicatorState();
@@ -15,8 +17,8 @@ class BusyIndicator extends StatefulWidget {
 class _BusyIndicatorState extends State<BusyIndicator> {
   final List<int> _emojis = [0x1F60A, 0x1F605, 0x1F633];
   final List<String> _texts = [
-    'Lejer',
-    'Destul de aglomerat',
+    'Deloc aglomerat',
+    'Aglomerat',
     'Foarte aglomerat'
   ];
   final List<MaterialColor> _colors = [Colors.green, Colors.yellow, Colors.red];
@@ -27,7 +29,7 @@ class _BusyIndicatorState extends State<BusyIndicator> {
   void initState() {
     super.initState();
     setState(() {
-      _percentage = widget.checkedInClients / 50;
+      _percentage = widget.checkedInClients / widget.capacity;
       if (_percentage <= 0.33) {
         _index = 0;
       } else if (_percentage <= 0.66) {
