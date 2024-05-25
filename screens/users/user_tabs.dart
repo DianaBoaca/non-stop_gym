@@ -52,9 +52,7 @@ class _UserTabsScreenState extends State<UserTabsScreen> {
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 builder: (context) => EditUser(
-                    userRef: FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)),
+                    userRef: FirebaseFirestore.instance.collection('users').doc(user.uid)),
               );
             },
             icon: const Icon(Icons.person),

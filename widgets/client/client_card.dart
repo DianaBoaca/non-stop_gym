@@ -6,10 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-DocumentReference<Map<String, dynamic>> firebase = FirebaseFirestore.instance
-    .collection('statistics')
-    .doc('4WVH8oQxUkXv0bWq3pXn');
-
 class ClientCard extends StatefulWidget {
   const ClientCard({super.key, required this.user});
 
@@ -51,8 +47,13 @@ class _ClientCardState extends State<ClientCard> {
     });
 
     try {
-      await firebase.update({
-        'checkedInClients': _checkedIn ? FieldValue.increment(1) : FieldValue.increment(-1),
+      await FirebaseFirestore.instance
+          .collection('statistics')
+          .doc('4WVH8oQxUkXv0bWq3pXn')
+          .update({
+        'checkedInClients': _checkedIn
+            ? FieldValue.increment(1)
+            : FieldValue.increment(-1),
       });
 
       await FirebaseFirestore.instance

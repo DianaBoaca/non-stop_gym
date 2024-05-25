@@ -20,6 +20,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
+  final TextEditingController _capacityController = TextEditingController();
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   bool _isEditable = false;
   bool _isLoading = false;
@@ -45,6 +46,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
         _phoneController.text = contactSnapshot['phone'];
         _emailController.text = contactSnapshot['email'];
         _websiteController.text = contactSnapshot['website'];
+        _capacityController.text = contactSnapshot['capacity'].toString();
         _imageUrl = contactSnapshot['tarife'];
         _isLoading = false;
       });
@@ -63,34 +65,42 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     String url = '';
 
     if (_selectedImageFile != null) {
-      Reference storageRef = FirebaseStorage.instance.ref().child('tarife').child('tarife2024');
+      Reference storageRef = FirebaseStorage.instance.ref()
+          .child('tarife')
+          .child('tarife2024');
       await storageRef.putFile(_selectedImageFile!);
       url = await storageRef.getDownloadURL();
 
-      try {
-        await _firebase.update({
-          'location': _addressController.text,
-          'phone': _phoneController.text,
-          'email': _emailController.text,
-          'website': _websiteController.text,
-          'tarife': url,
-        });
-      } on FirebaseException catch (error) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error.message ?? 'Eroare stocare date.'),
-            ),
-          );
-        }
+      setState(() {
+        _imageUrl = url;
+      });
+    }
+
+    try {
+      await _firebase.update({
+        'location': _addressController.text,
+        'phone': _phoneController.text,
+        'email': _emailController.text,
+        'website': _websiteController.text,
+        'capacity': int.tryParse(_capacityController.text),
+        'tarife': _imageUrl,
+      });
+    } on FirebaseException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message ?? 'Eroare stocare date.'),
+          ),
+        );
       }
     }
   }
 
   Future<void> _selectImage() async {
-    XFile? selectedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    XFile? selectedImage = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
 
     if (selectedImage != null) {
       setState(() {
@@ -199,12 +209,27 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                   return null;
                                 },
                               ),
+                              TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: 'Capacitate',
+                                ),
+                                controller: _capacityController,
+                                enabled: _isEditable,
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Introduceți un număr întreg.';
+                                  }
+
+                                  return null;
+                                },
+                              ),
                               const SizedBox(height: 20),
                               GestureDetector(
                                 onTap: _isEditable ? _selectImage : null,
                                 child: Container(
-                                  width: 140,
-                                  height: 160,
+                                  width: 260,
+                                  height: 300,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),

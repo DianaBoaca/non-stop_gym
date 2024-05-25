@@ -50,16 +50,16 @@ class AdminHomeScreen extends StatelessWidget {
             route: const ClassesListScreen(),
           ),
           CustomContainer(
-            icon: Icons.contact_page,
-            title: 'Date de contact',
-            color: Theme.of(context).colorScheme.primary,
-            route: const ContactDetailsScreen(),
-          ),
-          CustomContainer(
             icon: Icons.rule,
             title: 'Regulament',
-            color: Theme.of(context).colorScheme.tertiary,
+            color: Theme.of(context).colorScheme.primary,
             route: const AdminRuleScreen(),
+          ),
+          CustomContainer(
+            icon: Icons.contact_page,
+            title: 'Date de contact',
+            color: Theme.of(context).colorScheme.tertiary,
+            route: const ContactDetailsScreen(),
           ),
         ],
       ),
