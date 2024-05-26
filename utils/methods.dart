@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart';
 
 Future<String> getUserName(DocumentReference<Map<String, dynamic>> ref) async {
-  DocumentSnapshot<Map<String, dynamic>> trainer = await ref.get();
+  DocumentSnapshot<Map<String, dynamic>> user = await ref.get();
 
-  if (trainer.exists) {
-    Map<String, dynamic> trainerData = trainer.data()!;
+  if (user.exists) {
+    Map<String, dynamic> trainerData = user.data()!;
 
     return '${trainerData['lastName']} ${trainerData['firstName']}';
   }

@@ -12,7 +12,7 @@ class AdminRuleScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reguli și sfaturi'),
+        title: const Text('Regulament'),
         actions: [
           IconButton(
             onPressed: () {
@@ -28,7 +28,10 @@ class AdminRuleScreen extends StatelessWidget {
         ],
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('rules').orderBy('title').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('rules')
+            .orderBy('title')
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -71,9 +74,8 @@ class AdminRuleScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: RuleListTile(ruleSnapshot: rules[index]),
+              child: RuleListTile(
+                ruleSnapshot: rules[index],
               ),
             ),
           );

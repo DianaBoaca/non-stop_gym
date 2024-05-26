@@ -78,7 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
         return _isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(
-                mainAxisAlignment: _isClient ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.center,
+                mainAxisAlignment: _isClient
+                    ? MainAxisAlignment.spaceEvenly
+                    : MainAxisAlignment.center,
                 children: [
                   if (_isClient) ClientCard(user: _clientSnapshot),
                   BusyIndicator(

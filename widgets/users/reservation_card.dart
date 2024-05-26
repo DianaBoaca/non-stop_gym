@@ -35,6 +35,8 @@ class _ReservationCardState extends State<ReservationCard> {
 
       if (widget.position == 0) {
         upgradeFirstWaitingToReserved(widget.classSnapshot);
+      } else {
+        widget.classSnapshot.reference.update({'reserved': FieldValue.increment(-1)});
       }
     } on FirebaseException catch (error) {
       if (mounted) {

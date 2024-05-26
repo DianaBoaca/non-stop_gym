@@ -71,12 +71,11 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
             .collection('classes')
             .doc(widget.fitnessClass.id)
             .get();
-    Map<String, dynamic> classMap = classSnapshot.data()!;
     QuerySnapshot<Map<String, dynamic>> existingReservations =
         await FirebaseFirestore.instance
             .collection('reservations')
             .where('client', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-            .where('date', isEqualTo: classMap['date'])
+            .where('date', isEqualTo: classSnapshot['date'])
             .get();
     DocumentSnapshot<Map<String, dynamic>> userSnapshot =
         await FirebaseFirestore.instance
@@ -87,35 +86,35 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
     try {
       if (userSnapshot['role'] == 'trainer') {
         if (await verifyTrainerAvailability(
-                '',
-                userSnapshot.reference,
-                classMap['date'].toDate(),
-                convertToTimeOfDay(classMap['start']),
-                convertToTimeOfDay(classMap['end']))
+            '',
+            userSnapshot.reference,
+            classSnapshot['date'].toDate(),
+            convertToTimeOfDay(classSnapshot['start']),
+            convertToTimeOfDay(classSnapshot['end']))
             == false) {
           _showMessage('Sunteți înscris la o altă clasă în acest interval!');
           return;
         }
       } else {
         if (await verifyHours(
-                '',
-                existingReservations.docs,
-                classMap['date'].toDate(),
-                convertToTimeOfDay(classMap['start']),
-                convertToTimeOfDay(classMap['end']))
+            '',
+            existingReservations.docs,
+            classSnapshot['date'].toDate(),
+            convertToTimeOfDay(classSnapshot['start']),
+            convertToTimeOfDay(classSnapshot['end']))
             == false) {
           _showMessage('Sunteți înscris la o altă clasă în acest interval!');
           return;
         }
       }
 
-      if (classMap['reserved'] < classMap['capacity']) {
+      if (classSnapshot['reserved'] < classSnapshot['capacity']) {
         await FirebaseFirestore.instance.collection('reservations').add({
           'class': classSnapshot.reference,
           'client': userSnapshot.reference,
-          'date': classMap['date'],
-          'start': classMap['start'],
-          'end': classMap['end'],
+          'date': classSnapshot['date'],
+          'start': classSnapshot['start'],
+          'end': classSnapshot['end'],
         });
 
         await classSnapshot.reference.update({'reserved': FieldValue.increment(1)});
@@ -151,11 +150,11 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance
+      child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance
             .collection('classes')
             .doc(widget.fitnessClass.id)
-            .get(),
+            .snapshots(),
         builder: (context, snapshot) {
           return SingleChildScrollView(
             child: Card(
