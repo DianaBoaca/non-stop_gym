@@ -17,9 +17,7 @@ class RuleCard extends StatelessWidget {
       child: ListTile(
         leading: const Icon(
           Icons.rule,
-          color: Color.fromARGB(
-            255, 156, 124, 222,
-          ),
+          color: Color.fromARGB(255, 156, 124, 222),
         ),
         title: Text(
           ruleSnapshot['title'],

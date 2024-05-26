@@ -11,11 +11,11 @@ class ReservedClientsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      future: FirebaseFirestore.instance
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
           .collection('reservations')
           .where('class', isEqualTo: classSnapshot.reference)
-          .get(),
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting ||
             snapshot.data!.docs.isEmpty) {
@@ -43,7 +43,7 @@ class ReservedClientsList extends StatelessWidget {
                   reservations.isNotEmpty
                       ? ListView.builder(
                           shrinkWrap: true,
-                          itemCount: classSnapshot['reserved'],
+                          itemCount: reservations.length,
                           itemBuilder: (context, index) {
                             return FutureBuilder<String>(
                               future: getUserName(reservations[index].data()['client']),

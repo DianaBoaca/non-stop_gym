@@ -8,36 +8,28 @@ class AdminReservedClientsList extends StatefulWidget {
   final DocumentSnapshot<Map<String, dynamic>> classSnapshot;
 
   @override
-  State<AdminReservedClientsList> createState() => _AdminReservedClientsListState();
+  State<AdminReservedClientsList> createState() =>
+      _AdminReservedClientsListState();
 }
 
 class _AdminReservedClientsListState extends State<AdminReservedClientsList> {
-  int _counter = 0;
-
   @override
   void initState() {
     super.initState();
-    _loadData();
   }
 
-  Future<void> _loadData() async {
-    setState(() {
-     _counter = widget.classSnapshot['reserved'];
-    });
-  }
-
-  Future<void> _cancelReservation(DocumentSnapshot<Map<String, dynamic>> reservationsSnapshot) async {
+  Future<void> _cancelReservation(
+      DocumentSnapshot<Map<String, dynamic>> reservationsSnapshot) async {
     int position = await calculatePosition(reservationsSnapshot);
 
     try {
       reservationsSnapshot.reference.delete();
 
-      setState(() {
-        _counter = _counter - 1;
-      });
-
       if (position == 0) {
         upgradeFirstWaitingToReserved(widget.classSnapshot);
+      } else {
+        widget.classSnapshot.reference
+            .update({'reserved': FieldValue.increment(-1)});
       }
     } on FirebaseException catch (error) {
       if (mounted) {
@@ -65,15 +57,17 @@ class _AdminReservedClientsListState extends State<AdminReservedClientsList> {
         }
 
         if (snapshot.hasError) {
-          return const  Text('Eroare!');
+          return const Text('Eroare!');
         }
+
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> reservations = snapshot.data!.docs;
 
         return ListView.builder(
             shrinkWrap: true,
-            itemCount: _counter,
+            itemCount: reservations.length,
             itemBuilder: (context, index) {
               return FutureBuilder<String>(
-                  future: getUserName(snapshot.data!.docs[index]['client']),
+                  future: getUserName(reservations[index]['client']),
                   builder: (context, nameSnapshot) {
                     if (nameSnapshot.connectionState == ConnectionState.waiting ||
                         nameSnapshot.data!.isEmpty) {
@@ -102,7 +96,7 @@ class _AdminReservedClientsListState extends State<AdminReservedClientsList> {
                         ),
                         TextButton(
                           onPressed: () {
-                            _cancelReservation(snapshot.data!.docs[index]);
+                            _cancelReservation(reservations[index]);
                           },
                           child: const Text("X"),
                         ),
