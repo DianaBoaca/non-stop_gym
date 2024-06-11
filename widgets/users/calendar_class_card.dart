@@ -126,6 +126,9 @@ class _CalendarClassCardState extends State<CalendarClassCard> {
         await FirebaseFirestore.instance.collection('waitingList').add({
           'class': classSnapshot.reference,
           'client': userSnapshot.reference,
+          'date': classSnapshot['date'],
+          'start': classSnapshot['start'],
+          'end': classSnapshot['end'],
           'time': DateTime.now(),
         });
 

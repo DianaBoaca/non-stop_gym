@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _setNotifications() async {
     await FirebaseMessaging.instance.requestPermission();
     String? token = await FirebaseMessaging.instance.getToken();
+
     if (FirebaseAuth.instance.currentUser != null) {
       await FirebaseFirestore.instance
           .collection('users')

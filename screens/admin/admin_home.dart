@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:non_stop_gym/screens/admin/trainers_list.dart';
+import 'package:non_stop_gym/screens/admin/users_list.dart';
 import '../../widgets/admin/custom_container.dart';
 import '../authentication.dart';
 import 'admin_contact_details.dart';
