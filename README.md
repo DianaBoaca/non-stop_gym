@@ -20,11 +20,15 @@ Proiectul include următoarele directoare și fișiere:
 ## Pașii de instalare și compilare a aplicației
 
 1. **Clonarea repository-ului:**
+   
    git clone https://github.com/DianaBoaca/non-stop_gym
+   
    cd non-stop_gym
-2. **Instalarea dependențelor:**
+3. **Instalarea dependențelor:**
+   
    După instalarea SDK-ului Flutter:
    flutter pub get
-3. **Lansarea aplicației:**
+5. **Lansarea aplicației:**
+   
    După deschiderea unui emulator sau conectarea unui dispozitiv Android:
    flutter run
