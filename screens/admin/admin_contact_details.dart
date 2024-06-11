@@ -65,9 +65,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     String url = '';
 
     if (_selectedImageFile != null) {
-      Reference storageRef = FirebaseStorage.instance.ref()
-          .child('tarife')
-          .child('tarife2024');
+      Reference storageRef = FirebaseStorage.instance.ref().child('tarife').child('tarife2024');
       await storageRef.putFile(_selectedImageFile!);
       url = await storageRef.getDownloadURL();
 

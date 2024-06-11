@@ -24,19 +24,17 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
 
   Future<void> _submit() async {
+    UserCredential userCredentials;
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) return;
-
     _formKey.currentState!.save();
 
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      UserCredential userCredentials;
-
       if (_isLogin) {
         userCredentials = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _enteredEmail,
@@ -63,10 +61,8 @@ class _AuthScreenState extends State<AuthScreen> {
       }
 
       DocumentSnapshot<Map<String, dynamic>> userSnapshot = await FirebaseFirestore
-          .instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get();
+          .instance.collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid).get();
 
       if (userSnapshot['role'] == 'client') {
         _route(

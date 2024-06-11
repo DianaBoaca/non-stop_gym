@@ -58,12 +58,10 @@ Future<bool> verifyHours(String id, List existingClasses, DateTime date,
           doc['end'].toDate().isAfter(convertToDateTime(date, start))) {
         existingClassBeforeStart = true;
       }
-
       if (doc['start'].toDate().isBefore(convertToDateTime(date, end)) &&
           doc['end'].toDate().isAfter(convertToDateTime(date, end))) {
         existingClassAfterStart = true;
       }
-
       if (doc['start'].toDate().isAfter(convertToDateTime(date, start)) &&
           doc['start'].toDate().isBefore(convertToDateTime(date, end))) {
         existingClass = true;
@@ -74,7 +72,6 @@ Future<bool> verifyHours(String id, List existingClasses, DateTime date,
   if (existingClassBeforeStart || existingClassAfterStart || existingClass) {
     return false;
   }
-
   return true;
 }
 
