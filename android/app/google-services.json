@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "224380999505",
+    "project_id": "licenta-723b6",
+    "storage_bucket": "licenta-723b6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224380999505:android:287da1f2d960011cc06570",
+        "android_client_info": {
+          "package_name": "com.example.non_stop_gym"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdIZ4FLMD5fexWzAszOeQKMczLfM4HdE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
