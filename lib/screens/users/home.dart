@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/users/busy_indicator.dart';
+import '../../widgets/users/crowd_indicator.dart';
 import '../../widgets/client/client_card.dart';
 import '../../widgets/users/contact_details.dart';
 
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     : MainAxisAlignment.center,
                 children: [
                   if (_isClient) ClientCard(user: _clientSnapshot),
-                  BusyIndicator(
+                  CrowdIndicator(
                     checkedInClients: _checkedInClients,
                     capacity: _contactSnapshot['capacity'],
                   ),

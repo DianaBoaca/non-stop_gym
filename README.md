@@ -17,7 +17,7 @@ Proiectul include următoarele directoare și fișiere:
 - `android/` - Configurația specifice pentru platforma Android
 - `assets/` - Resursele aplicației (imagini)
 
-## Pașii de instalare și compilare a aplicației
+## Pașii de instalare și lansare a aplicației
 
 1. **Clonarea repository-ului:**
    
