@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class BusyIndicator extends StatefulWidget {
-  const BusyIndicator({
+class CrowdIndicator extends StatefulWidget {
+  const CrowdIndicator({
     super.key,
     required this.checkedInClients,
     required this.capacity,
@@ -11,10 +11,10 @@ class BusyIndicator extends StatefulWidget {
   final int capacity;
 
   @override
-  State<BusyIndicator> createState() => _BusyIndicatorState();
+  State<CrowdIndicator> createState() => _CrowdIndicatorState();
 }
 
-class _BusyIndicatorState extends State<BusyIndicator> {
+class _CrowdIndicatorState extends State<CrowdIndicator> {
   final List<int> _emojis = [0x1F60A, 0x1F605, 0x1F633];
   final List<String> _texts = [
     'Deloc aglomerat',
