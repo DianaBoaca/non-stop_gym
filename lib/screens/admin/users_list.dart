@@ -14,7 +14,7 @@ class UsersListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(showTrainers ? 'Antrenori' : 'Clienti'),
+        title: Text(showTrainers ? 'Antrenori' : 'Clienți'),
         actions: showTrainers ? [
           IconButton(
             onPressed: () {
