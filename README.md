@@ -13,7 +13,7 @@ Adresa repository-ului este: https://github.com/DianaBoaca/non-stop_gym.
 Proiectul include următoarele directoare și fișiere:
 
 - `lib/` - Codul sursă al aplicației
-- `pubspec.yaml` - Fișierul care conține dependențelor proiectului
+- `pubspec.yaml` - Fișierul care conține dependințele proiectului
 - `android/` - Configurația specifice pentru platforma Android
 - `assets/` - Resursele aplicației (imagini, fonturi, etc.)
 
