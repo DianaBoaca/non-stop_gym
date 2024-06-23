@@ -13,8 +13,8 @@ Adresa repository-ului este: https://github.com/DianaBoaca/non-stop_gym.
 Proiectul include următoarele directoare și fișiere:
 
 - `lib/` - Codul sursă al aplicației
-- `pubspec.yaml` - Fișierul care conține dependințele proiectului
-- `android/` - Configurația specifice pentru platforma Android
+- `pubspec.yaml` - Fișierul care conține dependențele proiectului
+- `android/` - Configurații specifice pentru platforma Android
 - `assets/` - Resursele aplicației (imagini)
 
 ## Pașii de instalare și lansare a aplicației
@@ -24,7 +24,7 @@ Proiectul include următoarele directoare și fișiere:
    git clone https://github.com/DianaBoaca/non-stop_gym
    
    cd non-stop_gym
-2. **Instalarea dependințelor:**
+2. **Instalarea dependențelor:**
    
    După instalarea SDK-ului Flutter:
    flutter pub get
