@@ -15,7 +15,7 @@ Proiectul include următoarele directoare și fișiere:
 - `lib/` - Codul sursă al aplicației
 - `pubspec.yaml` - Fișierul care conține dependințele proiectului
 - `android/` - Configurația specifice pentru platforma Android
-- `assets/` - Resursele aplicației (imagini, fonturi, etc.)
+- `assets/` - Resursele aplicației (imagini)
 
 ## Pașii de instalare și compilare a aplicației
 
