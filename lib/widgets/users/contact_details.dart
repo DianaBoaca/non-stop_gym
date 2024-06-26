@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:non_stop_gym/widgets/users/custom_row.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 class ContactDetails extends StatefulWidget {
   const ContactDetails({
@@ -18,7 +19,7 @@ class ContactDetails extends StatefulWidget {
 }
 
 class ContactDetailsState extends State<ContactDetails> {
-  final String _apiKey = 'AIzaSyAjnIwY9BBxT-rT6g4qnv2xyqIR1FWqGho';
+  String _apiKey = '';
   double _lat = 0;
   double _long = 0;
 
@@ -28,7 +29,16 @@ class ContactDetailsState extends State<ContactDetails> {
     _getCoordinates();
   }
 
+  Future<void> _fetchApiKey() async {
+    final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+    await remoteConfig.fetchAndActivate();
+    setState(() {
+      _apiKey = remoteConfig.getString('Key');
+    });
+  }
+
   Future<void> _getCoordinates() async {
+    await _fetchApiKey();
     String address = widget.contactDetails['location'];
     Response response = await get(
       Uri.parse(
