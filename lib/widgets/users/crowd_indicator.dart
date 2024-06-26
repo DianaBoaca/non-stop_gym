@@ -29,7 +29,13 @@ class _CrowdIndicatorState extends State<CrowdIndicator> {
   void initState() {
     super.initState();
     setState(() {
-      _percentage = widget.checkedInClients / widget.capacity;
+
+      if (widget.checkedInClients >= widget.capacity) {
+        _percentage = 0.99;
+      } else {
+        _percentage = widget.checkedInClients / widget.capacity;
+      }
+
       if (_percentage <= 0.33) {
         _index = 0;
       } else if (_percentage <= 0.66) {
@@ -67,7 +73,7 @@ class _CrowdIndicatorState extends State<CrowdIndicator> {
                     ),
                   ),
                   Positioned(
-                    left: constraints.maxWidth * (_percentage),
+                    left: constraints.maxWidth * _percentage,
                     child: Container(
                       width: 5,
                       height: 30,

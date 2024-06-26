@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (!_isClient) const SizedBox(height: 50),
                   ContactDetails(contactDetails: _contactSnapshot),
                 ],
-        );
+              );
       },
     );
   }
