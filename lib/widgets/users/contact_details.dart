@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:non_stop_gym/widgets/users/custom_row.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
+
+import '../../utils/methods.dart';
 
 class ContactDetails extends StatefulWidget {
   const ContactDetails({
@@ -29,20 +30,12 @@ class ContactDetailsState extends State<ContactDetails> {
     _getCoordinates();
   }
 
-  Future<void> _fetchApiKey() async {
-    final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
-    await remoteConfig.fetchAndActivate();
-    setState(() {
-      _apiKey = remoteConfig.getString('Key');
-    });
-  }
-
   Future<void> _getCoordinates() async {
-    await _fetchApiKey();
+    String key = await fetchApiKey('Key');
     String address = widget.contactDetails['location'];
     Response response = await get(
       Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$_apiKey',
+        'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$key',
       ),
     );
 
@@ -55,6 +48,7 @@ class ContactDetailsState extends State<ContactDetails> {
           setState(() {
             _lat = data['results'][0]['geometry']['location']['lat'];
             _long = data['results'][0]['geometry']['location']['lng'];
+            _apiKey = key;
           });
         }
       }
